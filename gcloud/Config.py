@@ -42,11 +42,15 @@ _default_profile = {
     'use-status-icon': True,
     'use-notify': False,
     'first-run': True,
-    'store-password': False,
+    'save-dir': HOME_DIR,
+    'username': '',
+    'password': '',
+    'remember-password': False,
+    'auto-signin': False,
     }
 
 _base_conf = {
-    'default': 0,
+    'default': '',
     'profiles': [],
     }
 
@@ -77,7 +81,6 @@ def load_profile(profile_name):
         with open(path) as fh:
             return json.load(fh)
     else:
-        dump_profile(_default_profile)
         return _default_profile
 
 def dump_profile(profile):

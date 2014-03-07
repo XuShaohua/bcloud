@@ -41,6 +41,7 @@ def urlopen(url, headers={}, data=None):
         headers_merged[key] = headers[key]
     opener = urllib.request.build_opener()
     opener.addheaders = [(k, v) for k,v in headers_merged.items()]
+
     req = opener.open(url, data=data)
     encoding = req.headers.get('Content-encoding')
     req.data = req.read()
@@ -49,3 +50,35 @@ def urlopen(url, headers={}, data=None):
     elif encoding == 'deflate':
         req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
     return req
+
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+
+    def http_error_302(self, req, fp, code, msg, headers):
+        if 'location' in headers:
+            return headers['location']
+        elif 'uri' in headers:
+            return headers['uri']
+        else:
+            return ''
+
+    http_error_301 = http_error_302
+    http_error_303 = http_error_302
+    http_error_307 = http_error_302
+
+def urlopen_without_redirect(url, headers={}, data=None):
+    '''不处理重定向, 直接返回重定向后的地址
+    
+    在下载大文件时, 网盘服务器会进行一次302重定向, 如果不手动修改一下cookie,
+    就会被限速.
+    '''
+    headers_merged = copy.copy(default_headers)
+    for key in headers.keys():
+        headers_merged[key] = headers[key]
+    opener = urllib.request.build_opener(NoRedirectHandler)
+    opener.addheaders = [(k, v) for k,v in headers_merged.items()]
+
+    req = opener.open(url, data=data)
+    if isinstance(req, str):
+        return req
+    else:
+        return url

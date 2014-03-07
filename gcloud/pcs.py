@@ -177,7 +177,7 @@ def delete_trash(cookie, tokens, fidlist):
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
     content = req.data
-    return json.load(content.decode())
+    return json.loads(content.decode())
 
 def clear_trash(cookie, tokens):
     '''清空回收站, 将里面的所有文件都删除.'''
@@ -192,10 +192,10 @@ def clear_trash(cookie, tokens):
         'Cookie': cookie.header_output(),
         }, data=''.encode())
     content = req.data
-    return json.load(content.decode())
+    return json.loads(content.decode())
 
 
-def list_dir(path, cookie, tokens, page=1, num=100):
+def list_dir(cookie, tokens, path, page=1, num=100):
     '''得到一个目录中的所有文件的信息.'''
     timestamp = util.timestamp()
     url = ''.join([
@@ -217,7 +217,7 @@ def list_dir(path, cookie, tokens, page=1, num=100):
     content = req.data
     return json.loads(content.decode())
 
-def mkdir(path, cookie, tokens):
+def mkdir(cookie, tokens, path):
     '''创建一个目录.
 
     path 目录名, 绝对路径.
@@ -277,7 +277,7 @@ def rename(cookie, tokens, filelist):
         'Cookie': cookie.header_output(),
         }, data=data.encode())
     content = req.data
-    return json.load(content.decode())
+    return json.loads(content.decode())
 
 def move(cookie, tokens, filelist):
     '''移动文件/目录到新的位置.
@@ -349,7 +349,19 @@ def get_category(cookie, tokens, category):
     content = req.data
     return json.loads(content.decode())
 
-def download(pcs_file, targ_path, cookie, range_=None):
+def get_download_link(pcs_file, cookie):
+    '''在下载之前, 要先获取最终的下载链接, 因为中间要进行一次302跳转.
+
+    这一步是为了得到最终的下载地址. 如果得不到最终的下载地址, 那下载速度就
+    会受到很大的限制.
+    '''
+    url = pcs_file['dlink'] + cookie.get('cflag').value
+    return net.urlopen_without_redirect(url, headers={
+            'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'cflag'),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            })
+
+def download(url, targ_path, cookie, range_=None):
     '''以普通方式下载文件.
 
     如果指定range的话, 可以下载指定的数据段.
@@ -360,7 +372,6 @@ def download(pcs_file, targ_path, cookie, range_=None):
 
     @return 
     '''
-    url = pcs_file['dlink'] + cookie.get('cflag').value
     headers = {'Cookie': cookie.header_output()}
     if range_:
         headers['Range'] = range_
@@ -370,7 +381,9 @@ def download(pcs_file, targ_path, cookie, range_=None):
         fh.write(content)
 
 def main():
-    cookie, tokens = auth.get_auth_info(refresh=False)
+    username = 'leeh3oDog9ee@163.com'
+    password = 'soz5mae4Neegae'
+    cookie, tokens = auth.get_auth_info(username, password, refresh=False)
 
     #timestamp = util.timestamp()
     #cookie.load('Hm_lvt_773fea2ac036979ebb5fcc768d8beb67=' + timestamp)
@@ -383,8 +396,9 @@ def main():
     #quota = get_quota(cookie, tokens)
     #print(quota)
 
-    #dirs = list_dir('/', cookie, tokens)
-    #print(dirs)
+    dirs = list_dir('/', cookie, tokens)
+    import pprint
+    pprint.pprint(dirs)
 
     #category = 3  # 图片
     #get_category(cookie, tokens, category)
@@ -392,29 +406,6 @@ def main():
     #path = '/dir8'
     #mkdir(path, cookie, tokens)
     
-#    pcs_file = {
-#        "server_ctime": 1393866365, 
-#        "path": "/Sunset.jpg", 
-#        "local_ctime": 1393866365, 
-#        "isdir": 0, 
-#        "size": 71189, 
-#        "server_filename": "Sunset.jpg", 
-#        "local_mtime": 1393866365, 
-#        "thumbs": {
-#            "icon": "http://d.pcs.baidu.com/thumbnail/1bc5b77f3e50b7fbe12c792ee438da45?fid=3410308862-250528-220763851904839&time=1394001097&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-s7RCGjwE0Mzu0Uo%2B7luOrLZlmWM%3D&expires=8h&prisign=RK9dhfZlTqV5TuwkO5ihMQzlM241kT2YUQhdvbwlbJYQv4BYX872LQQoEnFZymjKCCF38VFK3hV/C52M6xEPYvWj37uMHT3tJ+qFUcaYFa6JKh0IbmkaVK3lFdyvk37YNlAoJAj/96Q=&r=829038956&size=c60_u60&quality=100", 
-#            "url1": "http://d.pcs.baidu.com/thumbnail/1bc5b77f3e50b7fbe12c792ee438da45?fid=3410308862-250528-220763851904839&time=1394001097&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-s7RCGjwE0Mzu0Uo%2B7luOrLZlmWM%3D&expires=8h&prisign=RK9dhfZlTqV5TuwkO5ihMQzlM241kT2YUQhdvbwlbJYQv4BYX872LQQoEnFZymjKCCF38VFK3hV/C52M6xEPYvWj37uMHT3tJ+qFUcaYFa6JKh0IbmkaVK3lFdyvk37YNlAoJAj/96Q=&r=829038956&size=c140_u90&quality=100", 
-#            "url3": "http://d.pcs.baidu.com/thumbnail/1bc5b77f3e50b7fbe12c792ee438da45?fid=3410308862-250528-220763851904839&time=1394001097&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-s7RCGjwE0Mzu0Uo%2B7luOrLZlmWM%3D&expires=8h&prisign=RK9dhfZlTqV5TuwkO5ihMQzlM241kT2YUQhdvbwlbJYQv4BYX872LQQoEnFZymjKCCF38VFK3hV/C52M6xEPYvWj37uMHT3tJ+qFUcaYFa6JKh0IbmkaVK3lFdyvk37YNlAoJAj/96Q=&r=829038956&size=c850_u580&quality=100", 
-#            "url2": "http://d.pcs.baidu.com/thumbnail/1bc5b77f3e50b7fbe12c792ee438da45?fid=3410308862-250528-220763851904839&time=1394001097&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-s7RCGjwE0Mzu0Uo%2B7luOrLZlmWM%3D&expires=8h&prisign=RK9dhfZlTqV5TuwkO5ihMQzlM241kT2YUQhdvbwlbJYQv4BYX872LQQoEnFZymjKCCF38VFK3hV/C52M6xEPYvWj37uMHT3tJ+qFUcaYFa6JKh0IbmkaVK3lFdyvk37YNlAoJAj/96Q=&r=829038956&size=c360_u270&quality=100"
-#        }, 
-#        "category": 3, 
-#        "md5": "1bc5b77f3e50b7fbe12c792ee438da45", 
-#        "dlink": "http://d.pcs.baidu.com/file/1bc5b77f3e50b7fbe12c792ee438da45?fid=3410308862-250528-220763851904839&time=1394001097&rt=pr&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-2d4IZL%2BtscL08w0Dy4NJpMqmW44%3D&expires=8h&prisign=RK9dhfZlTqV5TuwkO5ihMQzlM241kT2YUQhdvbwlbJYQv4BYX872LQQoEnFZymjKCCF38VFK3hV/C52M6xEPYvWj37uMHT3tJ+qFUcaYFa6JKh0IbmkaVK3lFdyvk37YNlAoJAj/96Q=&r=130005106", 
-#        "server_mtime": 1393866365, 
-#        "fs_id": 220763851904839
-#        }
-    #targ_path = '/tmp/foo.jpg'
-    #download(pcs_file, targ_path, cookie)
-
     #list_inbox(cookie, tokens)
 
     #trash_files = list_trash(cookie, tokens)

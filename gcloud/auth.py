@@ -155,16 +155,19 @@ def get_bdstoken(cookie):
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     return parse_bdstoken(req.data.decode())
 
-def get_auth_info(refresh=False):
+def get_auth_info(username, password, refresh=False):
+    '''获取授权信息.
+
+    username - 用户名
+    password - 明文密码
+    refresh - 这个参数只用于测试, 会自动将敏感的授权信息保存起来.
+    '''
     auth_info_file = '/tmp/auth_info.json'
     if not refresh and os.path.exists(auth_info_file):
         with open(auth_info_file, 'r') as fh:
             cookie_str, tokens = json.load(fh)
             cookie = RequestCookie(cookie_str)
             return (cookie, tokens)
-
-    username = 'leeh3oDog9ee@163.com'
-    password = 'soz5mae4Neegae'
 
     cookie = RequestCookie()
     cookie.load('cflag=65535%3A1; PANWEB=1;')
@@ -174,7 +177,7 @@ def get_auth_info(refresh=False):
     status = check_login(cookie, token, username)
     if status != 0:
         print('Error: failed to check login!')
-        return
+        return (None, None)
     cookie.load_list(get_bduss(cookie, token, username, password))
     tokens = get_bdstoken(cookie)
     tokens['token'] = token
@@ -184,7 +187,9 @@ def get_auth_info(refresh=False):
     return (cookie, tokens)
 
 def main():
-    print(get_auth_info())
+    username = 'leeh3oDog9ee@163.com'
+    password = 'soz5mae4Neegae'
+    print(get_auth_info(username, password))
 
 if __name__ == '__main__':
     main()

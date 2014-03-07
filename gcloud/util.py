@@ -4,6 +4,7 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import os
 import random
 import time
 
@@ -18,3 +19,21 @@ def latency():
     我们需要随机生成它.
     '''
     return str(random.random())[:7]
+
+def rec_split_path(path):
+    '''将一个路径进行分隔, 分别得到每父母的绝对路径及目录名'''
+    result = []
+    while path != '/':
+        parent, name = os.path.split(path)
+        result.append((path, name))
+        path = parent
+    result.append(('/', '/'))
+    result.reverse()
+    return result
+
+
+def main():
+    print(rec_split_path('/usr/share/icons/gnome'))
+
+if __name__ == '__main__':
+    main()

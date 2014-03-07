@@ -13,6 +13,9 @@ from gi.repository import Gtk
 import Config
 Config.check_first()
 _ = Config._
+from MimeProvider import MimeProvider
+from PreferencesDialog import PreferencesDialog
+
 from BTPage import BTPage
 from CloudPage import CloudPage
 from DownloadPage import DownloadPage
@@ -23,6 +26,7 @@ from MusicPage import MusicPage
 from OtherPage import OtherPage
 from PicturePage import PicturePage
 from SharePage import SharePage
+from SigninDialog import SigninDialog
 from TrashPage import TrashPage
 from UploadPage import UploadPage
 from VideoPage import VideoPage
@@ -32,16 +36,21 @@ DBUS_APP_NAME = 'org.liulang.gcloud'
 
 class App:
 
+    profile = None
+    cookie = None
+    tokens = None
+
     def __init__(self):
         self.app = Gtk.Application.new(DBUS_APP_NAME, 0)
         self.app.connect('startup', self.on_app_startup)
         self.app.connect('activate', self.on_app_activate)
         self.app.connect('shutdown', self.on_app_shutdown)
 
+    def on_app_startup(self, app):
         self.icon_theme = Gtk.IconTheme.new()
         #self.icon_theme.append_search_path(Config.ICON_PATH)
+        self.mime = MimeProvider(self)
 
-    def on_app_startup(self, app):
         self.window = Gtk.ApplicationWindow(application=app)
         self.window.set_default_size(*Config._default_profile['window-size'])
         self.window.set_title(Config.APPNAME)
@@ -73,9 +82,12 @@ class App:
         nav_col.set_attributes(pix_cell, icon_name=0)
         nav_col.set_attributes(name_cell, text=1)
         nav_treeview.append_column(nav_col)
+        nav_selection = nav_treeview.get_selection()
+        nav_selection.connect('changed', self.on_nav_selection_changed)
         nav_window.add(nav_treeview)
 
         self.notebook = Gtk.Notebook()
+        self.notebook.props.show_tabs = False
         paned.add2(self.notebook)
 
         self.init_notebook()
@@ -83,11 +95,27 @@ class App:
         self.init_status_icon()
 
     def on_app_activate(self, app):
+        print('on_app_activate')
         self.window.show_all()
+        signin = SigninDialog(self)
+        signin.run()
+        signin.destroy()
+
+        if self.profile and self.profile['first-run']:
+            self.profile['first-run'] = False
+            preferences = PreferencesDialog(self)
+            preferences.run()
+            preferences.destroy()
+
+        if self.tokens and self.cookie:
+            self.switch_page_by_name('Home')
+            page = self.get_page_by_name('Home')
+            self.get_page_by_name('Home').init()
 
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
-        pass
+        if self.profile:
+            Config.dump_profile(self.profile)
 
     def run(self, argv):
         self.app.run(argv)
@@ -97,36 +125,65 @@ class App:
         self.app.quit()
 
     def on_main_window_resized(self, window):
-        pass
+        if self.profile:
+            self.profile['window-size'] = window.get_size()
 
     def on_main_window_deleted(self, window, event):
         pass
 
     def init_notebook(self):
-        app = self.app
-        self.pages = [
-            HomePage(app),
-            PicturePage(app),
-            DocPage(app),
-            VideoPage(app),
-            BTPage(app),
-            MusicPage(app),
-            OtherPage(app),
-            SharePage(app),
-            InboxPage(app),
-            TrashPage(app),
-            CloudPage(app),
-            DownloadPage(app),
-            UploadPage(app),
-            ]
+        self.page_names = (
+            'Home', 'Picture', 'Doc', 'Video', 'BT', 'Music', 'Other',
+            'Share', 'Inbox', 'Trash', 'Cloud', 'Download', 'Upload',
+            )
+        self.pages = (
+            HomePage(self),
+            PicturePage(self),
+            DocPage(self),
+            VideoPage(self),
+            BTPage(self),
+            MusicPage(self),
+            OtherPage(self),
+            SharePage(self),
+            InboxPage(self),
+            TrashPage(self),
+            CloudPage(self),
+            DownloadPage(self),
+            UploadPage(self),
+            )
         for page in self.pages:
             page.page_num = self.notebook.append_page(
                     page, Gtk.Label(page.disname))
             self.nav_liststore.append([
                 page.icon_name, page.disname, page.tooltip])
 
-    def on_notebook_switched(self, notebook, page, page_num):
+    def get_page_by_name(self, name):
+        index = self.page_names.index(name)
+        return self.pages[index]
+
+    def reload_current_page(self, *args, **kwds):
+        '''重新载入当前页面.
+        
+        所有的页面都应该实现reload()方法.
+        '''
+        index = self.notebook.get_current_page()
+        self.pages[index].reload()
+
+    def switch_page_by_name(self, name):
+        index = self.page_names.index(name)
+        self.switch_page_by_index(index)
+
+    def switch_page_by_index(self, index):
+        self.notebook.set_current_page(index)
+
+    def on_notebook_switched(self, notebook, page, num):
         pass
+
+    def on_nav_selection_changed(self, nav_selection):
+        model, iter_ = nav_selection.get_selected()
+        path = model.get_path(iter_)
+        index = path.get_indices()[0]
+        self.switch_page_by_index(index)
 
     def init_status_icon(self):
         pass
