@@ -223,6 +223,8 @@ def mkdir(cookie, tokens, path):
     path 目录名, 绝对路径.
     @return 返回一个dict, 里面包含了fs_id, ctime等信息.
     '''
+    print('pcs.mkdir()--')
+    print(path)
     url = ''.join([
         const.PAN_API_URL, 
         'create?a=commit&channel=chunlei&clienttype=0&web=1',
@@ -237,6 +239,7 @@ def mkdir(cookie, tokens, path):
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
     content = req.data
+    print(content)
     return json.loads(content.decode())
 
 def delete_files(cookie, tokens, filelist):

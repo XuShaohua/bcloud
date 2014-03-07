@@ -19,9 +19,10 @@ class RenameDialog(Gtk.Dialog):
                 _('Rename files'), app.window, Gtk.DialogFlags.MODAL,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                  Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.set_border_width(10)
+        self.set_default_response(Gtk.ResponseType.OK)
         self.app = app
 
-        self.set_border_width(10)
         box = self.get_content_area()
 
         grid = Gtk.Grid()
@@ -40,6 +41,7 @@ class RenameDialog(Gtk.Dialog):
             dir_name, name = os.path.split(path)
             old_entry = Gtk.Entry(text=name)
             old_entry.props.editable = False
+            old_entry.props.can_focus = False
             old_entry.set_tooltip_text(path)
             grid.attach(old_entry, 0, i, 1, 1)
             
@@ -56,7 +58,6 @@ class RenameDialog(Gtk.Dialog):
 
         这里, 会忽略掉那些名称没发生变化的文件.
         '''
-        print('do destroy')
         if response_id != Gtk.ResponseType.OK:
             return
         filelist = []

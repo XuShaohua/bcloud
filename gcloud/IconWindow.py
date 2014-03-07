@@ -13,6 +13,7 @@ from gi.repository import Gtk
 
 from gcloud import Config
 _ = Config._
+from gcloud.NewFolderDialog import NewFolderDialog
 from gcloud.RenameDialog import RenameDialog
 from gcloud import gutil
 
@@ -26,8 +27,6 @@ class IconWindow(Gtk.ScrolledWindow):
     其中的网络操作部分多半是异步进行的.
     '''
 
-    #page = 0
-    #path = '/'  # 当前的路径
     filelist = []
     pathlist = []
 
@@ -82,7 +81,6 @@ class IconWindow(Gtk.ScrolledWindow):
             self.liststore.append([pixbuf, disname, path, tooltip, type_])
 
     def on_iconview_item_activated(self, iconview, tree_path):
-        print('item activated:', tree_path)
         path = self.liststore[tree_path][PATH_COL]
         type_ = self.liststore[tree_path][TYPE_COL]
         if type_ == 'folder':
@@ -241,11 +239,12 @@ class IconWindow(Gtk.ScrolledWindow):
 
     # current folder popup menu
     def on_new_folder_activated(self, menu_item):
-        print('create new folder')
+        dialog = NewFolderDialog(self.parent, self.app, self.parent.path)
+        dialog.run()
+        dialog.destroy()
 
     def on_reload_activated(self, menu_item):
-        print('reload')
-        self.parent.load(self.path)
+        self.parent.reload()
 
     # item popup menu
     def on_launch_app_activated(self, menu_item, app_info):
@@ -275,7 +274,6 @@ class IconWindow(Gtk.ScrolledWindow):
         print('copy to...')
 
     def on_rename_activated(self, menu_item):
-        print('rename...')
         tree_paths = self.iconview.get_selected_items()
         if len(tree_paths) == 0:
             return
