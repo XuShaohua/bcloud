@@ -215,6 +215,8 @@ def list_dir(cookie, tokens, path, page=1, num=100):
         'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'PANWEB', 'cflag'),
         })
     content = req.data
+    import pprint
+    pprint.pprint(json.loads(content.decode()))
     return json.loads(content.decode())
 
 def mkdir(cookie, tokens, path):

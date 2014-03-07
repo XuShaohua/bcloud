@@ -14,6 +14,7 @@ from gi.repository import Gtk
 from gcloud import Config
 _ = Config._
 from gcloud.NewFolderDialog import NewFolderDialog
+from gcloud.PropertiesDialog import PropertiesDialog
 from gcloud.RenameDialog import RenameDialog
 from gcloud import gutil
 
@@ -289,4 +290,13 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def on_props_activated(self, menu_item):
         '''显示选中的文件或者当前目录的属性'''
-        print('show properties.')
+        tree_paths = self.iconview.get_selected_items()
+        if len(tree_paths) != 1:
+            return
+        tree_path = tree_paths[0]
+        index = tree_path.get_indices()[0]
+        pcs_file = self.filelist[index]
+        print(pcs_file)
+        dialog = PropertiesDialog(self.parent, self.app, pcs_file)
+        dialog.run()
+        dialog.destroy()

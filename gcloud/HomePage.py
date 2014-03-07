@@ -69,6 +69,8 @@ class HomePage(Gtk.Box):
         # search button
         search_button = Gtk.ToggleToolButton('Search')
         search_button.set_icon_name('folder-saved-search-symbolic')
+        search_button.set_tooltip_text(
+                _('Search documents and folders by name'))
         search_button.connect('toggled', self.on_search_button_toggled)
         nav_bar.insert(search_button, 1)
 
@@ -112,4 +114,9 @@ class HomePage(Gtk.Box):
         self.load(self.path)
 
     def on_search_button_toggled(self, search_button):
-        self.search_entry.props.visible = search_button.get_active()
+        status = search_button.get_active()
+        self.search_entry.props.visible = status
+        if status:
+            self.search_entry.grab_focus()
+        else:
+            self.reload()

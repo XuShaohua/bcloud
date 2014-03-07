@@ -8,6 +8,15 @@ import os
 import random
 import time
 
+SIZE_K = 2 ** 10
+SIZE_M = 2 ** 20
+SIZE_G = 2 ** 30
+SIZE_T = 2 ** 40
+DESI_K = SIZE_K / 10
+DESI_M = SIZE_M / 10
+DESI_G = SIZE_G / 10
+DESI_T = SIZE_T / 10
+
 def timestamp():
     '''返回当前的时间标记, 以毫秒为单位'''
     return str(int(time.time() * 1000))
@@ -31,9 +40,23 @@ def rec_split_path(path):
     result.reverse()
     return result
 
+def get_human_size(size):
 
-def main():
-    print(rec_split_path('/usr/share/icons/gnome'))
+    '''将文件大小转为人类可读的形式'''
+    assert size > 0, 'ValueError: size > 0'
+
+    size_kb = '{0:,}'.format(size)
+    if size < DESI_K:
+        return ('', size_kb)
+    if size < DESI_M:
+        return ('{0:.1f} kB'.format(size / SIZE_K), size_kb)
+    if size < DESI_G:
+        return ('{0:.1f} MB'.format(size / SIZE_M), size_kb)
+    if size < DESI_T:
+        return ('{0:.1f} GB'.format(size / SIZE_G), size_kb)
+    return ('{0:.1f} TB'.format(size / SIZE_T), size_kb)
 
 if __name__ == '__main__':
-    main()
+    num = 3022788
+    num = 684
+    print(get_human_size(num))
