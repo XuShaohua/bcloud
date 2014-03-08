@@ -99,6 +99,9 @@ class HomePage(Gtk.Box):
         gutil.async_call(
                 pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
                 callback=self.icon_window.load)
+        gutil.async_call(
+                pcs.get_quota, self.app.cookie, self.app.tokens,
+                callback=self.app.update_quota)
 
     def load_next(self):
         '''载入下一页'''

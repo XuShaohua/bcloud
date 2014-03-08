@@ -296,7 +296,6 @@ class IconWindow(Gtk.ScrolledWindow):
         tree_path = tree_paths[0]
         index = tree_path.get_indices()[0]
         pcs_file = self.filelist[index]
-        print(pcs_file)
         dialog = PropertiesDialog(self.parent, self.app, pcs_file)
         dialog.run()
         dialog.destroy()

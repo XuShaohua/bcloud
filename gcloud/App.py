@@ -13,6 +13,7 @@ from gi.repository import Gtk
 import Config
 Config.check_first()
 _ = Config._
+import util
 from MimeProvider import MimeProvider
 from PreferencesDialog import PreferencesDialog
 
@@ -63,10 +64,13 @@ class App:
         paned = Gtk.Paned()
         self.window.add(paned)
 
+        left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+        paned.add1(left_box)
+
         nav_window = Gtk.ScrolledWindow()
         nav_window.props.hscrollbar_policy = Gtk.PolicyType.NEVER
         #nav_window.props.border_width = 5
-        paned.add1(nav_window)
+        left_box.pack_start(nav_window, True, True, 0)
 
         # icon_name, disname, tooltip
         self.nav_liststore = Gtk.ListStore(str, str, str)
@@ -85,6 +89,14 @@ class App:
         nav_selection = nav_treeview.get_selection()
         nav_selection.connect('changed', self.on_nav_selection_changed)
         nav_window.add(nav_treeview)
+
+        self.progressbar = Gtk.ProgressBar()
+        self.progressbar.set_show_text(True)
+        self.progressbar.set_text(_('Unknown'))
+        left_box.pack_end(self.progressbar, False, False, 0)
+
+        #self.spinner = Gtk.Spinner()
+        #left_box.pack_end(self.spinner, False, False, 0)
 
         self.notebook = Gtk.Notebook()
         self.notebook.props.show_tabs = False
@@ -130,6 +142,15 @@ class App:
 
     def on_main_window_deleted(self, window, event):
         pass
+
+    def update_quota(self, quota_info, error=None):
+        '''更新网盘容量信息'''
+        used = quota_info['used']
+        total = quota_info['total']
+        used_size, _ = util.get_human_size(used)
+        total_size, _ = util.get_human_size(total)
+        self.progressbar.set_text(used_size + ' / ' + total_size)
+        self.progressbar.set_fraction(used / total)
 
     def init_notebook(self):
         self.page_names = (

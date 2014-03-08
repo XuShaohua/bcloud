@@ -215,8 +215,6 @@ def list_dir(cookie, tokens, path, page=1, num=100):
         'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'PANWEB', 'cflag'),
         })
     content = req.data
-    import pprint
-    pprint.pprint(json.loads(content.decode()))
     return json.loads(content.decode())
 
 def mkdir(cookie, tokens, path):
@@ -401,9 +399,8 @@ def main():
     #quota = get_quota(cookie, tokens)
     #print(quota)
 
-    dirs = list_dir('/', cookie, tokens)
-    import pprint
-    pprint.pprint(dirs)
+    #dirs = list_dir('/', cookie, tokens)
+    #print(dirs)
 
     #category = 3  # 图片
     #get_category(cookie, tokens, category)
