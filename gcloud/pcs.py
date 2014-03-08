@@ -97,7 +97,6 @@ def disable_share(cookie, tokens, shareid_list):
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
     content = req.data
-    print(content)
     return json.loads(content.decode())
 
 
@@ -349,19 +348,21 @@ def get_category(cookie, tokens, category):
     content = req.data
     return json.loads(content.decode())
 
-def get_download_link(pcs_file, cookie):
+def get_download_link(cookie, dlink):
     '''在下载之前, 要先获取最终的下载链接, 因为中间要进行一次302跳转.
 
     这一步是为了得到最终的下载地址. 如果得不到最终的下载地址, 那下载速度就
     会受到很大的限制.
+
+    dlink - 在pcs_file里面的dlink项, 这个链接是一个临时下载链接.
     '''
-    url = pcs_file['dlink'] + cookie.get('cflag').value
+    url = dlink + cookie.get('cflag').value
     return net.urlopen_without_redirect(url, headers={
             'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'cflag'),
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             })
 
-def download(url, targ_path, cookie, range_=None):
+def download(cookie, url, targ_path, range_=None):
     '''以普通方式下载文件.
 
     如果指定range的话, 可以下载指定的数据段.
@@ -380,18 +381,29 @@ def download(url, targ_path, cookie, range_=None):
     with open(targ_path, 'wb') as fh:
         fh.write(content)
 
+def search(cookie, tokens, key, path='/'):
+    '''搜索全部文件, 根据文件名.
+
+    key - 搜索的关键词
+    path - 如果指定目录名的话, 只搜索本目录及其子目录里的文件名.
+    '''
+    url = ''.join([
+        const.PAN_API_URL,
+        'search?channel=chunlei&clienttype=0&web=1',
+        '&dir=', path,
+        '&key=', key,
+        '&recursion',
+        '&timeStamp=', util.latency(),
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    content = req.data
+    return json.loads(content.decode())
+
 def main():
     username = 'leeh3oDog9ee@163.com'
     password = 'soz5mae4Neegae'
     cookie, tokens = auth.get_auth_info(username, password, refresh=False)
-
-    #timestamp = util.timestamp()
-    #cookie.load('Hm_lvt_773fea2ac036979ebb5fcc768d8beb67=' + timestamp)
-    #cookie.load('Hm_lpvt_773fea2ac036979ebb5fcc768d8beb67=' + timestamp)
-    #cookie.load('Hm_lvt_b181fb73f90936ebd334d457c848c8b5=' + timestamp)
-    #cookie.load('Hm_lpvt_b181fb73f90936ebd334d457c848c8b5=' + timestamp)
-    #cookie.load('Hm_lvt_adf736c22cd6bcc36a1d27e5af30949e=' + timestamp)
-    #cookie.load('Hm_lpvt_adf736c22cd6bcc36a1d27e5af30949e=' + timestamp)
 
     #quota = get_quota(cookie, tokens)
     #print(quota)

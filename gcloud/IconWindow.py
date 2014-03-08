@@ -250,7 +250,31 @@ class IconWindow(Gtk.ScrolledWindow):
 
     # item popup menu
     def on_launch_app_activated(self, menu_item, app_info):
+        def open_video_link(link, error=None):
+            print('open video link:', link)
+            if error or not link:
+                return
+            app_info.launch_uris([link,], None)
+
         print('open with ', app_info.get_display_name())
+        # first, download this to load dir
+        # then open it with app_info
+        tree_paths = self.iconview.get_selected_items()
+        if len(tree_paths) != 1:
+            return
+        tree_path = tree_paths[0]
+        file_type = self.liststore[tree_path][TYPE_COL]
+        indices = tree_path.get_indices()
+        if not indices:
+            return
+        index = tree_path.get_indices()[0]
+        pcs_file = self.filelist[index]
+        if file_type.startswith('video'):
+            gutil.async_call(
+                    pcs.get_download_link, self.app.cookie,
+                    pcs_file['dlink'], callback=open_video_link)
+        else:
+            print('will download this link and launch app')
 
     def on_choose_app_activated(self, menu_item):
         print('choose app')
@@ -261,10 +285,26 @@ class IconWindow(Gtk.ScrolledWindow):
             self.parent.load(self.liststore[tree_paths][PATH_COL])
 
     def on_copy_link_activated(self, menu_item):
-        print('copy link to clipboard')
+        def copy_link_to_clipboard(link, error=None):
+            print('will copy link to clipboard:', link)
+            if error or not link:
+                return
+            clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+            clipboard.set_text(link, -1)
+
+        tree_paths = self.iconview.get_selected_items()
+        if len(tree_paths) != 1:
+            return
+        tree_path = tree_paths[0]
+        index = tree_path.get_indices()[0]
+        pcs_file = self.filelist[index]
+        gutil.async_call(
+                pcs.get_download_link, self.app.cookie, pcs_file['dlink'],
+                callback=copy_link_to_clipboard)
 
     def on_download_activated(self, menu_item):
         print('download activated')
+        # 下载文件与下载目录的操作是不相同的.
 
     def on_share_activated(self, menu_item):
         print('share activated')

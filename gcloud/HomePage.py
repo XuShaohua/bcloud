@@ -84,6 +84,8 @@ class HomePage(Gtk.Box):
             self.search_entry = Gtk.SearchEntry()
         self.search_entry.props.no_show_all = True
         self.search_entry.props.visible = False
+        self.search_entry.connect(
+                'activate', self.on_search_entry_activated)
         self.pack_start(self.search_entry, False, False, 0)
 
         self.icon_window = IconWindow(self, app)
@@ -121,3 +123,11 @@ class HomePage(Gtk.Box):
             self.search_entry.grab_focus()
         else:
             self.reload()
+
+    def on_search_entry_activated(self, search_entry):
+        text = search_entry.get_text()
+        if not text:
+            return
+        gutil.async_call(
+                pcs.search, self.app.cookie, self.app.tokens, text,
+                self.path, callback=self.icon_window.load)
