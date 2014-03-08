@@ -45,6 +45,7 @@ class HomePage(Gtk.Box):
     icon_name = 'go-home-symbolic'
     disname = _('Home')
     tooltip = _('Show all of your files on Cloud')
+    first_run = False
     page_num = 1
     path = '/'
     has_next = False
@@ -88,10 +89,7 @@ class HomePage(Gtk.Box):
         self.icon_window = IconWindow(self, app)
         self.pack_end(self.icon_window, True, True, 0)
 
-    def init(self):
-        self.load(self.path)
-
-    def load(self, path):
+    def load(self, path='/'):
         self.path = path
         self.page_num = 1
         self.has_next = False
@@ -112,7 +110,7 @@ class HomePage(Gtk.Box):
                 pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
                 callback=self.icon_window.load_next)
 
-    def reload(self):
+    def reload(self, *args, **kwds):
         '''重新载入本页面'''
         self.load(self.path)
 

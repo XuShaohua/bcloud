@@ -4,6 +4,7 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import datetime
 import os
 import random
 import time
@@ -43,11 +44,9 @@ def rec_split_path(path):
 def get_human_size(size):
 
     '''将文件大小转为人类可读的形式'''
-    assert size > 0, 'ValueError: size > 0'
-
     size_kb = '{0:,}'.format(size)
     if size < DESI_K:
-        return ('', size_kb)
+        return ('{0} B'.format(size), size_kb)
     if size < DESI_M:
         return ('{0:.1f} kB'.format(size / SIZE_K), size_kb)
     if size < DESI_G:
@@ -55,6 +54,12 @@ def get_human_size(size):
     if size < DESI_T:
         return ('{0:.1f} GB'.format(size / SIZE_G), size_kb)
     return ('{0:.1f} TB'.format(size / SIZE_T), size_kb)
+
+def get_delta_days(from_sec, to_sec):
+    '''计算两个时间节点之间的日期'''
+    seconds = abs(to_sec - from_sec)
+    delta = datetime.timedelta(seconds=seconds)
+    return delta.days
 
 if __name__ == '__main__':
     num = 3022788

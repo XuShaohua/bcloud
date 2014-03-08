@@ -17,6 +17,7 @@ from gcloud.NewFolderDialog import NewFolderDialog
 from gcloud.PropertiesDialog import PropertiesDialog
 from gcloud.RenameDialog import RenameDialog
 from gcloud import gutil
+from gcloud import pcs
 
 
 PIXBUF_COL, DISNAME_COL, PATH_COL, TOOLTIP_COL, TYPE_COL = list(range(5))
@@ -286,7 +287,15 @@ class IconWindow(Gtk.ScrolledWindow):
         dialog.destroy()
 
     def on_trash_activated(self, menu_item):
-        print('move to trash..')
+        tree_paths = self.iconview.get_selected_items()
+        if len(tree_paths) == 0:
+            return
+        path_list = []
+        for tree_path in tree_paths:
+            path_list.append(self.liststore[tree_path][PATH_COL])
+        gutil.async_call(
+                pcs.delete_files, self.app.cookie, self.app.tokens,
+                path_list, callback=self.parent.reload)
 
     def on_props_activated(self, menu_item):
         '''显示选中的文件或者当前目录的属性'''

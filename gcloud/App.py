@@ -77,13 +77,13 @@ class App:
         nav_treeview = Gtk.TreeView(model=self.nav_liststore)
         nav_treeview.props.headers_visible = False
         nav_treeview.set_tooltip_column(2)
-        pix_cell = Gtk.CellRendererPixbuf()
+        icon_cell = Gtk.CellRendererPixbuf()
         name_cell = Gtk.CellRendererText()
         nav_col = Gtk.TreeViewColumn.new()
         nav_col.set_title('Places')
-        nav_col.pack_start(pix_cell, False)
+        nav_col.pack_start(icon_cell, False)
         nav_col.pack_start(name_cell, True)
-        nav_col.set_attributes(pix_cell, icon_name=0)
+        nav_col.set_attributes(icon_cell, icon_name=0)
         nav_col.set_attributes(name_cell, text=1)
         nav_treeview.append_column(nav_col)
         nav_selection = nav_treeview.get_selection()
@@ -107,7 +107,6 @@ class App:
         self.init_status_icon()
 
     def on_app_activate(self, app):
-        print('on_app_activate')
         self.window.show_all()
         signin = SigninDialog(self)
         signin.run()
@@ -119,10 +118,8 @@ class App:
             preferences.run()
             preferences.destroy()
 
-        if self.tokens and self.cookie:
-            self.switch_page_by_name('Home')
-            page = self.get_page_by_name('Home')
-            self.get_page_by_name('Home').init()
+        home_page = self.get_page_by_name('Home')
+        home_page.load()
 
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
@@ -145,6 +142,8 @@ class App:
 
     def update_quota(self, quota_info, error=None):
         '''更新网盘容量信息'''
+        if not quota_info or quota_info['errno'] != 0:
+            return
         used = quota_info['used']
         total = quota_info['total']
         used_size, _ = util.get_human_size(used)
@@ -198,7 +197,9 @@ class App:
         self.notebook.set_current_page(index)
 
     def on_notebook_switched(self, notebook, page, num):
-        pass
+        if page.first_run:
+            page.load()
+            page.first_run = False
 
     def on_nav_selection_changed(self, nav_selection):
         model, iter_ = nav_selection.get_selected()
