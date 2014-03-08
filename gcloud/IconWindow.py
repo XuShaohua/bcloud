@@ -13,12 +13,12 @@ from gi.repository import Gtk
 
 from gcloud import Config
 _ = Config._
+from gcloud.FolderBrowserDialog import FolderBrowserDialog
 from gcloud.NewFolderDialog import NewFolderDialog
 from gcloud.PropertiesDialog import PropertiesDialog
 from gcloud.RenameDialog import RenameDialog
 from gcloud import gutil
 from gcloud import pcs
-
 
 PIXBUF_COL, DISNAME_COL, PATH_COL, TOOLTIP_COL, TYPE_COL = list(range(5))
 
@@ -270,10 +270,56 @@ class IconWindow(Gtk.ScrolledWindow):
         print('share activated')
 
     def on_moveto_activated(self, menu_item):
-        print('move to..')
+        tree_paths = self.iconview.get_selected_items()
+        if len(tree_paths) == 0:
+            return
+
+        dialog = FolderBrowserDialog(self.parent, self.app, _('Move to..'))
+        response = dialog.run()
+        targ_path = ''
+        if response == Gtk.ResponseType.OK:
+            targ_path = dialog.get_path()
+        dialog.destroy()
+        if not targ_path:
+            return
+
+        filelist = []
+        for tree_path in tree_paths:
+            filelist.append({
+                'path': self.liststore[tree_path][PATH_COL],
+                'dest': targ_path,
+                'newname': self.liststore[tree_path][DISNAME_COL],
+                })
+        gutil.async_call(
+                pcs.move,
+                self.app.cookie, self.app.tokens, filelist,
+                callback=self.parent.reload)
 
     def on_copyto_activated(self, menu_item):
-        print('copy to...')
+        tree_paths = self.iconview.get_selected_items()
+        if len(tree_paths) == 0:
+            return
+
+        dialog = FolderBrowserDialog(self.parent, self.app, _('Copy to..'))
+        response = dialog.run()
+        targ_path = ''
+        if response == Gtk.ResponseType.OK:
+            targ_path = dialog.get_path()
+        dialog.destroy()
+        if not targ_path:
+            return
+
+        filelist = []
+        for tree_path in tree_paths:
+            filelist.append({
+                'path': self.liststore[tree_path][PATH_COL],
+                'dest': targ_path,
+                'newname': self.liststore[tree_path][DISNAME_COL],
+                })
+        gutil.async_call(
+                pcs.copy,
+                self.app.cookie, self.app.tokens, filelist,
+                callback=self.parent.reload)
 
     def on_rename_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
