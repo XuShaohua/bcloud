@@ -355,12 +355,21 @@ def get_download_link(cookie, dlink):
     会受到很大的限制.
 
     dlink - 在pcs_file里面的dlink项, 这个链接是一个临时下载链接.
+
+    @return (red_url, request_id), red_url 是重定向后的URL, 如果获取失败,
+            就返回原来的dlink; request_id 是一个字符串, 用于下载文件时的认
+            证, 如果获取失败, 它的值就为空.
     '''
     url = dlink + cookie.get('cflag').value
-    return net.urlopen_without_redirect(url, headers={
+    req = net.urlopen_without_redirect(url, headers={
             'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'cflag'),
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept': const.ACCEPT_HTML,
             })
+    if not req:
+        return (url, '')
+    red_url = req.getheader('Location', url)
+    req_id = req.getheader('x-pcs-request-id', '')
+    return (red_url, req_id)
 
 def download(cookie, url, targ_path, range_=None):
     '''以普通方式下载文件.
@@ -380,6 +389,26 @@ def download(cookie, url, targ_path, range_=None):
     content = req.data
     with open(targ_path, 'wb') as fh:
         fh.write(content)
+
+def get_metas(cookie, tokens, filelist):
+    '''获取文件的metadata.
+
+    filelist - 一个list, 里面是文件的绝对路径.
+
+    @return 包含了文件的下载链接dlink, 通过它可以得到最终的下载链接.
+    '''
+    url = ''.join([
+        const.PAN_API_URL,
+        'filemetas?channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    data = 'dlink=1&target=' + encoder.encode_uri_component(json.dumps(filelist))
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.sub_output('BDUSS'),
+        'Content-type': const.CONTENT_FORM,
+        }, data=data.encode())
+    content = req.data
+    return json.loads(content.decode())
 
 def search(cookie, tokens, key, path='/'):
     '''搜索全部文件, 根据文件名.

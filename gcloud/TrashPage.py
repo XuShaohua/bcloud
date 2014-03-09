@@ -15,8 +15,8 @@ from gcloud import gutil
 from gcloud import pcs
 from gcloud import util
 
-(SELECT_COL, ICON_COL, DISNAME_COL, PATH_COL, FSID_COL, TOOLTIP_COL,
-    SIZE_COL, DELETING_COL, REMAINING_COL) = list(range(9))
+(ICON_COL, DISNAME_COL, PATH_COL, FSID_COL, TOOLTIP_COL,
+    SIZE_COL, DELETING_COL, REMAINING_COL) = list(range(8))
 MAX_DAYS = 10  # 10天后会自动从回收站中删除
 ICON_SIZE = 24
 
@@ -38,11 +38,6 @@ class TrashPage(Gtk.Box):
         control_box.props.margin_bottom = 10
         self.pack_start(control_box, False, False, 0)
 
-        select_all_button = Gtk.CheckButton(_('Select All'))
-        select_all_button.connect('toggled', self.on_select_all_toggled)
-        select_all_button.props.margin_right =  20
-        control_box.pack_start(select_all_button, False, False, 0)
-
         restore_button = Gtk.Button(_('Restore'))
         restore_button.connect('clicked', self.on_restore_button_clicked)
         control_box.pack_start(restore_button, False, False, 0)
@@ -63,23 +58,23 @@ class TrashPage(Gtk.Box):
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
 
-        # select, icon name, disname, path, fs_id, tooltip,
+        # icon name, disname, path, fs_id, tooltip,
         # size, deleting time, remaining days
         self.liststore = Gtk.ListStore(
-                bool, str, str, str, GObject.TYPE_ULONG, str,
+                str, str, str, GObject.TYPE_ULONG, str,
                 str, str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
+        selection = self.treeview.get_selection()
+        selection.set_mode(Gtk.SelectionMode.MULTIPLE)
+        self.treeview.set_rubber_banding(True)
         scrolled_win.add(self.treeview)
-        select_cell = Gtk.CellRendererToggle()
-        select_cell.connect('toggled', self.on_select_cell_toggled)
+
         icon_cell = Gtk.CellRendererPixbuf()
         name_cell = Gtk.CellRendererText()
         name_col = Gtk.TreeViewColumn()
         name_col.set_title(_('File Name'))
-        name_col.pack_start(select_cell, False)
         name_col.pack_start(icon_cell, False)
         name_col.pack_start(name_cell, True)
-        name_col.set_attributes(select_cell, active=SELECT_COL)
         name_col.set_attributes(icon_cell, icon_name=ICON_COL)
         name_col.set_attributes(name_cell, text=DISNAME_COL)
         name_col.set_expand(True)
@@ -114,7 +109,6 @@ class TrashPage(Gtk.Box):
         self.load()
 
     def append_filelist(self, infos, error=None):
-        #print('append filelist', infos)
         if error or not infos or infos['errno'] != 0:
             return
         for pcs_file in infos['list']:
@@ -131,7 +125,6 @@ class TrashPage(Gtk.Box):
                     int(pcs_file['server_mtime']), time.time())
             remaining_days = str(MAX_DAYS - remaining_days) + ' days'
             self.liststore.append([
-                False,
                 icon_name,
                 pcs_file['server_filename'],
                 path,
@@ -142,29 +135,26 @@ class TrashPage(Gtk.Box):
                 remaining_days,
                 ])
 
-    def on_select_all_toggled(self, button):
-        status = button.get_active()
-        for row in self.liststore:
-            row[SELECT_COL] = status
-
     def on_restore_button_clicked(self, button):
-        fidlist = []
-        for row in self.liststore:
-            if row[SELECT_COL]:
-                fidlist.append(row[FSID_COL])
-        if not fidlist:
+        selection = self.treeview.get_selection()
+        model, tree_paths = selection.get_selected_rows()
+        if not tree_paths:
             return
+        fidlist = []
+        for tree_path in tree_paths:
+            fidlist.append(model[tree_path][FSID_COL])
         gutil.async_call(
                 pcs.restore_trash, self.app.cookie, self.app.tokens,
                 fidlist, callback=self.reload)
 
     def on_delete_button_clicked(self, button):
-        fidlist = []
-        for row in self.liststore:
-            if row[SELECT_COL]:
-                fidlist.append(row[FSID_COL])
-        if not fidlist:
+        selection = self.treeview.get_selection()
+        model, tree_paths = selection.get_selected_rows()
+        if not tree_paths:
             return
+        fidlist = []
+        for tree_path in tree_paths:
+            fidlist.append(model[tree_path][FSID_COL])
         gutil.async_call(
                 pcs.delete_trash, self.app.cookie, self.app.tokens,
                 fidlist, callback=self.reload)
@@ -173,6 +163,3 @@ class TrashPage(Gtk.Box):
         gutil.async_call(
                 pcs.clear_trash, self.app.cookie, self.app.tokens,
                 callback=self.reload)
-
-    def on_select_cell_toggled(self, cell, path):
-        self.liststore[path][SELECT_COL] = not self.liststore[path][SELECT_COL]

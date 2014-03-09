@@ -40,3 +40,5 @@ PC_VERSION = '4.5.0.7'
 ## HTTP 请求时的一些常量
 CONTENT_FORM = 'application/x-www-form-urlencoded'
 CONTENT_FORM_UTF8 = CONTENT_FORM + '; charset=UTF-8'
+ACCEPT_HTML = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+ACCEPT_JSON = 'application/json, text/javascript, */*; q=0.01'

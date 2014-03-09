@@ -86,8 +86,7 @@ class IconWindow(Gtk.ScrolledWindow):
         path = self.liststore[tree_path][PATH_COL]
         type_ = self.liststore[tree_path][TYPE_COL]
         if type_ == 'folder':
-            home_page = self.app.get_page_by_name('Home')
-            home_page.load(path)
+            self.app.home_page.load(path)
         else:
             print('will load:', path)
 
@@ -250,11 +249,11 @@ class IconWindow(Gtk.ScrolledWindow):
 
     # item popup menu
     def on_launch_app_activated(self, menu_item, app_info):
-        def open_video_link(link, error=None):
-            print('open video link:', link)
-            if error or not link:
+        def open_video_link(resp, error=None):
+            if error:
                 return
-            app_info.launch_uris([link,], None)
+            red_url, req_id = resp
+            app_info.launch_uris([red_url, ], None)
 
         print('open with ', app_info.get_display_name())
         # first, download this to load dir
@@ -269,7 +268,8 @@ class IconWindow(Gtk.ScrolledWindow):
             return
         index = tree_path.get_indices()[0]
         pcs_file = self.filelist[index]
-        if file_type.startswith('video'):
+        # 'media' 对应于rmvb格式.
+        if 'video' in file_type or 'media' in file_type:
             gutil.async_call(
                     pcs.get_download_link, self.app.cookie,
                     pcs_file['dlink'], callback=open_video_link)
@@ -285,12 +285,13 @@ class IconWindow(Gtk.ScrolledWindow):
             self.parent.load(self.liststore[tree_paths][PATH_COL])
 
     def on_copy_link_activated(self, menu_item):
-        def copy_link_to_clipboard(link, error=None):
-            print('will copy link to clipboard:', link)
-            if error or not link:
+        def copy_link_to_clipboard(res, error=None):
+            if error:
                 return
+            red_url, req_id = res
+            print('will copy link to clipboard:', red_url)
             clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-            clipboard.set_text(link, -1)
+            clipboard.set_text(red_url, -1)
 
         tree_paths = self.iconview.get_selected_items()
         if len(tree_paths) != 1:
@@ -303,8 +304,14 @@ class IconWindow(Gtk.ScrolledWindow):
                 callback=copy_link_to_clipboard)
 
     def on_download_activated(self, menu_item):
-        print('download activated')
         # 下载文件与下载目录的操作是不相同的.
+        tree_paths = self.iconview.get_selected_items()
+        if len(tree_paths) != 1:
+            return
+        tree_path = tree_paths[0]
+        index = tree_path.get_indices()[0]
+        pcs_file = self.filelist[index]
+        self.app.download_page.add_task(pcs_file)
 
     def on_share_activated(self, menu_item):
         print('share activated')

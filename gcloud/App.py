@@ -95,9 +95,6 @@ class App:
         self.progressbar.set_text(_('Unknown'))
         left_box.pack_end(self.progressbar, False, False, 0)
 
-        #self.spinner = Gtk.Spinner()
-        #left_box.pack_end(self.spinner, False, False, 0)
-
         self.notebook = Gtk.Notebook()
         self.notebook.props.show_tabs = False
         paned.add2(self.notebook)
@@ -112,14 +109,17 @@ class App:
         signin.run()
         signin.destroy()
 
-        if self.profile and self.profile['first-run']:
+        if not self.profile:
+            self.quit()
+
+        if self.profile['first-run']:
             self.profile['first-run'] = False
             preferences = PreferencesDialog(self)
             preferences.run()
             preferences.destroy()
 
-        home_page = self.get_page_by_name('Home')
-        home_page.load()
+        self.home_page.load()
+        self.download_page.load()
 
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
@@ -152,34 +152,39 @@ class App:
         self.progressbar.set_fraction(used / total)
 
     def init_notebook(self):
-        self.page_names = (
-            'Home', 'Picture', 'Doc', 'Video', 'BT', 'Music', 'Other',
-            'Share', 'Inbox', 'Trash', 'Cloud', 'Download', 'Upload',
-            )
-        self.pages = (
-            HomePage(self),
-            PicturePage(self),
-            DocPage(self),
-            VideoPage(self),
-            BTPage(self),
-            MusicPage(self),
-            OtherPage(self),
-            SharePage(self),
-            InboxPage(self),
-            TrashPage(self),
-            CloudPage(self),
-            DownloadPage(self),
-            UploadPage(self),
-            )
-        for page in self.pages:
+        pages = []
+        self.home_page = HomePage(self)
+        pages.append(self.home_page)
+        self.picture_page = PicturePage(self)
+        pages.append(self.picture_page)
+        self.doc_page = DocPage(self)
+        pages.append(self.doc_page)
+        self.video_page = VideoPage(self)
+        pages.append(self.video_page)
+        self.bt_page = BTPage(self)
+        pages.append(self.bt_page)
+        self.music_page = MusicPage(self)
+        pages.append(self.music_page)
+        self.other_page = OtherPage(self)
+        pages.append(self.other_page)
+        self.share_page = SharePage(self)
+        pages.append(self.share_page)
+        self.inbox_page = InboxPage(self)
+        pages.append(self.inbox_page)
+        self.trash_page = TrashPage(self)
+        pages.append(self.trash_page)
+        self.cloud_page = CloudPage(self)
+        pages.append(self.cloud_page)
+        self.download_page = DownloadPage(self)
+        pages.append(self.download_page)
+        self.upload_page = UploadPage(self)
+        pages.append(self.upload_page)
+
+        for page in pages:
             page.page_num = self.notebook.append_page(
                     page, Gtk.Label(page.disname))
             self.nav_liststore.append([
                 page.icon_name, page.disname, page.tooltip])
-
-    def get_page_by_name(self, name):
-        index = self.page_names.index(name)
-        return self.pages[index]
 
     def reload_current_page(self, *args, **kwds):
         '''重新载入当前页面.
@@ -187,16 +192,12 @@ class App:
         所有的页面都应该实现reload()方法.
         '''
         index = self.notebook.get_current_page()
-        self.pages[index].reload()
-
-    def switch_page_by_name(self, name):
-        index = self.page_names.index(name)
-        self.switch_page_by_index(index)
+        self.notebook.get_nth_page(index).reload()
 
     def switch_page_by_index(self, index):
         self.notebook.set_current_page(index)
 
-    def on_notebook_switched(self, notebook, page, num):
+    def on_notebook_switched(self, notebook, page, index):
         if page.first_run:
             page.load()
             page.first_run = False

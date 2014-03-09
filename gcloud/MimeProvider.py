@@ -4,6 +4,8 @@
 
 
 import mimetypes
+# 目前, linux系统中还不支持rmvb的MIME
+mimetypes.add_type('application/vnd.rn-realmedia', '.rmvb')
 
 from gi.repository import GdkPixbuf
 from gi.repository import Gio
