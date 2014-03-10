@@ -13,10 +13,10 @@ SIZE_K = 2 ** 10
 SIZE_M = 2 ** 20
 SIZE_G = 2 ** 30
 SIZE_T = 2 ** 40
-DESI_K = SIZE_K / 10
-DESI_M = SIZE_M / 10
-DESI_G = SIZE_G / 10
-DESI_T = SIZE_T / 10
+#DESI_K = SIZE_K / 10
+#DESI_M = SIZE_M / 10
+#DESI_G = SIZE_G / 10
+#DESI_T = SIZE_T / 10
 
 def timestamp():
     '''返回当前的时间标记, 以毫秒为单位'''
@@ -45,13 +45,13 @@ def get_human_size(size):
 
     '''将文件大小转为人类可读的形式'''
     size_kb = '{0:,}'.format(size)
-    if size < DESI_K:
+    if size < SIZE_K:
         return ('{0} B'.format(size), size_kb)
-    if size < DESI_M:
+    if size < SIZE_M:
         return ('{0:.1f} kB'.format(size / SIZE_K), size_kb)
-    if size < DESI_G:
+    if size < SIZE_G:
         return ('{0:.1f} MB'.format(size / SIZE_M), size_kb)
-    if size < DESI_T:
+    if size < SIZE_T:
         return ('{0:.1f} GB'.format(size / SIZE_G), size_kb)
     return ('{0:.1f} TB'.format(size / SIZE_T), size_kb)
 
@@ -61,7 +61,21 @@ def get_delta_days(from_sec, to_sec):
     delta = datetime.timedelta(seconds=seconds)
     return delta.days
 
+def list_remove_by_index(l, index):
+    '''将list中的index位的数据删除'''
+    if index < 0 or index >= len(l):
+        raise ValueError('index out of range')
+    if index == (len(l) - 1):
+        l.pop()
+    elif index == 0:
+        l = l[1:]
+    else:
+        l = l[0:index] + l[index+1:]
+
+    return l
+
 if __name__ == '__main__':
-    num = 3022788
-    num = 684
-    print(get_human_size(num))
+    l = [1, 2, 3, 5, 8]
+    l2 = list_remove_by_index(l, 3)
+    print(l)
+    print(l2)

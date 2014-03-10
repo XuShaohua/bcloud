@@ -3,6 +3,7 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import subprocess
 import threading
 
 from gi.repository import GObject
@@ -22,3 +23,9 @@ def async_call(func, *args, callback=None):
 
     thread = threading.Thread(target=do_call)
     thread.start()
+
+def xdg_open(uri):
+    try:
+        subprocess.call(['xdg-open', folder, ])
+    except FileNotFoundError as e:
+        print(e)

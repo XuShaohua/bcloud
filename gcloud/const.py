@@ -42,3 +42,14 @@ CONTENT_FORM = 'application/x-www-form-urlencoded'
 CONTENT_FORM_UTF8 = CONTENT_FORM + '; charset=UTF-8'
 ACCEPT_HTML = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 ACCEPT_JSON = 'application/json, text/javascript, */*; q=0.01'
+
+
+
+
+class State:
+    '''下载状态常量'''
+    DOWNLOADING = 0
+    WAITING = 1
+    PAUSED = 2
+    FINISHED = 3
+    CANCELED = 4

@@ -1,2 +1,2 @@
 
-* urllib3
+* python3-gi

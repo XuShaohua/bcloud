@@ -43,6 +43,7 @@ _default_profile = {
     'use-notify': False,
     'first-run': True,
     'save-dir': HOME_DIR,
+    'concurr-tasks': 2,
     'username': '',
     'password': '',
     'remember-password': False,
