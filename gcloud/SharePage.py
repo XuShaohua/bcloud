@@ -5,7 +5,8 @@
 
 from gi.repository import Gtk
 
-from gcloud.Config import _
+from gcloud import Config
+_ = Config._
 
 
 class SharePage(Gtk.ScrolledWindow):
@@ -13,8 +14,11 @@ class SharePage(Gtk.ScrolledWindow):
     icon_name = 'folder-publicshare-symbolic'
     disname = _('Share')
     tooltip = _('Share')
-    page_num = 7
+    first_run = False
 
     def __init__(self, app):
         super().__init__()
         self.app = app
+        
+    def load(self):
+        pass

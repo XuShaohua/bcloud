@@ -98,6 +98,7 @@ class DownloadPage(Gtk.Box):
         self.liststore = Gtk.ListStore(
                 str, str, str, str, str, str, int)
         self.treeview = Gtk.TreeView(model=self.liststore)
+        self.treeview.set_tooltip_column(PATH_COL)
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
@@ -173,16 +174,16 @@ class DownloadPage(Gtk.Box):
                 'md5': pcs_file['md5'],
                 'fs_id': pcs_file['fs_id'],
                 'size': pcs_file['size'],
+                'currRange': 0,
                 'saveDir': saveDir,
                 'saveName': saveName,
                 'state': State.WAITING,
-                'currRange': 0,
-                'percent': 0,
                 'link': red_url,
                 }
             self.tasks.append(task)
             self.append_task_to_liststore(task)
 
+        # 目前还不支持下载目录.
         if pcs_file['isdir']:
             return
         if self.get_task_by_fsid(pcs_file['fs_id']):
@@ -200,17 +201,20 @@ class DownloadPage(Gtk.Box):
         human_size, _ = util.get_human_size(task['size'])
         self.liststore.append([
             task['name'], task['path'], human_size, task['saveDir'],
-            task['saveName'], StateNames[task['state']], task['percent'],
+            task['saveName'], StateNames[task['state']],
+            self.get_percent(task),
             ])
+
+    def get_percent(self, task):
+        return int(task['currRange'] / task['size'] * 100)
 
     def update_treeview(self, task, tree_iter):
         '''更新主界面上的显示信息'''
-        print('update treeview()')
         if not tree_iter or not task:
             return
         tree_path = self.liststore.get_path(tree_iter)
         self.liststore[tree_path][STATE_COL] = StateNames[task['state']]
-        self.liststore[tree_path][PERCENT_COL] = task['percent']
+        self.liststore[tree_path][PERCENT_COL] = self.get_percent(task)
         total_size, _ = util.get_human_size(task['size'])
         curr_size, _ = util.get_human_size(task['currRange'])
         self.liststore[tree_path][SIZE_COL] = '{0} / {1}'.format(

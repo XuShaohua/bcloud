@@ -13,10 +13,6 @@ SIZE_K = 2 ** 10
 SIZE_M = 2 ** 20
 SIZE_G = 2 ** 30
 SIZE_T = 2 ** 40
-#DESI_K = SIZE_K / 10
-#DESI_M = SIZE_M / 10
-#DESI_G = SIZE_G / 10
-#DESI_T = SIZE_T / 10
 
 def timestamp():
     '''返回当前的时间标记, 以毫秒为单位'''

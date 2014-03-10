@@ -5,7 +5,8 @@
 
 from gi.repository import Gtk
 
-from gcloud.Config import _
+from gcloud import Config
+_ = Config._
 
 
 class UploadPage(Gtk.ScrolledWindow):
@@ -13,8 +14,11 @@ class UploadPage(Gtk.ScrolledWindow):
     icon_name = 'upload-symbolic'
     disname = _('Upload')
     tooltip = _('Uploading tasks')
-    page_num = 12
+    first_run = False
 
     def __init__(self, app):
         super().__init__()
         self.app = app
+
+    def load(self):
+        pass

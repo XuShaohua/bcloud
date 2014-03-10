@@ -93,5 +93,5 @@ def get_cache_path(profile_name):
     '''获取这个帐户的缓存目录, 如果不存在, 就创建它'''
     path = os.path.join(CACHE_DIR, profile_name, 'cache')
     if not os.path.exists(path):
-        os.makedirs(path, exists_ok=True)
+        os.makedirs(path, exist_ok=True)
     return path

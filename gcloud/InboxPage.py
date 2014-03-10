@@ -5,7 +5,8 @@
 
 from gi.repository import Gtk
 
-from gcloud.Config import _
+from gcloud import Config
+_ = Config._
 
 
 class InboxPage(Gtk.ScrolledWindow):
@@ -13,8 +14,11 @@ class InboxPage(Gtk.ScrolledWindow):
     icon_name = 'mail-send-receive-symbolic'
     disname = _('Inbox')
     tooltip = _('Inbox')
-    page_num = 8
+    first_run = False
 
     def __init__(self, app):
         super().__init__()
         self.app = app
+
+    def load(self):
+        pass

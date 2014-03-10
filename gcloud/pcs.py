@@ -321,7 +321,7 @@ def copy(cookie, tokens, filelist):
     return json.loads(content.decode())
 
 
-def get_category(cookie, tokens, category):
+def get_category(cookie, tokens, category, page=1):
     '''获取一个分类中的所有文件信息, 比如音乐/图片
 
     目前的有分类有:
@@ -340,7 +340,8 @@ def get_category(cookie, tokens, category):
         '&category=', str(category),
         '&pri=-1&num=100',
         '&t=', timestamp,
-        '&page=1&order=time&desc=1',
+        '&page=', str(page),
+        '&order=time&desc=1',
         '&_=', timestamp,
         '&bdstoken=', cookie.get('STOKEN').value,
         ])

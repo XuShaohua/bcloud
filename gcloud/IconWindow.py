@@ -53,6 +53,7 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def load(self, filelist, error=None):
         '''载入一个目录并显示里面的内容.'''
+        print('IconWindow.load() --')
         self.filelist = []
         self.pathlist = []
         self.liststore.clear()
@@ -72,15 +73,30 @@ class IconWindow(Gtk.ScrolledWindow):
         '''
         if filelist['errno'] != 0:
             return
-        for file_item in filelist['list']:
-            path = file_item['path']
-            self.filelist.append(file_item)
+        if 'list' in filelist:
+            key = 'list'
+        elif 'info' in filelist:
+            key = 'info'
+        else:
+            print('Error: current filelist format not supported!')
+            print(filelist)
+            return
+        cache_path = Config.get_cache_path(self.app.profile['username'])
+        for pcs_file in filelist[key]:
+            path = pcs_file['path']
+            self.filelist.append(pcs_file)
             self.pathlist.append(path)
-            pixbuf, type_ = self.app.mime.get(path, file_item['isdir'])
+            pixbuf, type_ = self.app.mime.get(path, pcs_file['isdir'])
             disname = os.path.split(path)[DISNAME_COL]
             #tooltip = gutil.escape(disname)
             tooltip = disname
-            self.liststore.append([pixbuf, disname, path, tooltip, type_])
+            tree_iter = self.liststore.append([
+                pixbuf, disname, path, tooltip, type_
+                ])
+            gutil.update_liststore_image(
+                self.liststore, tree_iter, PIXBUF_COL, pcs_file,
+                cache_path,
+                )
 
     def on_iconview_item_activated(self, iconview, tree_path):
         path = self.liststore[tree_path][PATH_COL]

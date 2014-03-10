@@ -5,7 +5,8 @@
 
 from gi.repository import Gtk
 
-from gcloud.Config import _
+from gcloud import Config
+_ = Config._
 
 
 class CloudPage(Gtk.ScrolledWindow):
@@ -13,8 +14,11 @@ class CloudPage(Gtk.ScrolledWindow):
     icon_name = 'cloud-symbolic'
     disname = _('Cloud')
     tooltip = _('Cloud downloading')
-    page_num = 10
+    first_run = True
 
     def __init__(self, app):
         super().__init__()
         self.app = app
+
+    def load(self):
+        pass

@@ -17,20 +17,15 @@ import util
 from MimeProvider import MimeProvider
 from PreferencesDialog import PreferencesDialog
 
-from BTPage import BTPage
+from CategoryPage import *
 from CloudPage import CloudPage
 from DownloadPage import DownloadPage
-from DocPage import DocPage
 from HomePage import HomePage
 from InboxPage import InboxPage
-from MusicPage import MusicPage
-from OtherPage import OtherPage
-from PicturePage import PicturePage
 from SharePage import SharePage
 from SigninDialog import SigninDialog
 from TrashPage import TrashPage
 from UploadPage import UploadPage
-from VideoPage import VideoPage
 
 GObject.threads_init()
 DBUS_APP_NAME = 'org.liulang.gcloud'
@@ -181,8 +176,7 @@ class App:
         pages.append(self.upload_page)
 
         for page in pages:
-            page.page_num = self.notebook.append_page(
-                    page, Gtk.Label(page.disname))
+            self.notebook.append_page(page, Gtk.Label(page.disname))
             self.nav_liststore.append([
                 page.icon_name, page.disname, page.tooltip])
 

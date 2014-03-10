@@ -81,8 +81,8 @@ class Downloader(threading.Thread):
                 continue
             elif (self.task['state'] == State.FINISHED or 
                     self.task['state'] == State.PAUSED):
-                self.flush()
-                self.close()
+                self.fh.flush()
+                self.fh.close()
                 self.fh = None
                 break
             elif self.task['state'] == State.CANCELED:
@@ -124,12 +124,8 @@ class Downloader(threading.Thread):
         self.write_bytes(range_, block)
 
     def write_bytes(self, range_, block):
-        print('write bytes:', range_)
-        print('block size:', len(block))
+        print('write bytes() :', len(block))
         self.task['currRange'] = range_[1]
-
-        self.task['percent'] = int(
-                self.task['currRange'] / self.task['size'] * 100)
         GLib.idle_add(
                 self.parent.update_treeview,
                 self.task, self.tree_iter)
