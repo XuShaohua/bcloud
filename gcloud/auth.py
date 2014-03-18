@@ -85,6 +85,8 @@ def check_login(cookie, token, username):
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     content = req.data
+    print('content:', content)
+    # TODO: FIXME: 如果返回的codestring非空, 我们就需要解析验证码了.
     content_obj = json.loads(content.decode())
     return int(content_obj['errInfo']['no'])
 
@@ -153,6 +155,8 @@ def get_bdstoken(cookie):
     '''
     url = 'http://pan.baidu.com/disk/home'
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    with open('/tmp/index.html', 'wb') as fh:
+        fh.write(req.data)
     return parse_bdstoken(req.data.decode())
 
 def get_auth_info(username, password, refresh=False):
@@ -179,17 +183,21 @@ def get_auth_info(username, password, refresh=False):
         print('Error: failed to check login!')
         return (None, None)
     cookie.load_list(get_bduss(cookie, token, username, password))
+    print(cookie)
     tokens = get_bdstoken(cookie)
     tokens['token'] = token
+    print(tokens)
     auth_info = [str(cookie), tokens]
+    if 'bdstoken' not in tokens or not tokens['bdstoken']:
+        return (None, None)
     with open(auth_info_file, 'w') as fh:
         json.dump(auth_info, fh)
     return (cookie, tokens)
 
 def main():
     username = 'leeh3oDog9ee@163.com'
-    password = 'soz5mae4Neegae'
-    print(get_auth_info(username, password))
+    password = 'Iz6Eeng0jeivie'
+    print(get_auth_info(username, password, refresh=True))
 
 if __name__ == '__main__':
     main()

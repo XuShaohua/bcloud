@@ -361,7 +361,11 @@ def get_download_link(cookie, dlink):
             就返回原来的dlink; request_id 是一个字符串, 用于下载文件时的认
             证, 如果获取失败, 它的值就为空.
     '''
-    url = dlink + cookie.get('cflag').value
+    url = ''.join([
+        dlink,
+        '&cflg=', cookie.get('cflag').value
+        ])
+    print('get download link: ', url)
     req = net.urlopen_without_redirect(url, headers={
             'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'cflag'),
             'Accept': const.ACCEPT_HTML,

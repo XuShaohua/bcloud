@@ -104,7 +104,8 @@ class IconWindow(Gtk.ScrolledWindow):
         if type_ == 'folder':
             self.app.home_page.load(path)
         else:
-            print('will load:', path)
+            #print('will load:', path)
+            self.launch_app(tree_path)
 
     def on_iconview_button_pressed(self, iconview, event):
         if ((event.type != Gdk.EventType.BUTTON_PRESS) or
@@ -263,8 +264,16 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_reload_activated(self, menu_item):
         self.parent.reload()
 
-    # item popup menu
-    def on_launch_app_activated(self, menu_item, app_info):
+    def launch_app(self, tree_path):
+        '''用默认的程序打开这个文件链接.'''
+        file_type = self.liststore[tree_path][TYPE_COL]
+        app_infos = Gio.AppInfo.get_recommended_for_type(file_type)
+        if app_infos:
+            self.launch_app_with_app_info(app_infos[0])
+        else:
+            print('Unknown file type')
+
+    def launch_app_with_app_info(self, app_info):
         def open_video_link(resp, error=None):
             if error:
                 return
@@ -276,6 +285,7 @@ class IconWindow(Gtk.ScrolledWindow):
         # then open it with app_info
         tree_paths = self.iconview.get_selected_items()
         if len(tree_paths) != 1:
+            print('Please open one file at a time!')
             return
         tree_path = tree_paths[0]
         file_type = self.liststore[tree_path][TYPE_COL]
@@ -291,6 +301,11 @@ class IconWindow(Gtk.ScrolledWindow):
                     pcs_file['dlink'], callback=open_video_link)
         else:
             print('will download this link and launch app')
+            self.app.download_page.add_launch_task(pcs_file, app_info)
+
+    # item popup menu
+    def on_launch_app_activated(self, menu_item, app_info):
+        self.launch_app_with_app_info(app_info)
 
     def on_choose_app_activated(self, menu_item):
         print('choose app')
@@ -322,12 +337,11 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_download_activated(self, menu_item):
         # 下载文件与下载目录的操作是不相同的.
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) != 1:
+        if not tree_paths:
             return
-        tree_path = tree_paths[0]
-        index = tree_path.get_indices()[0]
-        pcs_file = self.filelist[index]
-        self.app.download_page.add_task(pcs_file)
+        for tree_path in tree_paths:
+            pcs_file = self.filelist[tree_path.get_indices()[0]]
+            self.app.download_page.add_task(pcs_file)
 
     def on_share_activated(self, menu_item):
         print('share activated')
@@ -386,7 +400,7 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def on_rename_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) == 0:
+        if not tree_paths:
             return
         path_list = []
         for tree_path in tree_paths:
@@ -397,7 +411,7 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def on_trash_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) == 0:
+        if not tree_paths:
             return
         path_list = []
         for tree_path in tree_paths:
@@ -409,11 +423,11 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_props_activated(self, menu_item):
         '''显示选中的文件或者当前目录的属性'''
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) != 1:
+        if not tree_paths:
             return
-        tree_path = tree_paths[0]
-        index = tree_path.get_indices()[0]
-        pcs_file = self.filelist[index]
-        dialog = PropertiesDialog(self.parent, self.app, pcs_file)
-        dialog.run()
-        dialog.destroy()
+        for tree_path in tree_paths:
+            index = tree_path.get_indices()[0]
+            pcs_file = self.filelist[index]
+            dialog = PropertiesDialog(self.parent, self.app, pcs_file)
+            dialog.run()
+            dialog.destroy()

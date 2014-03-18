@@ -4,9 +4,9 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
-'''这个类主要包含了一些转码的小函数.
+'''This module contains some useful functions to handle encoding/decoding
 
-比如, 常用的escape(), unescape(), encodeURIComponent()等等.
+just like escape(), encodeURLComponent()... in javascript.
 '''
 
 import base64

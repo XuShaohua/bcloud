@@ -54,10 +54,8 @@ def urlopen(url, headers={}, data=None):
     return req
 
 def urlopen_without_redirect(url, headers={}, data=None):
-    '''使用HEAD方法请求一个URL, 并返回一个Response对象.
+    '''请求一个URL, 并返回一个Response对象. 不处理重定向.
 
-    HEAD 方法只会要求服务器返回Response Header, 并不返回Response Body,
-    因为有时候我们只需要这个Response Header.
     使用这个函数可以返回URL重定向(Error 301/302)后的地址, 也可以重到URL中请
     求的文件的大小, 或者Header中的其它认证信息.
     '''
@@ -67,5 +65,6 @@ def urlopen_without_redirect(url, headers={}, data=None):
 
     parse_result = urllib.parse.urlparse(url)
     conn = http.client.HTTPConnection(parse_result.netloc)
-    conn.request('HEAD', url, body=data, headers=headers_merged)
+    #conn.request('HEAD', url, body=data, headers=headers_merged)
+    conn.request('GET', url, body=data, headers=headers_merged)
     return conn.getresponse()
