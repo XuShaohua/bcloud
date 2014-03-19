@@ -3,10 +3,8 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
-#from http.client import HTTPConnection
 import os
 import threading
-import urllib.parse
 
 from gi.repository import GLib
 from gi.repository import GObject
@@ -59,8 +57,6 @@ class Downloader(threading.Thread, GObject.GObject):
         print('new worker inited:')
         print(self.row)
 
-        #url_info = urllib.parse.urlparse(self.row[LINK_COL])
-        #self.pool = HTTPConnection(url_info.netloc)
         self.pool = urllib3.PoolManager()
 
     def init_files(self):
@@ -85,7 +81,6 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def destroy(self):
         '''自毁'''
-        print('Downloader.destroy()')
         self.pause()
 
     def run(self):
@@ -96,7 +91,6 @@ class Downloader(threading.Thread, GObject.GObject):
             self.download()
 
     def download(self):
-        print('Downloader.download() ')
         while True:
             if self.row[STATE_COL] == State.DOWNLOADING:
                 range_ = self.get_range()
@@ -118,32 +112,25 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def pause(self):
         '''暂停下载任务'''
-        print('Downloader.pause() --')
         self.row[STATE_COL] = State.PAUSED
 
     def stop(self):
         '''停止下载, 并删除之前下载的片段'''
-        print('Downloader.stop() ')
         self.row[STATE_COL] = State.CANCELED
 
     def finished(self):
-        print('Downloader.finished() --')
         self.row[STATE_COL] = State.FINISHED
-        print(self.row[FSID_COL], self.row[STATE_COL])
         self.emit('downloaded', self.row[FSID_COL])
 
     def get_range(self):
-        print('get range() --', self.row[CURRSIZE_COL], self.row[SIZE_COL])
         if self.row[CURRSIZE_COL] >= self.row[SIZE_COL]:
             self.finished()
             return None
         start = self.row[CURRSIZE_COL]
         stop = min(start + CHUNK, self.row[SIZE_COL])
-        print('range:', start, stop)
         return (start, stop)
 
     def request_bytes(self, range_):
-        #self.pool.request('GET', self.row[LINK_COL], headers={
         resp = self.pool.urlopen('GET', self.row[LINK_COL], headers={
             'Range': 'bytes={0}-{1}'.format(range_[0], range_[1]-1),
             'Connection': 'Keep-Alive',
@@ -151,9 +138,6 @@ class Downloader(threading.Thread, GObject.GObject):
             })
         for _ in range(RETRIES):
             try:
-                #resp = self.pool.getresponse()
-                #block = resp.read()
-                #self.write_bytes(range_, block)
                 self.write_bytes(range_, resp.data)
                 return
             except OSError as e:
