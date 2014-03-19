@@ -3,13 +3,14 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
-from http.client import HTTPConnection
+#from http.client import HTTPConnection
 import os
 import threading
 import urllib.parse
 
 from gi.repository import GLib
 from gi.repository import GObject
+import urllib3
 
 from gcloud.const import State
 
@@ -49,17 +50,18 @@ class Downloader(threading.Thread, GObject.GObject):
     def __init__(self, parent, row, cookie, tokens):
         threading.Thread.__init__(self)
         GObject.GObject.__init__(self)
-        print('new worker inited:')
 
         self.parent = parent
         self.cookie = cookie
         self.tokens = tokens
 
         self.row = row[:]  # 复制一份
+        print('new worker inited:')
         print(self.row)
 
-        url_info = urllib.parse.urlparse(self.row[LINK_COL])
-        self.pool = HTTPConnection(url_info.netloc)
+        #url_info = urllib.parse.urlparse(self.row[LINK_COL])
+        #self.pool = HTTPConnection(url_info.netloc)
+        self.pool = urllib3.PoolManager()
 
     def init_files(self):
         row = self.row
@@ -70,8 +72,6 @@ class Downloader(threading.Thread, GObject.GObject):
         if os.path.exists(self.filepath):
             truncated = True
             stat = os.stat(self.filepath)
-            print(stat)
-            print(row)
             if (row[SIZE_COL] == stat.st_size and 
                     stat.st_size == stat.st_blocks * 512):
                 print('File exists and has same size, quit!')
@@ -133,24 +133,28 @@ class Downloader(threading.Thread, GObject.GObject):
         self.emit('downloaded', self.row[FSID_COL])
 
     def get_range(self):
+        print('get range() --', self.row[CURRSIZE_COL], self.row[SIZE_COL])
         if self.row[CURRSIZE_COL] >= self.row[SIZE_COL]:
             self.finished()
             return None
         start = self.row[CURRSIZE_COL]
         stop = min(start + CHUNK, self.row[SIZE_COL])
+        print('range:', start, stop)
         return (start, stop)
 
     def request_bytes(self, range_):
-        self.pool.request('GET', self.row[LINK_COL], headers={
+        #self.pool.request('GET', self.row[LINK_COL], headers={
+        resp = self.pool.urlopen('GET', self.row[LINK_COL], headers={
             'Range': 'bytes={0}-{1}'.format(range_[0], range_[1]-1),
             'Connection': 'Keep-Alive',
             #'Cookie': self.cookie.header_output(),
             })
         for _ in range(RETRIES):
             try:
-                resp = self.pool.getresponse()
-                block = resp.read()
-                self.write_bytes(range_, block)
+                #resp = self.pool.getresponse()
+                #block = resp.read()
+                #self.write_bytes(range_, block)
+                self.write_bytes(range_, resp.data)
                 return
             except OSError as e:
                 print(e)

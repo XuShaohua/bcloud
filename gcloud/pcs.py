@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 # Copyright (C) 2013-2014 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
@@ -31,8 +30,11 @@ def get_quota(cookie, tokens):
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         })
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def list_share(cookie, tokens, path='/', page=1, num=100):
     '''获取用户已经共享的文件的信息
@@ -57,8 +59,11 @@ def list_share(cookie, tokens, path='/', page=1, num=100):
         'Cookie': cookie.header_output(),
         'Referer': const.SHARE_REFERER,
         })
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def enable_share(cookie, tokens, fid_list):
     '''建立新的分享.
@@ -78,8 +83,11 @@ def enable_share(cookie, tokens, fid_list):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def disable_share(cookie, tokens, shareid_list):
     '''取消分享.
@@ -96,8 +104,11 @@ def disable_share(cookie, tokens, shareid_list):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 
 def list_inbox(cookie, tokens, start=0, limit=20):
@@ -112,8 +123,11 @@ def list_inbox(cookie, tokens, start=0, limit=20):
         '&bdstoken=', tokens['bdstoken'],
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def list_trash(cookie, tokens, path='/', page=1, num=100):
     '''获取回收站的信息.
@@ -136,8 +150,11 @@ def list_trash(cookie, tokens, path='/', page=1, num=100):
         '&bdstoken=', tokens['bdstoken'],
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def restore_trash(cookie, tokens, fidlist):
     '''从回收站中还原文件/目录.
@@ -155,8 +172,11 @@ def restore_trash(cookie, tokens, fidlist):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def delete_trash(cookie, tokens, fidlist):
     '''批量将文件从回收站中删除, 这一步不可还原!'
@@ -175,8 +195,11 @@ def delete_trash(cookie, tokens, fidlist):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def clear_trash(cookie, tokens):
     '''清空回收站, 将里面的所有文件都删除.'''
@@ -190,8 +213,11 @@ def clear_trash(cookie, tokens):
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         }, data=''.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 
 def list_dir(cookie, tokens, path, page=1, num=100):
@@ -213,8 +239,11 @@ def list_dir(cookie, tokens, path, page=1, num=100):
         'Content-type': const.CONTENT_FORM_UTF8,
         'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'PANWEB', 'cflag'),
         })
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def mkdir(cookie, tokens, path):
     '''创建一个目录.
@@ -235,8 +264,11 @@ def mkdir(cookie, tokens, path):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def delete_files(cookie, tokens, filelist):
     '''批量删除文件/目录.
@@ -253,8 +285,11 @@ def delete_files(cookie, tokens, filelist):
         'Content-type': const.CONTENT_FORM_UTF8,
         'Cookie': cookie.header_output(),
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def rename(cookie, tokens, filelist):
     '''批量重命名目录/文件.
@@ -275,8 +310,11 @@ def rename(cookie, tokens, filelist):
         'Content-type': const.CONTENT_FORM_UTF8,
         'Cookie': cookie.header_output(),
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def move(cookie, tokens, filelist):
     '''移动文件/目录到新的位置.
@@ -296,8 +334,11 @@ def move(cookie, tokens, filelist):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def copy(cookie, tokens, filelist):
     '''复制文件/目录到新位置.
@@ -317,8 +358,11 @@ def copy(cookie, tokens, filelist):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 
 def get_category(cookie, tokens, category, page=1):
@@ -346,8 +390,11 @@ def get_category(cookie, tokens, category, page=1):
         '&bdstoken=', cookie.get('STOKEN').value,
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def get_download_link(cookie, dlink):
     '''在下载之前, 要先获取最终的下载链接, 因为中间要进行一次302跳转.
@@ -376,24 +423,24 @@ def get_download_link(cookie, dlink):
     req_id = req.getheader('x-pcs-request-id', '')
     return (red_url, req_id)
 
-def download(cookie, url, targ_path, range_=None):
-    '''以普通方式下载文件.
-
-    如果指定range的话, 可以下载指定的数据段.
-    pcs_file - 文件的详细信息.
-    targ_path - 保存文件的目标路径
-    range_ - 要下载的数据范围, 利用这个可以实现断点续传; 如果不指定它,
-             就会一次性下载文件的全部内容(在pcs_file中有文件的大小信息).
-
-    @return 
-    '''
-    headers = {'Cookie': cookie.header_output()}
-    if range_:
-        headers['Range'] = range_
-    req = net.urlopen(url, headers=headers)
-    content = req.data
-    with open(targ_path, 'wb') as fh:
-        fh.write(content)
+#def download(cookie, url, targ_path, range_=None):
+#    '''以普通方式下载文件.
+#
+#    如果指定range的话, 可以下载指定的数据段.
+#    pcs_file - 文件的详细信息.
+#    targ_path - 保存文件的目标路径
+#    range_ - 要下载的数据范围, 利用这个可以实现断点续传; 如果不指定它,
+#             就会一次性下载文件的全部内容(在pcs_file中有文件的大小信息).
+#
+#    @return 
+#    '''
+#    headers = {'Cookie': cookie.header_output()}
+#    if range_:
+#        headers['Range'] = range_
+#    req = net.urlopen(url, headers=headers)
+#    content = req.data
+#    with open(targ_path, 'wb') as fh:
+#        fh.write(content)
 
 def get_metas(cookie, tokens, filelist):
     '''获取文件的metadata.
@@ -412,8 +459,11 @@ def get_metas(cookie, tokens, filelist):
         'Cookie': cookie.sub_output('BDUSS'),
         'Content-type': const.CONTENT_FORM,
         }, data=data.encode())
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
 def search(cookie, tokens, key, path='/'):
     '''搜索全部文件, 根据文件名.
@@ -431,55 +481,242 @@ def search(cookie, tokens, key, path='/'):
         '&bdstoken=', tokens['bdstoken'],
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    content = req.data
-    return json.loads(content.decode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
-def main():
-    username = 'leeh3oDog9ee@163.com'
-    password = 'soz5mae4Neegae'
-    cookie, tokens = auth.get_auth_info(username, password, refresh=False)
-
-    #quota = get_quota(cookie, tokens)
-    #print(quota)
-
-    #dirs = list_dir('/', cookie, tokens)
-    #print(dirs)
-
-    #category = 3  # 图片
-    #get_category(cookie, tokens, category)
-
-    #path = '/dir8'
-    #mkdir(path, cookie, tokens)
+def cloud_add_link_task(cookie, tokens, source_url, save_path):
+    '''新建离线下载任务.
     
-    #list_inbox(cookie, tokens)
+    source_url - 可以是http/https/ftp等一般的链接
+                 可以是eMule这样的链接
+    path       - 要保存到哪个目录, 比如 /Music/, 以/开头, 以/结尾的绝对路径.
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl?channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    type_ = ''
+    if source_url.startswith('ed2k'):
+        type_ = '&type=3'
+    if not save_path.endswith('/'):
+        save_path = save_path + '/'
+    data = ''.join([
+        'method=add_task&app_id=250528',
+        '&source_url=', encoder.encode_uri_component(source_url),
+        '&save_path=', encoder.encode_uri_component(save_path),
+        '&type=', type_,
+        ])
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        }, data=data.encode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
-    #trash_files = list_trash(cookie, tokens)
-    #print(trash_files)
-    #restore_trash(cookie, tokens, [186616217120184, 222756948157255])
-    #delete_trash(cookie, tokens, [331091603537793, 222756948157255])
-    #clear_trash(cookie, tokens)
+def cloud_add_bt_task(cookie, tokens, source_url, save_path,
+                    selected_idx, file_sha1='', vcode='', vcode_input=''):
+    '''新建一个BT类的离线下载任务, 包括magent磁链.
 
-    #delete_files(cookie, tokens, ['/dir6', '/dir7'])
+    source_path  - BT种子所在的绝对路径
+    save_path    - 下载的文件要存放到的目录
+    selected_idx - BT种子中, 包含若干个文件, 这里, 来指定要下载哪些文件,
+                   从1开始计数.
+    file_sha1    - BT种子的sha1值, 如果是magent的话, 这个sha1值可以为空
+    vcode        - 验证码的vcode
+    vcode_input  - 用户输入的四位验证码
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl?channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    type_ = '2'
+    url_type = 'source_path'
+    if source_url.startswith('magnet:'):
+        type_ = '4'
+        url_type = 'source_url'
+    if not save_path.endswith('/'):
+        save_path = save_path + '/'
+    data = [
+        'method=add_task&app_id=250528',
+        '&file_sha1=', file_sha1,
+        '&save_path=', encoder.encode_uri_component(save_path),
+        '&selected_idx=', ','.join(str(i) for i in selected_idx),
+        '&task_from=1',
+        '&t=', util.timestamp(),
+        '&', url_type, '=', encoder.encode_uri_component(source_url),
+        '&type=', type_
+        ]
+    if vcode:
+        data.append('&input=')
+        data.append(vcode_input)
+        data.append('&vcode=')
+        data.append(vcode)
+    data = ''.join(data)
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        }, data=data.encode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
-    #rename(cookie, tokens, [
-    #    {'path': '/dir5.1', 'newname': 'dir5.0'},
-    #    {'path': '/dir4.2', 'newname': 'dir4.0'},
-    #    ])
-    #move(cookie, tokens, [
-    #    {'path': '/dir5.0', 'dest': '/dir3', 'newname': 'dir5.1'},
-    #    {'path': '/dir4.0', 'dest': '/dir3', 'newname': 'dir4.1'},
-    #    ])
-    #copy(cookie, tokens, [
-    #    {'path': '/dir', 'dest': '/dir3', 'newname': 'dir0.1'},
-    #    ])
+def cloud_query_sinfo(cookie, tokens, source_path):
+    '''获取网盘中种子的信息, 比如里面的文件名, 文件大小等.
 
-    #list_share(cookie, tokens)
-    #enable_share(cookie, tokens, [
-    #    220763851904839,
-    #    ])
-    #disable_share(cookie, tokens, [
-    #    491379316,
-    #    ])
+    source_path - BT种子的绝对路径.
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl?channel=chunlei&clienttype=0&web=1',
+        '&method=query_sinfo&app_id=250528',
+        '&bdstoken=', tokens['bdstoken'],
+        '&source_path=', encoder.encode_uri_component(source_path),
+        '&type=2',
+        '&t=', util.timestamp(),
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
 
-if __name__ == '__main__':
-    main()
+def cloud_query_magnetinfo(cookie, tokens, source_url, save_path):
+    '''获取磁链的信息.
+    
+    在新建磁链任务时, 要先获取这个磁链的信息, 比如里面包含哪些文件, 文件的名
+    称与大小等.
+
+    source_url - 磁链的url, 以magent:开头.
+    save_path  - 保存到哪个目录
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl?channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    data = ''.join([
+        'method=query_magnetinfo&app_id=250528',
+        '&source_url=', encoder.encode_uri_component(source_url),
+        '&save_path=', encoder.encode_uri_component(save_path),
+        '&type=4',
+        ])
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        }, data=data.encode())
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
+
+def cloud_list_task(cookie, tokens, start=0):
+    '''获取当前离线下载的任务信息
+    
+    start - 从哪个任务开始, 从0开始计数, 会获取这50条任务信息
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl?channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        '&need_task_info=1&status=255',
+        '&start=', str(start),
+        '&limit=50&method=list_task&app_id=250528',
+        '&t=', util.timestamp(),
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
+
+def cloud_query_task(cookie, tokens, task_ids):
+    '''查询离线下载任务的信息, 比如进度, 是否完成下载等.
+
+    最好先用cloud_list_task() 来获取当前所有的任务, 然后调用这个函数来获取
+    某项任务的详细信息.
+
+    task_ids - 一个list, 里面至少要有一个task_id, task_id 是一个字符串
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl?method=query_task&app_id=250528',
+        '&bdstoken=', tokens['bdstoken'],
+        '&task_ids=', ','.join(task_ids),
+        '&t=', util.timestamp(),
+        '&channel=chunlei&clienttype=0&web=1',
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
+
+def cloud_cancel_task(cookie, tokens, task_id):
+    '''取消离线下载任务.
+    
+    task_id - 之前建立离线下载任务时的task id, 也可以从cloud_list_task()里
+              获取.
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl',
+        '?bdstoken=', tokens['bdstoken'],
+        '&task_id=', str(task_id),
+        '&method=cancel_task&app_id=250528',
+        '&t=', util.timestamp(),
+        '&channel=chunlei&clienttype=0&web=1',
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
+
+def cloud_delete_task(cookie, tokens, task_id):
+    '''删除一个离线下载任务, 不管这个任务是否已完成下载.
+
+    同时还会把它从下载列表中删除.
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl',
+        '?bdstoken=', tokens['bdstoken'],
+        '&task_id=', str(task_id),
+        '&method=delete_task&app_id=250528',
+        '&t=', util.timestamp(),
+        '&channel=chunlei&clienttype=0&web=1',
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
+
+def cloud_clear_task(cookie, tokens):
+    '''清空离线下载的历史(已经完成或者取消的).'''
+    url = ''.join([
+        const.PAN_URL,
+        'rest/2.0/services/cloud_dl?method=clear_task&app_id=250528',
+        '&channel=chunlei&clienttype=0&web=1',
+        '&t=', util.timestamp(),
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None

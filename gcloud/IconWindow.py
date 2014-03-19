@@ -71,7 +71,7 @@ class IconWindow(Gtk.ScrolledWindow):
         这一操作主要是为了便于接下来的查找工作.
         文件的path都被提取出来, 然后放到了一个list中.
         '''
-        if filelist['errno'] != 0:
+        if not filelist or filelist['errno'] != 0:
             return
         if 'list' in filelist:
             key = 'list'

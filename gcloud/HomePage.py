@@ -24,8 +24,9 @@ class PathBox(Gtk.Box):
             self.remove(button)
 
     def append_button(self, abspath, name):
-        button = Gtk.Button(name)
+        button = Gtk.Button(gutil.ellipse_text(name))
         button.abspath = abspath
+        button.set_tooltip_text(name)
         self.pack_start(button, False, False, 0)
         button.connect('clicked', self.on_button_clicked)
 

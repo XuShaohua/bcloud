@@ -94,7 +94,7 @@ class FolderBrowserDialog(Gtk.Dialog):
         selection = self.treeview.get_selection()
         model, tree_iter = selection.get_selected()
         if not tree_iter:
-            return ''
+            return '/'
         else:
             return model[tree_iter][PATH_COL]
 

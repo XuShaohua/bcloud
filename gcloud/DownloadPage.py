@@ -11,6 +11,7 @@ import threading
 from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import Gtk
+from gi.repository import Pango
 
 from gcloud import Config
 _ = Config._
@@ -110,7 +111,8 @@ class DownloadPage(Gtk.Box):
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
         
-        name_cell = Gtk.CellRendererText()
+        name_cell = Gtk.CellRendererText(
+                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
@@ -176,7 +178,6 @@ class DownloadPage(Gtk.Box):
         req = self.cursor.execute('SELECT * FROM queue')
         for task in req:
             self.liststore.append(task)
-        self.scan_tasks()
 
     def dump_tasks(self):
         sql = 'DELETE FROM queue'
@@ -200,36 +201,35 @@ class DownloadPage(Gtk.Box):
     # Open API
     def add_launch_task(self, pcs_file, app_info, saveDir=None,
                         saveName=None):
+        print('DownloadPage.add_launch_task()--')
         if pcs_file['fs_id'] in self.app_infos:
+            print('fs id already in self.app_infs')
             return
         self.app_infos[pcs_file['fs_id']] = app_info
         self.add_task(pcs_file, saveDir, saveName)
 
     def launch_app(self, fs_id):
-        print('launch app() ')
+        print('launch app() --')
         if fs_id in self.app_infos:
-            print('will launch app')
             row = self.get_task_by_fsid(fs_id)
             app_info = self.app_infos[fs_id]
             filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
-            print('file path:', filepath)
             gfile = Gio.File.new_for_path(filepath)
-            print('g file:', gfile)
             app_info.launch([gfile, ], None)
+            del self.app_infos[fs_id]
         else:
             print('fs id not in self.app_infos')
 
     # Open API
     def add_task(self, pcs_file, saveDir=None, saveName=None):
         '''加入新的下载任务'''
-        print('add_task() --', pcs_file)
+        print('add_task() --')
         def _add_task(resp, error=None):
             print('_add task')
             if error:
                 print('Error occured will adding task:', resp)
                 return
             red_url, req_id = resp
-            print('resp:', resp)
             human_size, _ = util.get_human_size(pcs_file['size'])
             task = (
                 pcs_file['server_filename'],
@@ -255,12 +255,9 @@ class DownloadPage(Gtk.Box):
         # 如果已经存在于下载列表中, 就忽略.
         row = self.get_task_by_fsid(pcs_file['fs_id'])
         if row:
-            print('fs id already exists in task list')
-            print(row[STATENAME_COL])
             if row[STATE_COL] == State.FINISHED:
                 self.launch_app(pcs_file['fs_id'])
             elif row[STATE_COL] not in RUNNING_STATES:
-                print(row[STATENAME_COL])
                 row[STATE_COL] = State.WAITING
                 self.scan_tasks()
             return
@@ -309,6 +306,7 @@ class DownloadPage(Gtk.Box):
             total_size, _ = util.get_human_size(row[SIZE_COL])
             row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
             row[STATENAME_COL] = StateNames[State.FINISHED]
+            del self.workers[fs_id]
             self.launch_app(fs_id)
 
         def on_worker_network_error(worker, fs_id):
@@ -324,7 +322,7 @@ class DownloadPage(Gtk.Box):
         tree_iter = row.iter
         worker = Downloader(self, row, self.app.cookie, self.app.tokens)
         self.workers[row[FSID_COL]] = (worker, row)
-        print(self.workers.keys())
+        # TODO: add to main thread
         worker.connect('received', on_worker_received)
         worker.connect('downloaded', on_worker_downloaded)
         worker.connect('network-error', on_worker_network_error)
@@ -390,8 +388,7 @@ class DownloadPage(Gtk.Box):
             filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
             if os.path.exists(filepath):
                 os.remove(filepath)
-        if row[FSID_COL] in self.app_infos:
-            del self.app_infos[row[FSID_COL]]
+        self.launch_app(row[FSID_COL])
         tree_iter = row.iter
         if tree_iter:
             self.liststore.remove(tree_iter)

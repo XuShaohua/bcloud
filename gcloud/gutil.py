@@ -72,7 +72,13 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
         print('url is to short')
         return
     filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
-    if os.path.exists(filepath):
+    if os.path.exists(filepath) and os.stat(filepath).st_blocks:
         _update_image()
     else:
         async_call(net.urlopen, url, callback=_dump_image)
+
+def ellipse_text(text, length=10):
+    if len(text) < length:
+        return text
+    else:
+        return text[:8] + '..'

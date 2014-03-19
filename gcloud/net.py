@@ -16,6 +16,8 @@ import zlib
 sys.path.insert(0, os.path.dirname(__file__))
 import const
 
+RETRIES = 3
+
 default_headers = {
     'User-agent': const.USER_AGENT,
     'Referer': const.PAN_REFERER,
@@ -27,7 +29,15 @@ default_headers = {
     'Cache-control': 'no-cache',
     }
 
-def urlopen(url, headers={}, data=None):
+class ForbiddenHandler(urllib.request.HTTPErrorProcessor):
+
+    def http_error_403(self, req, fp, code, msg, headers):
+        return fp
+    http_error_400 = http_error_403
+    http_error_500 = http_error_403
+
+
+def urlopen(url, headers={}, data=None, retries=RETRIES):
     '''打开一个http连接, 并返回Request.
 
     headers 是一个dict. 默认提供了一些项目, 比如User-Agent, Referer等, 就
@@ -41,19 +51,24 @@ def urlopen(url, headers={}, data=None):
     headers_merged = copy.copy(default_headers)
     for key in headers.keys():
         headers_merged[key] = headers[key]
-    opener = urllib.request.build_opener()
+    opener = urllib.request.build_opener(ForbiddenHandler)
     opener.addheaders = [(k, v) for k,v in headers_merged.items()]
 
-    req = opener.open(url, data=data)
-    encoding = req.headers.get('Content-encoding')
-    req.data = req.read()
-    if encoding == 'gzip':
-        req.data = gzip.decompress(req.data)
-    elif encoding == 'deflate':
-        req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
-    return req
+    for _ in range(retries):
+        try:
+            req = opener.open(url, data=data)
+            encoding = req.headers.get('Content-encoding')
+            req.data = req.read()
+            if encoding == 'gzip':
+                req.data = gzip.decompress(req.data)
+            elif encoding == 'deflate':
+                req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
+            return req
+        except OSError as e:
+            print('Error in net.urlopen :', e)
+        return None
 
-def urlopen_without_redirect(url, headers={}, data=None):
+def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
     '''请求一个URL, 并返回一个Response对象. 不处理重定向.
 
     使用这个函数可以返回URL重定向(Error 301/302)后的地址, 也可以重到URL中请
@@ -64,7 +79,12 @@ def urlopen_without_redirect(url, headers={}, data=None):
         headers_merged[key] = headers[key]
 
     parse_result = urllib.parse.urlparse(url)
-    conn = http.client.HTTPConnection(parse_result.netloc)
-    #conn.request('HEAD', url, body=data, headers=headers_merged)
-    conn.request('GET', url, body=data, headers=headers_merged)
-    return conn.getresponse()
+    for _ in range(retries):
+        try:
+            conn = http.client.HTTPConnection(parse_result.netloc)
+            #conn.request('HEAD', url, body=data, headers=headers_merged)
+            conn.request('GET', url, body=data, headers=headers_merged)
+            return conn.getresponse()
+        except OSError as e:
+            print(e)
+        return None

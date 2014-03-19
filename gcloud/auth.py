@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 # Copyright (C) 2013-2014 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
@@ -155,8 +154,6 @@ def get_bdstoken(cookie):
     '''
     url = 'http://pan.baidu.com/disk/home'
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    with open('/tmp/index.html', 'wb') as fh:
-        fh.write(req.data)
     return parse_bdstoken(req.data.decode())
 
 def get_auth_info(username, password, refresh=False):
@@ -183,10 +180,8 @@ def get_auth_info(username, password, refresh=False):
         print('Error: failed to check login!')
         return (None, None)
     cookie.load_list(get_bduss(cookie, token, username, password))
-    print(cookie)
     tokens = get_bdstoken(cookie)
     tokens['token'] = token
-    print(tokens)
     auth_info = [str(cookie), tokens]
     if 'bdstoken' not in tokens or not tokens['bdstoken']:
         return (None, None)
@@ -194,10 +189,3 @@ def get_auth_info(username, password, refresh=False):
         json.dump(auth_info, fh)
     return (cookie, tokens)
 
-def main():
-    username = 'leeh3oDog9ee@163.com'
-    password = 'Iz6Eeng0jeivie'
-    print(get_auth_info(username, password, refresh=True))
-
-if __name__ == '__main__':
-    main()

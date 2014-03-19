@@ -28,6 +28,8 @@ def latency():
 
 def rec_split_path(path):
     '''将一个路径进行分隔, 分别得到每父母的绝对路径及目录名'''
+    if len(path) > 1 and path.endswith('/'):
+        path = path[:-1]
     result = []
     while path != '/':
         parent, name = os.path.split(path)

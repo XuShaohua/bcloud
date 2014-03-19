@@ -70,6 +70,7 @@ class App:
         # icon_name, disname, tooltip
         self.nav_liststore = Gtk.ListStore(str, str, str)
         nav_treeview = Gtk.TreeView(model=self.nav_liststore)
+        self.nav_selection = nav_treeview.get_selection()
         nav_treeview.props.headers_visible = False
         nav_treeview.set_tooltip_column(2)
         icon_cell = Gtk.CellRendererPixbuf()
@@ -190,6 +191,13 @@ class App:
 
     def switch_page_by_index(self, index):
         self.notebook.set_current_page(index)
+
+    def switch_page(self, page):
+        for index, p in enumerate(self.notebook):
+            if p == page:
+                self.nav_selection.select_iter(self.nav_liststore[index].iter)
+                #self.notebook.set_current_page(index)
+                break
 
     def on_notebook_switched(self, notebook, page, index):
         if page.first_run:
