@@ -283,7 +283,7 @@ msgstr "一般"
 
 #: ../gcloud/PreferencesDialog.py:36
 msgid "Save To:"
-msgstr "保存到.."
+msgstr "保存到:"
 
 #: ../gcloud/PreferencesDialog.py:45
 msgid "Use Notification:"
