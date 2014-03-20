@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 # Copyright (C) 2013-2014 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
@@ -16,7 +15,7 @@ import zlib
 sys.path.insert(0, os.path.dirname(__file__))
 import const
 
-RETRIES = 3
+RETRIES = 1
 
 default_headers = {
     'User-agent': const.USER_AGENT,
@@ -65,7 +64,7 @@ def urlopen(url, headers={}, data=None, retries=RETRIES):
                 req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
             return req
         except OSError as e:
-            print('Error in net.urlopen :', e)
+            print('Error in net.urlopen :', e, ', with url:', url)
         return None
 
 def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):

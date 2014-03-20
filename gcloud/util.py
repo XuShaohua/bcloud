@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 # Copyright (C) 2014 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
@@ -71,9 +70,3 @@ def list_remove_by_index(l, index):
         l = l[0:index] + l[index+1:]
 
     return l
-
-if __name__ == '__main__':
-    l = [1, 2, 3, 5, 8]
-    l2 = list_remove_by_index(l, 3)
-    print(l)
-    print(l2)

@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 
 from gi.repository import GdkPixbuf
+from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import Gtk
 
@@ -22,6 +23,7 @@ from CloudPage import CloudPage
 from DownloadPage import DownloadPage
 from HomePage import HomePage
 from InboxPage import InboxPage
+from PreferencesDialog import PreferencesDialog
 from SharePage import SharePage
 from SigninDialog import SigninDialog
 from TrashPage import TrashPage
@@ -51,10 +53,27 @@ class App:
         self.window.set_default_size(*Config._default_profile['window-size'])
         self.window.set_title(Config.APPNAME)
         self.window.props.hide_titlebar_when_maximized = True
-        # self.window.set_icon_name()
+        self.window.set_icon_name(Config.NAME)
         self.window.connect('check-resize', self.on_main_window_resized)
         self.window.connect('delete-event', self.on_main_window_deleted)
         app.add_window(self.window)
+
+        app_menu = Gio.Menu.new()
+        app_menu.append(_('Preferences'), 'app.preferences')
+        app_menu.append(_('About'), 'app.about')
+        app_menu.append(_('Quit'), 'app.quit')
+        app.set_app_menu(app_menu)
+
+        preferences_action = Gio.SimpleAction.new('preferences', None)
+        preferences_action.connect(
+                'activate', self.on_preferences_action_activated)
+        app.add_action(preferences_action)
+        about_action = Gio.SimpleAction.new('about', None)
+        about_action.connect('activate', self.on_about_action_activated)
+        app.add_action(about_action)
+        quit_action = Gio.SimpleAction.new('quit', None)
+        quit_action.connect('activate', self.on_quit_action_activated)
+        app.add_action(quit_action)
 
         paned = Gtk.Paned()
         self.window.add(paned)
@@ -126,7 +145,6 @@ class App:
         self.app.run(argv)
 
     def quit(self):
-        self.window.destroy()
         self.app.quit()
 
     def on_main_window_resized(self, window):
@@ -134,7 +152,34 @@ class App:
             self.profile['window-size'] = window.get_size()
 
     def on_main_window_deleted(self, window, event):
-        pass
+        print('on main window deleted')
+        # TODO: minimize to sys tray
+        #return False
+
+    def on_preferences_action_activated(self, action, params):
+        dialog = PreferencesDialog(self)
+        dialog.run()
+        dialog.destroy()
+        if self.profile:
+            Config.dump_profile(self.profile)
+
+    def on_about_action_activated(self, action, params):
+        dialog = Gtk.AboutDialog()
+        dialog.set_modal(True)
+        dialog.set_transient_for(self.window)
+        dialog.set_program_name(Config.APPNAME)
+        dialog.set_logo_icon_name(Config.NAME)
+        dialog.set_version(Config.VERSION)
+        dialog.set_comments(Config.DESCRIPTION)
+        dialog.set_copyright(Config.COPYRIGHT)
+        dialog.set_website(Config.HOMEPAGE)
+        dialog.set_license_type(Gtk.License.GPL_3_0)
+        dialog.set_authors(Config.AUTHORS)
+        dialog.run()
+        dialog.destroy()
+
+    def on_quit_action_activated(self, action, params):
+        self.quit()
 
     def update_quota(self, quota_info, error=None):
         '''更新网盘容量信息'''

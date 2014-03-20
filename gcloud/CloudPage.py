@@ -219,8 +219,15 @@ class CloudPage(Gtk.Box):
         box = dialog.get_content_area()
         entry = Gtk.Entry()
         entry.set_placeholder_text(_('Link ..'))
-        entry.set_tooltip_text(_('Support http/https/ftp/eMule/Magnet format'))
         box.pack_start(entry, False, False, 0)
+
+        infobar = Gtk.InfoBar()
+        infobar.set_message_type(Gtk.MessageType.INFO)
+        box.pack_start(infobar, False, False, 5)
+        info_content = infobar.get_content_area()
+        info_label = Gtk.Label(_('Support http/https/ftp/eMule/Magnet format'))
+        info_content.pack_start(info_label, False, False, 0)
+
         box.show_all()
         response = dialog.run()
         source_url = entry.get_text()

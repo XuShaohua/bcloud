@@ -9,6 +9,7 @@ import os
 
 from gi.repository import Gtk
 
+NAME = 'gcloud'
 if __file__.startswith('/usr/local/'):
     PREF = '/usr/local/share'
 elif __file__.startswith('/usr/'):
@@ -17,23 +18,24 @@ else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
 
 LOCALEDIR = os.path.join(PREF, 'locale')
-gettext.bindtextdomain('gcloud', LOCALEDIR)
-gettext.textdomain('gcloud')
+gettext.bindtextdomain(NAME, LOCALEDIR)
+gettext.textdomain(NAME)
 _ = gettext.gettext
 
 APPNAME = _('GCloud')
 VERSION = '1.0.0'
 HOMEPAGE = 'https://github.com/LiuLang/gcloud'
 AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
+COPYRIGHT = _('Copyright (c) 2014 LiuLang')
 DESCRIPTION = _('Baidu Pan client for GNU/Linux desktop users.')
 
 HOME_DIR = os.path.expanduser('~')
-CACHE_DIR = os.path.join(HOME_DIR, '.cache', 'gcloud')
+CACHE_DIR = os.path.join(HOME_DIR, '.cache', NAME)
 
 # Check Gtk version <= 3.6
 GTK_LE_36 = (Gtk.MAJOR_VERSION == 3) and (Gtk.MINOR_VERSION <= 6)
 
-CONF_DIR = os.path.join(HOME_DIR, '.config', 'gcloud')
+CONF_DIR = os.path.join(HOME_DIR, '.config', NAME)
 _conf_file = os.path.join(CONF_DIR, 'conf.json')
 
 _default_profile = {

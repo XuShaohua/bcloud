@@ -48,6 +48,9 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
     def _update_image(error=None):
         if error:
             return
+        if os.stat(filepath).st_size == 0:
+            print('target image file is empty:', filepath)
+            return
         try:
             pix = GdkPixbuf.Pixbuf.new_from_file_at_size(filepath, 96, 96)
             tree_path = liststore.get_path(tree_iter)

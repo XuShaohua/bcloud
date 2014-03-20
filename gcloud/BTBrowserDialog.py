@@ -7,13 +7,15 @@ from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Pango
 
-CHECK_COL, NAME_COL, SIZE_COL, HUMANSIZE_COL = list(range(4))
 from gcloud import Config
 _ = Config._
 from gcloud import gutil
 from gcloud import pcs
 from gcloud import util
 
+CHECK_COL, NAME_COL, SIZE_COL, HUMANSIZE_COL = list(range(4))
+MIN_SIZE_TO_CHECK = 2 ** 20  # 1M
+CHECK_EXT = ('jpg', 'png', 'gif', 'bitttorrent')
 
 class BTBrowserDialog(Gtk.Dialog):
 
@@ -49,6 +51,7 @@ class BTBrowserDialog(Gtk.Dialog):
         # check, name, size, humansize
         self.liststore = Gtk.ListStore(bool, str, GObject.TYPE_LONG, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
+        self.treeview.set_tooltip_column(NAME_COL)
         scrolled_win.add(self.treeview)
         check_cell = Gtk.CellRendererToggle()
         check_cell.connect('toggled', self.on_check_cell_toggled)
@@ -82,11 +85,14 @@ class BTBrowserDialog(Gtk.Dialog):
                 print('tasks is null:', info)
                 return
             for task in tasks:
-                human_size, _ = util.get_human_size(int(task['size']))
+                size = int(task['size'])
+                human_size, _ = util.get_human_size(size)
+                select = (size > MIN_SIZE_TO_CHECK or 
+                        task['file_name'].endswith(CHECK_EXT))
                 self.liststore.append([
-                    False,
+                    select,
                     task['file_name'],
-                    int(task['size']),
+                    size,
                     human_size,
                     ])
 
