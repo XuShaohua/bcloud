@@ -156,16 +156,15 @@ def get_bdstoken(cookie):
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     return parse_bdstoken(req.data.decode())
 
-def get_auth_info(username, password, refresh=False):
+def get_auth_info(username, password, auth_cache=None):
     '''获取授权信息.
 
     username - 用户名
     password - 明文密码
     refresh - 这个参数只用于测试, 会自动将敏感的授权信息保存起来.
     '''
-    auth_info_file = '/tmp/auth_info.json'
-    if not refresh and os.path.exists(auth_info_file):
-        with open(auth_info_file, 'r') as fh:
+    if auth_cache and os.path.exists(auth_cache):
+        with open(auth_cache, 'r') as fh:
             cookie_str, tokens = json.load(fh)
             cookie = RequestCookie(cookie_str)
             return (cookie, tokens)
@@ -185,7 +184,8 @@ def get_auth_info(username, password, refresh=False):
     auth_info = [str(cookie), tokens]
     if 'bdstoken' not in tokens or not tokens['bdstoken']:
         return (None, None)
-    with open(auth_info_file, 'w') as fh:
-        json.dump(auth_info, fh)
+    if auth_cache:
+        with open(auth_cache, 'w') as fh:
+            json.dump(auth_info, fh)
     return (cookie, tokens)
 

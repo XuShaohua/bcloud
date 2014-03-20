@@ -3,6 +3,8 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import os
+
 from gi.repository import GLib
 from gi.repository import Gtk
 
@@ -118,7 +120,8 @@ class SigninDialog(Gtk.Dialog):
     def signin(self):
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
-        cookie, tokens = auth.get_auth_info(username, password)
+        auth_cache = os.path.join(Config.CACHE_DIR, username, 'auth.json')
+        cookie, tokens = auth.get_auth_info(username, password, auth_cache)
         if cookie and tokens:
             if not self.profile:
                 self.profile = Config.load_profile(username)

@@ -412,7 +412,6 @@ def get_download_link(cookie, dlink):
         dlink,
         '&cflg=', cookie.get('cflag').value
         ])
-    print('get download link: ', url)
     req = net.urlopen_without_redirect(url, headers={
             'Cookie': cookie.sub_output('BAIDUID', 'BDUSS', 'cflag'),
             'Accept': const.ACCEPT_HTML,
@@ -573,7 +572,6 @@ def cloud_query_sinfo(cookie, tokens, source_path):
 
     source_path - BT种子的绝对路径.
     '''
-    print('pcs.cloud_query_sinfo:', cookie, tokens, source_path)
     url = ''.join([
         const.PAN_URL,
         'rest/2.0/services/cloud_dl?channel=chunlei&clienttype=0&web=1',
@@ -584,13 +582,10 @@ def cloud_query_sinfo(cookie, tokens, source_path):
         '&t=', util.timestamp(),
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    print('pcs.cloud_query_sinfo:', req)
     if req:
         content = req.data
-        print(content)
         return json.loads(content.decode())
     else:
-        print(' req is none:', req)
         return None
 
 def cloud_query_magnetinfo(cookie, tokens, source_url, save_path):
@@ -616,7 +611,6 @@ def cloud_query_magnetinfo(cookie, tokens, source_url, save_path):
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         }, data=data.encode())
-    print('pcs.cloud_query_magnetinfo:', source_url)
     if req:
         content = req.data
         return json.loads(content.decode())
