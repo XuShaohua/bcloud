@@ -31,6 +31,8 @@ class CategoryPage(IconWindow):
                 pcs.get_category, self.app.cookie, self.app.tokens,
                 self.category, self.page_num, callback=super().load)
 
+    def reload(self, *args):
+        self.load()
 
 class VideoPage(CategoryPage):
 

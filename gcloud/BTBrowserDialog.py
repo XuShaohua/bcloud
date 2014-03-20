@@ -21,10 +21,10 @@ class BTBrowserDialog(Gtk.Dialog):
 
     file_sha1 = ''
 
-    def __init__(self, parent, app, title, source_path):
+    def __init__(self, parent, app, title, source_url, save_path):
         '''初始化BT种子查询对话框.
 
-        source_path - 如果是BT种子的话, 就是种子的绝对路径.
+        source_url - 如果是BT种子的话, 就是种子的绝对路径.
                       如果是磁链的话, 就是以magent:开头的磁链链接.
         '''
         super().__init__(
@@ -33,7 +33,8 @@ class BTBrowserDialog(Gtk.Dialog):
             Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
         self.app = app
-        self.source_path = source_path
+        self.source_url = source_url
+        self.save_path = save_path
 
         self.set_default_size(520, 480)
         self.set_border_width(10)
@@ -75,6 +76,7 @@ class BTBrowserDialog(Gtk.Dialog):
         '''在调用dialog.run()之前先调用这个函数来获取数据'''
         def on_tasks_received(info, error=None):
             if error or not info:
+                print('error occurred, or info is None:', info)
                 return
             if 'magnet_info' in info:
                 tasks = info['magnet_info']
@@ -96,15 +98,15 @@ class BTBrowserDialog(Gtk.Dialog):
                     human_size,
                     ])
 
-        if self.source_path.startswith('magnet'):
+        if self.source_url.startswith('magnet'):
             gutil.async_call(
                 pcs.cloud_query_magnetinfo, self.app.cookie,
-                self.app.tokens, self.source_path, '/',
+                self.app.tokens, self.source_url, self.save_path,
                 callback=on_tasks_received)
         else:
             gutil.async_call(
                 pcs.cloud_query_sinfo, self.app.cookie, self.app.tokens,
-                self.source_path, '/', callback=on_tasks_received)
+                self.source_url, callback=on_tasks_received)
 
     def get_selected(self):
         '''返回选中要下载的文件的编号及sha1值, 从1开始计数.'''

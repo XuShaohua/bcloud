@@ -96,6 +96,11 @@ class CloudPage(Gtk.Box):
         self.treeview.set_tooltip_column(PATH_COL)
         scrolled_win.add(self.treeview)
 
+    def check_first(self):
+        if self.first_run:
+            self.first_run = False
+            self.load()
+
     def load(self):
         '''获取当前的离线任务列表'''
         def on_list_task(info, error=None):
@@ -169,46 +174,64 @@ class CloudPage(Gtk.Box):
                 task_ids, callback=update_task_status)
 
 
+    # Open API
+    def add_cloud_bt_task(self, source_url):
+        '''从服务器上获取种子, 并建立离线下载任务
 
-
-    def add_cloud_bt_task(self):
-        '''从服务器上获取种子, 并建立离线下载任务'''
-        if self.first_run:
-            self.first_run = False
-            self.load()
-
-    def add_local_bt_task(self):
-        '''从本地上传种子到服务器, 再建议离线下载任务'''
-        pass
-
-    def on_bt_button_clicked(self, button):
-        pass
-
-    def on_link_button_clicked(self, button):
+        source_url - BT 种子在服务器上的绝对路径, 或者是磁链的地址.
+        '''
         def check_vcode(info, error=None):
             if error or not info:
                 print('Error in check_vcode:', info)
                 return
-            if 'error_code' in info and info['error_code'] != 0:
-                if info['error_code'] == -19:
-                    vcode_dialog = VCodeDialog(self, self.app, info)
-                    response = vcode_dialog.run()
-                    vcode_input = vcode_dialog.get_vcode()
-                    vcode_dialog.destroy()
-                    if response != Gtk.ResponseType.OK:
-                        return
-                    gutil.async_call(
-                        pcs.cloud_add_bt_task, self.app.cookie,
-                        self.app.tokens, source_url, save_path,
-                        selected_idx, file_sha1, info['vcode'], vcode_input,
-                        callback=check_vcode)
-                    return
-                else:
-                    print('Unknown error info:', info)
-                    return
-            else:
+            if 'error_code' not in info or info['error_code'] == 0:
                 self.reload()
+                return
+            if info['error_code'] == -19:
+                vcode_dialog = VCodeDialog(self, self.app, info)
+                response = vcode_dialog.run()
+                vcode_input = vcode_dialog.get_vcode()
+                vcode_dialog.destroy()
+                if response != Gtk.ResponseType.OK:
+                    return
+                gutil.async_call(
+                    pcs.cloud_add_bt_task, self.app.cookie,
+                    self.app.tokens, source_url, save_path,
+                    selected_idx, file_sha1, info['vcode'], vcode_input,
+                    callback=check_vcode)
+            else:
+                print('Unknown error info:', info)
 
+        self.check_first()
+        folder_browser = FolderBrowserDialog(
+                self, self.app, _('Save to..'))
+        response = folder_browser.run()
+        if response != Gtk.ResponseType.OK:
+            return
+        save_path = folder_browser.get_path()
+        folder_browser.destroy()
+
+        bt_browser = BTBrowserDialog(
+                self, self.app, _('Choose..'), source_url, save_path)
+        response = bt_browser.run()
+        selected_idx, file_sha1 = bt_browser.get_selected()
+        bt_browser.destroy()
+        if response != Gtk.ResponseType.OK or not selected_idx:
+            return
+        gutil.async_call(
+            pcs.cloud_add_bt_task, self.app.cookie, self.app.tokens,
+            source_url, save_path, selected_idx, file_sha1,
+            callback=check_vcode)
+
+
+    # Open API
+    def add_local_bt_task(self):
+        '''从本地上传种子到服务器, 再创建离线下载任务'''
+        self.check_first()
+
+    # Open API
+    def add_link_task(self):
+        self.check_first()
         dialog = Gtk.Dialog(
                 _('Add new link task'), self.app.window,
                 Gtk.DialogFlags.MODAL,
@@ -225,7 +248,8 @@ class CloudPage(Gtk.Box):
         infobar.set_message_type(Gtk.MessageType.INFO)
         box.pack_start(infobar, False, False, 5)
         info_content = infobar.get_content_area()
-        info_label = Gtk.Label(_('Support http/https/ftp/eMule/Magnet format'))
+        info_label = Gtk.Label(
+                _('Support http/https/ftp/eMule/Magnet format'))
         info_content.pack_start(info_label, False, False, 0)
 
         box.show_all()
@@ -234,31 +258,27 @@ class CloudPage(Gtk.Box):
         dialog.destroy()
         if response != Gtk.ResponseType.OK or not len(source_url):
             return
+
+        if source_url.startswith('magent'):
+            self.add_cloud_bt_task(source_url)
+            return
+
         folder_browser = FolderBrowserDialog(
-                self, self.app, 
-                _('Save to..'))
+                self, self.app, _('Save to..'))
         response = folder_browser.run()
         if response != Gtk.ResponseType.OK:
             return
         save_path = folder_browser.get_path()
         folder_browser.destroy()
-        if source_url.startswith('magnet'):
-            bt_browser = BTBrowserDialog(
-                    self, self.app, _('Choose..'), source_url)
-            response = bt_browser.run()
-            selected_idx, file_sha1 = bt_browser.get_selected()
-            bt_browser.destroy()
-            if response != Gtk.ResponseType.OK or not selected_idx:
-                return
-            gutil.async_call(
-                pcs.cloud_add_bt_task, self.app.cookie, self.app.tokens,
-                source_url, save_path, selected_idx, file_sha1,
-                callback=check_vcode)
-        else:
-            gutil.async_call(
-                pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
-                source_url, save_path, callback=self.reload)
+        gutil.async_call(
+            pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
+            source_url, save_path, callback=self.reload)
 
+    def on_bt_button_clicked(self, button):
+        self.add_local_bt_task()
+
+    def on_link_button_clicked(self, button):
+        self.add_link_task()
 
     def on_reload_button_clicked(self, button):
         self.reload()

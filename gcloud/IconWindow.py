@@ -21,6 +21,7 @@ from gcloud import gutil
 from gcloud import pcs
 
 PIXBUF_COL, DISNAME_COL, PATH_COL, TOOLTIP_COL, TYPE_COL = list(range(5))
+TYPE_TORRENT = 'application/x-bittorrent'
 
 class IconWindow(Gtk.ScrolledWindow):
     '''这个类用于获取文件, 并将它显示到IconView中去.
@@ -177,6 +178,12 @@ class IconWindow(Gtk.ScrolledWindow):
                 menu.append(open_dir_item)
             # 不是目录的话, 就显示出程序菜单
             else:
+                if file_type == TYPE_TORRENT:
+                    cloud_download_item = Gtk.MenuItem(_('Cloud Download'))
+                    cloud_download_item.connect(
+                            'activate',
+                            self.on_cloud_download_item_activated)
+                    menu.append(cloud_download_item)
                 app_infos = Gio.AppInfo.get_recommended_for_type(file_type)
                 # 第一个app_info是默认的app.
                 if len(app_infos) > 2:
@@ -313,7 +320,14 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_open_dir_item_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
         if tree_paths and len(tree_paths) == 1:
-            self.parent.load(self.liststore[tree_paths][PATH_COL])
+            self.parent.load(self.liststore[tree_paths[0]][PATH_COL])
+
+    def on_cloud_download_item_activated(self, menu_item):
+        '''创建离线下载任务, 下载选中的BT种子.'''
+        tree_paths = self.iconview.get_selected_items()
+        if tree_paths and len(tree_paths) == 1:
+            self.app.cloud_page.add_cloud_bt_task(
+                self.liststore[tree_paths[0]][PATH_COL])
 
     def on_copy_link_activated(self, menu_item):
         def copy_link_to_clipboard(res, error=None):
