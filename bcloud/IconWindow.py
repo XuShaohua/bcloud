@@ -284,10 +284,11 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def launch_app_with_app_info(self, app_info):
         def open_video_link(resp, error=None):
-            if error:
+            print('IconWindow.open_video_ink:', resp)
+            if error or not resp:
                 return
             red_url, req_id = resp
-            app_info.launch_uris([red_url, ], None)
+            gutil.async_call(app_info.launch_uris, [red_url, ], None)
 
         print('open with ', app_info.get_display_name())
         # first, download this to load dir
@@ -309,7 +310,6 @@ class IconWindow(Gtk.ScrolledWindow):
                     pcs.get_download_link, self.app.cookie,
                     pcs_file['dlink'], callback=open_video_link)
         else:
-            print('will download this link and launch app')
             self.app.download_page.add_launch_task(pcs_file, app_info)
 
     # item popup menu
