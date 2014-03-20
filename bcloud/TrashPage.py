@@ -9,11 +9,11 @@ from gi.repository import GdkPixbuf
 from gi.repository import GObject
 from gi.repository import Gtk
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud import gutil
-from gcloud import pcs
-from gcloud import util
+from bcloud import gutil
+from bcloud import pcs
+from bcloud import util
 
 (ICON_COL, DISNAME_COL, PATH_COL, FSID_COL, TOOLTIP_COL,
     SIZE_COL, DELETING_COL, REMAINING_COL) = list(range(8))

@@ -10,7 +10,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 import urllib3
 
-from gcloud.const import State
+from bcloud.const import State
 
 CHUNK = 2 ** 18  # 256k 
 RETRIES = 3

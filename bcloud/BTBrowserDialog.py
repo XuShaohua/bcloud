@@ -7,11 +7,11 @@ from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud import gutil
-from gcloud import pcs
-from gcloud import util
+from bcloud import gutil
+from bcloud import pcs
+from bcloud import util
 
 CHECK_COL, NAME_COL, SIZE_COL, HUMANSIZE_COL = list(range(4))
 MIN_SIZE_TO_CHECK = 2 ** 20  # 1M

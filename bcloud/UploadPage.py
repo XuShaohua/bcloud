@@ -5,15 +5,15 @@
 
 from gi.repository import Gtk
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
 
 
-class InboxPage(Gtk.ScrolledWindow):
+class UploadPage(Gtk.ScrolledWindow):
 
-    icon_name = 'mail-send-receive-symbolic'
-    disname = _('Inbox')
-    tooltip = _('Inbox')
+    icon_name = 'upload-symbolic'
+    disname = _('Upload')
+    tooltip = _('Uploading tasks')
     first_run = False
 
     def __init__(self, app):

@@ -30,7 +30,7 @@ from TrashPage import TrashPage
 from UploadPage import UploadPage
 
 GObject.threads_init()
-DBUS_APP_NAME = 'org.liulang.gcloud'
+DBUS_APP_NAME = 'org.liulang.bcloud'
 
 class App:
 

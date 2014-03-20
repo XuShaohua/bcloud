@@ -7,10 +7,10 @@ import os
 
 from gi.repository import Gtk
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud import gutil
-from gcloud import pcs
+from bcloud import gutil
+from bcloud import pcs
 
 class NewFolderDialog(Gtk.Dialog):
     

@@ -8,8 +8,8 @@ import os
 from gi.repository import GLib
 from gi.repository import Gtk
 
-from gcloud import auth
-from gcloud import Config
+from bcloud import auth
+from bcloud import Config
 _ = Config._
 
 class SigninDialog(Gtk.Dialog):

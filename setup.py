@@ -24,11 +24,11 @@ def build_data_files():
             data_files.append((target, files))
     return data_files
 
-scripts = ['gcloud.py', ]
+scripts = ['bcloud-gui', ]
 
 if __name__ == '__main__':
     setup(
-        name = 'gcloud',
+        name = Config.NAME,
         description = 'Baidu Pan client for Linux Desktop users',
         version = Config.VERSION,
         license = 'GPLv3',
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         author = 'LiuLang',
         author_email = 'gsushzhsosgsu@gmail.com',
 
-        packages = ['gcloud', ],
+        packages = ['bcloud', ],
         scripts = scripts,
         data_files = build_data_files(),
         )

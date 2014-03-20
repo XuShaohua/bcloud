@@ -5,11 +5,11 @@
 
 from gi.repository import Gtk
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud.IconWindow import IconWindow
-from gcloud import gutil
-from gcloud import pcs
+from bcloud.IconWindow import IconWindow
+from bcloud import gutil
+from bcloud import pcs
 
 __all__ = [
     'CategoryPage', 'PicturePage', 'DocPage', 'VideoPage',

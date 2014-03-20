@@ -9,7 +9,7 @@ import os
 
 from gi.repository import Gtk
 
-NAME = 'gcloud'
+NAME = 'bcloud'
 if __file__.startswith('/usr/local/'):
     PREF = '/usr/local/share'
 elif __file__.startswith('/usr/'):
@@ -22,9 +22,9 @@ gettext.bindtextdomain(NAME, LOCALEDIR)
 gettext.textdomain(NAME)
 _ = gettext.gettext
 
-APPNAME = _('GCloud')
-VERSION = '1.1'
-HOMEPAGE = 'https://github.com/LiuLang/gcloud'
+APPNAME = _('BCloud')
+VERSION = '2.1'
+HOMEPAGE = 'https://github.com/LiuLang/bcloud'
 AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
 DESCRIPTION = _('Baidu Pan client for GNU/Linux desktop users.')

@@ -13,13 +13,13 @@ from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud.Downloader import Downloader
-from gcloud import gutil
-from gcloud import pcs
-from gcloud import util
-from gcloud.const import State
+from bcloud.Downloader import Downloader
+from bcloud import gutil
+from bcloud import pcs
+from bcloud import util
+from bcloud.const import State
 
 
 TASK_FILE = 'tasks.sqlite'

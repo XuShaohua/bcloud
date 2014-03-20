@@ -6,10 +6,10 @@
 
 from gi.repository import Gtk
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud import gutil
-from gcloud import net
+from bcloud import gutil
+from bcloud import net
 
 
 class VCodeDialog(Gtk.Dialog):
@@ -48,7 +48,7 @@ class VCodeDialog(Gtk.Dialog):
         if error or not request:
             print('failed to get vcode image')
             return
-        vcode_path = '/tmp/gcloud-vcode.jpg'
+        vcode_path = '/tmp/bcloud-vcode.jpg'
         with open(vcode_path, 'wb') as fh:
             fh.write(request.data)
         self.img.set_from_file(vcode_path)

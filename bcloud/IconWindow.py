@@ -11,14 +11,14 @@ from gi.repository import GdkPixbuf
 from gi.repository import Gio
 from gi.repository import Gtk
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud.FolderBrowserDialog import FolderBrowserDialog
-from gcloud.NewFolderDialog import NewFolderDialog
-from gcloud.PropertiesDialog import PropertiesDialog
-from gcloud.RenameDialog import RenameDialog
-from gcloud import gutil
-from gcloud import pcs
+from bcloud.FolderBrowserDialog import FolderBrowserDialog
+from bcloud.NewFolderDialog import NewFolderDialog
+from bcloud.PropertiesDialog import PropertiesDialog
+from bcloud.RenameDialog import RenameDialog
+from bcloud import gutil
+from bcloud import pcs
 
 PIXBUF_COL, DISNAME_COL, PATH_COL, TOOLTIP_COL, TYPE_COL = list(range(5))
 TYPE_TORRENT = 'application/x-bittorrent'

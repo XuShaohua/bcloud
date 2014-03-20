@@ -8,11 +8,11 @@ import time
 
 from gi.repository import Gtk
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud import util
-from gcloud.Widgets import LeftLabel
-from gcloud.Widgets import SelectableLeftLabel
+from bcloud import util
+from bcloud.Widgets import LeftLabel
+from bcloud.Widgets import SelectableLeftLabel
 
 class PropertiesDialog(Gtk.Dialog):
 

@@ -9,7 +9,7 @@ import threading
 
 from gi.repository import GdkPixbuf
 from gi.repository import GLib
-from gcloud import net
+from bcloud import net
 
 # calls f on another thread
 def async_call(func, *args, callback=None):

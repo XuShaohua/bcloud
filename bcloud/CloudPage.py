@@ -7,14 +7,14 @@ from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Pango
 
-from gcloud import Config
+from bcloud import Config
 _ = Config._
-from gcloud.BTBrowserDialog import BTBrowserDialog
-from gcloud.FolderBrowserDialog import FolderBrowserDialog
-from gcloud.VCodeDialog import VCodeDialog
-from gcloud import gutil
-from gcloud import pcs
-from gcloud import util
+from bcloud.BTBrowserDialog import BTBrowserDialog
+from bcloud.FolderBrowserDialog import FolderBrowserDialog
+from bcloud.VCodeDialog import VCodeDialog
+from bcloud import gutil
+from bcloud import pcs
+from bcloud import util
 
 
 (TASKID_COL, NAME_COL, PATH_COL, SOURCEURL_COL, SIZE_COL,
