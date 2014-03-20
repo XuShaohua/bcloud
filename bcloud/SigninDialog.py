@@ -146,3 +146,6 @@ class SigninDialog(Gtk.Dialog):
             self.destroy()
         else:
             self.infobar.show_all()
+
+    def get_profile(self):
+        return self.profile

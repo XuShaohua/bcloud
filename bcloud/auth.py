@@ -185,6 +185,9 @@ def get_auth_info(username, password, auth_cache=None):
     if 'bdstoken' not in tokens or not tokens['bdstoken']:
         return (None, None)
     if auth_cache:
+        auth_folder, _ = os.path.split(auth_cache)
+        if not os.path.exists(auth_folder):
+            os.makedirs(auth_folder)
         with open(auth_cache, 'w') as fh:
             json.dump(auth_info, fh)
     return (cookie, tokens)

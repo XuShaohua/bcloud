@@ -5,7 +5,7 @@
 
 from gi.repository import Gtk
 
-from bclud import Config
+from bcloud import Config
 _ = Config._
 
 

@@ -124,17 +124,17 @@ class App:
         signin.run()
         signin.destroy()
 
-        if not self.profile:
+        if self.profile:
+            if self.profile['first-run']:
+                self.profile['first-run'] = False
+                preferences = PreferencesDialog(self)
+                preferences.run()
+                preferences.destroy()
+
+            self.home_page.load()
+            self.download_page.load()
+        else:
             self.quit()
-
-        if self.profile['first-run']:
-            self.profile['first-run'] = False
-            preferences = PreferencesDialog(self)
-            preferences.run()
-            preferences.destroy()
-
-        self.home_page.load()
-        self.download_page.load()
 
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''

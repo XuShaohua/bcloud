@@ -6,7 +6,7 @@
 
 import sys
 
-from gcloud.App import App
+from bcloud.App import App
 
 
 def main():
