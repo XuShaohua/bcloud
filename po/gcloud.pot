@@ -1,0 +1,412 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-03-20 12:05+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gcloud/App.py:62 ../gcloud/PreferencesDialog.py:17
+msgid "Preferences"
+msgstr ""
+
+#: ../gcloud/App.py:63
+msgid "About"
+msgstr ""
+
+#: ../gcloud/App.py:64
+msgid "Quit"
+msgstr ""
+
+#: ../gcloud/App.py:110
+msgid "Unknown"
+msgstr ""
+
+#: ../gcloud/BTBrowserDialog.py:43
+msgid "Select All"
+msgstr ""
+
+#: ../gcloud/BTBrowserDialog.py:64 ../gcloud/CloudPage.py:85
+#: ../gcloud/DownloadPage.py:116 ../gcloud/TrashPage.py:75
+msgid "Name"
+msgstr ""
+
+#: ../gcloud/BTBrowserDialog.py:69 ../gcloud/CloudPage.py:90
+#: ../gcloud/DownloadPage.py:127 ../gcloud/PropertiesDialog.py:49
+#: ../gcloud/TrashPage.py:83
+msgid "Size"
+msgstr ""
+
+#: ../gcloud/CategoryPage.py:40 ../gcloud/CategoryPage.py:41
+msgid "Videos"
+msgstr ""
+
+#: ../gcloud/CategoryPage.py:48 ../gcloud/CategoryPage.py:49
+msgid "Music"
+msgstr ""
+
+#: ../gcloud/CategoryPage.py:56 ../gcloud/CategoryPage.py:57
+msgid "Pictures"
+msgstr ""
+
+#: ../gcloud/CategoryPage.py:64 ../gcloud/CategoryPage.py:65
+msgid "Documents"
+msgstr ""
+
+#: ../gcloud/CategoryPage.py:72 ../gcloud/CategoryPage.py:73
+msgid "Others"
+msgstr ""
+
+#: ../gcloud/CategoryPage.py:80
+msgid "BT"
+msgstr ""
+
+#: ../gcloud/CategoryPage.py:81
+msgid "BT seeds"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:24 ../gcloud/DownloadPage.py:35
+msgid "FINISHED"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:24 ../gcloud/DownloadPage.py:32
+msgid "DOWNLOADING"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:30
+msgid "Cloud"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:31 ../gcloud/IconWindow.py:182
+msgid "Cloud Download"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:41
+msgid "New BT Task"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:44
+msgid "New Link Task"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:48 ../gcloud/IconWindow.py:141
+#: ../gcloud/TrashPage.py:55
+msgid "Reload"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:53 ../gcloud/DownloadPage.py:92
+msgid "Open Directory"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:57
+msgid "Cancel"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:58
+msgid "Cancel selected tasks"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:63 ../gcloud/DownloadPage.py:88
+msgid "Remove"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:64
+msgid "Remove selected tasks"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:68
+msgid "Clear"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:69
+msgid "Clear finished or canceled tasks"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:94 ../gcloud/DownloadPage.py:122
+msgid "Progress"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:207 ../gcloud/CloudPage.py:267
+msgid "Save to.."
+msgstr ""
+
+#: ../gcloud/CloudPage.py:215
+msgid "Choose.."
+msgstr ""
+
+#: ../gcloud/CloudPage.py:236
+msgid "Add new link task"
+msgstr ""
+
+#: ../gcloud/CloudPage.py:244
+msgid "Link .."
+msgstr ""
+
+#: ../gcloud/CloudPage.py:252
+msgid "Support http/https/ftp/eMule/Magnet format"
+msgstr ""
+
+#: ../gcloud/Config.py:25
+msgid "GCloud"
+msgstr ""
+
+#: ../gcloud/Config.py:30
+msgid "Baidu Pan client for GNU/Linux desktop users."
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:33
+msgid "WAITING"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:34
+msgid "PAUSED"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:36
+msgid "CANCELED"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:37
+msgid "ERROR"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:64
+msgid "Download"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:65
+msgid "Downloading tasks"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:80
+msgid "Start"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:84
+msgid "Pause"
+msgstr ""
+
+#: ../gcloud/DownloadPage.py:132
+msgid "State"
+msgstr ""
+
+#: ../gcloud/FolderBrowserDialog.py:41
+msgid "Folder"
+msgstr ""
+
+#: ../gcloud/HomePage.py:47
+msgid "Home"
+msgstr ""
+
+#: ../gcloud/HomePage.py:48
+msgid "Show all of your files on Cloud"
+msgstr ""
+
+#: ../gcloud/HomePage.py:75
+msgid "Search documents and folders by name"
+msgstr ""
+
+#: ../gcloud/IconWindow.py:135 ../gcloud/NewFolderDialog.py:19
+#: ../gcloud/NewFolderDialog.py:33
+msgid "New Folder"
+msgstr ""
+
+#: ../gcloud/IconWindow.py:147 ../gcloud/IconWindow.py:260
+msgid "Properties"
+msgstr ""
+
+#: ../gcloud/IconWindow.py:175
+msgid "Open"
+msgstr ""
+
+#: ../gcloud/IconWindow.py:192 ../gcloud/IconWindow.py:214
+#, python-brace-format
+msgid "Open With {0}"
+msgstr ""
+
+#: ../gcloud/IconWindow.py:196
+msgid "Open With"
+msgstr ""
+
+#: ../gcloud/IconWindow.py:207
+msgid "Other Application..."
+msgstr ""
+
+#: ../gcloud/IconWindow.py:218
+msgid "Open With Other Application..."
+msgstr ""
+
+#: ../gcloud/IconWindow.py:225
+msgid "Copy Link"
+msgstr ""
+
+#: ../gcloud/IconWindow.py:233
+msgid "Download..."
+msgstr ""
+
+#: ../gcloud/IconWindow.py:236
+msgid "Share..."
+msgstr ""
+
+#: ../gcloud/IconWindow.py:242 ../gcloud/IconWindow.py:370
+msgid "Move To..."
+msgstr ""
+
+#: ../gcloud/IconWindow.py:245 ../gcloud/IconWindow.py:396
+msgid "Copy To..."
+msgstr ""
+
+#: ../gcloud/IconWindow.py:248
+msgid "Rename..."
+msgstr ""
+
+#: ../gcloud/IconWindow.py:254
+msgid "Move to Trash"
+msgstr ""
+
+#: ../gcloud/InboxPage.py:15 ../gcloud/InboxPage.py:16
+msgid "Inbox"
+msgstr ""
+
+#: ../gcloud/PreferencesDialog.py:34
+msgid "General"
+msgstr ""
+
+#: ../gcloud/PreferencesDialog.py:36
+msgid "Save To:"
+msgstr ""
+
+#: ../gcloud/PreferencesDialog.py:45
+msgid "Use Notification:"
+msgstr ""
+
+#: ../gcloud/PreferencesDialog.py:52
+msgid "Minimize To System Tray:"
+msgstr ""
+
+#: ../gcloud/PropertiesDialog.py:22
+msgid " Properties"
+msgstr ""
+
+#: ../gcloud/PropertiesDialog.py:36
+msgid "Name:"
+msgstr ""
+
+#: ../gcloud/PropertiesDialog.py:41
+msgid "Location:"
+msgstr ""
+
+#: ../gcloud/PropertiesDialog.py:54 ../gcloud/PropertiesDialog.py:56
+msgid " bytes"
+msgstr ""
+
+#: ../gcloud/PropertiesDialog.py:69
+msgid "Created:"
+msgstr ""
+
+#: ../gcloud/PropertiesDialog.py:75
+msgid "Modified:"
+msgstr ""
+
+#: ../gcloud/RenameDialog.py:19
+msgid "Rename files"
+msgstr ""
+
+#: ../gcloud/RenameDialog.py:35
+msgid "Old Name:"
+msgstr ""
+
+#: ../gcloud/RenameDialog.py:36
+msgid "New Name:"
+msgstr ""
+
+#: ../gcloud/SharePage.py:15 ../gcloud/SharePage.py:16
+msgid "Share"
+msgstr ""
+
+#: ../gcloud/SigninDialog.py:19
+msgid "Sign in now"
+msgstr ""
+
+#: ../gcloud/SigninDialog.py:38
+msgid "Username/Email/Phone..."
+msgstr ""
+
+#: ../gcloud/SigninDialog.py:43
+msgid "Password .."
+msgstr ""
+
+#: ../gcloud/SigninDialog.py:47
+msgid "Remember Password"
+msgstr ""
+
+#: ../gcloud/SigninDialog.py:52
+msgid "Signin Automatically"
+msgstr ""
+
+#: ../gcloud/SigninDialog.py:57
+msgid "Sign in"
+msgstr ""
+
+#: ../gcloud/SigninDialog.py:66
+msgid "Failed to sign in, please try again."
+msgstr ""
+
+#: ../gcloud/TrashPage.py:26
+msgid "Trash"
+msgstr ""
+
+#: ../gcloud/TrashPage.py:27
+msgid "Files deleted."
+msgstr ""
+
+#: ../gcloud/TrashPage.py:41
+msgid "Restore"
+msgstr ""
+
+#: ../gcloud/TrashPage.py:45
+msgid "Delete"
+msgstr ""
+
+#: ../gcloud/TrashPage.py:46
+msgid "Delete selected files permanently"
+msgstr ""
+
+#: ../gcloud/TrashPage.py:50
+msgid "Clear Trash"
+msgstr ""
+
+#: ../gcloud/TrashPage.py:51
+msgid "Will delete all files in trash"
+msgstr ""
+
+#: ../gcloud/TrashPage.py:87
+msgid "Time"
+msgstr ""
+
+#: ../gcloud/TrashPage.py:91
+msgid "Remaining"
+msgstr ""
+
+#: ../gcloud/UploadPage.py:15
+msgid "Upload"
+msgstr ""
+
+#: ../gcloud/UploadPage.py:16
+msgid "Uploading tasks"
+msgstr ""
+
+#: ../gcloud/VCodeDialog.py:19
+msgid "Verification.."
+msgstr ""

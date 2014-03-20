@@ -33,7 +33,7 @@ class PreferencesDialog(Gtk.Dialog):
         general_grid.props.margin_top = 5
         notebook.append_page(general_grid, Gtk.Label(_('General')))
 
-        dir_label = Gtk.Label(_('Save to:'))
+        dir_label = Gtk.Label(_('Save To:'))
         dir_label.props.xalign = 1
         general_grid.attach(dir_label, 0, 0, 1, 1)
         dir_button = Gtk.FileChooserButton()
@@ -49,7 +49,7 @@ class PreferencesDialog(Gtk.Dialog):
         notify_switch.props.halign = Gtk.Align.START
         general_grid.attach(notify_switch, 1, 1, 1, 1)
 
-        tray_label = Gtk.Label(_('Minimize to System Tray:'))
+        tray_label = Gtk.Label(_('Minimize To System Tray:'))
         tray_label.props.xalign = 1
         general_grid.attach(tray_label, 0, 2, 1, 1)
         tray_switch = Gtk.Switch()

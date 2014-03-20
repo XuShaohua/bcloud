@@ -189,10 +189,11 @@ class IconWindow(Gtk.ScrolledWindow):
                 if len(app_infos) > 2:
                     app_info = app_infos[0]
                     launch_item = Gtk.ImageMenuItem(
-                            _('Open with ') + app_info.get_display_name())
+                        _('Open With {0}').format(
+                            app_info.get_display_name()))
                     build_app_menu(menu, launch_item, app_info)
 
-                    more_app_item = Gtk.MenuItem(_('Open with'))
+                    more_app_item = Gtk.MenuItem(_('Open With'))
                     menu.append(more_app_item)
                     sub_menu = Gtk.Menu()
                     more_app_item.set_submenu(sub_menu)
@@ -210,10 +211,11 @@ class IconWindow(Gtk.ScrolledWindow):
                 else:
                     for app_info in app_infos:
                         launch_item = Gtk.ImageMenuItem(
-                                _('Open with ') + app_info.get_display_name())
+                        _('Open With {0}').format(
+                            app_info.get_display_name()))
                         build_app_menu(menu, launch_item, app_info)
                     choose_app_item = Gtk.MenuItem(
-                            _('Open with Other Application...'))
+                            _('Open With Other Application...'))
                     choose_app_item.connect(
                             'activate', self.on_choose_app_activated)
                     menu.append(choose_app_item)
@@ -365,7 +367,7 @@ class IconWindow(Gtk.ScrolledWindow):
         if len(tree_paths) == 0:
             return
 
-        dialog = FolderBrowserDialog(self.parent, self.app, _('Move to..'))
+        dialog = FolderBrowserDialog(self.parent, self.app, _('Move To...'))
         response = dialog.run()
         targ_path = ''
         if response == Gtk.ResponseType.OK:
@@ -391,7 +393,7 @@ class IconWindow(Gtk.ScrolledWindow):
         if len(tree_paths) == 0:
             return
 
-        dialog = FolderBrowserDialog(self.parent, self.app, _('Copy to..'))
+        dialog = FolderBrowserDialog(self.parent, self.app, _('Copy To...'))
         response = dialog.run()
         targ_path = ''
         if response == Gtk.ResponseType.OK:

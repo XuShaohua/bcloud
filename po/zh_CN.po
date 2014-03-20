@@ -1,0 +1,410 @@
+# Chinese translations for PACKAGE package.
+# Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# LiuLang <gsushzhsosgsu@gmail.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-03-20 12:02+0800\n"
+"PO-Revision-Date: 2014-03-20 11:25+0800\n"
+"Last-Translator: LiuLang <gsushzhsosgsu@gmail.com>\n"
+"Language-Team: Chinese (simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gcloud/App.py:62 ../gcloud/PreferencesDialog.py:17
+msgid "Preferences"
+msgstr "首选项"
+
+#: ../gcloud/App.py:63
+msgid "About"
+msgstr "关于"
+
+#: ../gcloud/App.py:64
+msgid "Quit"
+msgstr "退出"
+
+#: ../gcloud/App.py:110
+msgid "Unknown"
+msgstr "未知"
+
+#: ../gcloud/BTBrowserDialog.py:43
+msgid "Select All"
+msgstr "全选"
+
+#: ../gcloud/BTBrowserDialog.py:64 ../gcloud/CloudPage.py:85
+#: ../gcloud/DownloadPage.py:116 ../gcloud/TrashPage.py:75
+msgid "Name"
+msgstr "文件名"
+
+#: ../gcloud/BTBrowserDialog.py:69 ../gcloud/CloudPage.py:90
+#: ../gcloud/DownloadPage.py:127 ../gcloud/PropertiesDialog.py:49
+#: ../gcloud/TrashPage.py:83
+msgid "Size"
+msgstr "大小"
+
+#: ../gcloud/CategoryPage.py:40 ../gcloud/CategoryPage.py:41
+msgid "Videos"
+msgstr "视频"
+
+#: ../gcloud/CategoryPage.py:48 ../gcloud/CategoryPage.py:49
+msgid "Music"
+msgstr "音乐"
+
+#: ../gcloud/CategoryPage.py:56 ../gcloud/CategoryPage.py:57
+msgid "Pictures"
+msgstr "图片"
+
+#: ../gcloud/CategoryPage.py:64 ../gcloud/CategoryPage.py:65
+msgid "Documents"
+msgstr "文档"
+
+#: ../gcloud/CategoryPage.py:72 ../gcloud/CategoryPage.py:73
+msgid "Others"
+msgstr "其它"
+
+#: ../gcloud/CategoryPage.py:80
+msgid "BT"
+msgstr "BT"
+
+#: ../gcloud/CategoryPage.py:81
+msgid "BT seeds"
+msgstr "BT种子"
+
+#: ../gcloud/CloudPage.py:24 ../gcloud/DownloadPage.py:35
+msgid "FINISHED"
+msgstr "完成"
+
+#: ../gcloud/CloudPage.py:24 ../gcloud/DownloadPage.py:32
+msgid "DOWNLOADING"
+msgstr "正在下载"
+
+#: ../gcloud/CloudPage.py:30
+msgid "Cloud"
+msgstr "云"
+
+#: ../gcloud/CloudPage.py:31 ../gcloud/IconWindow.py:182
+msgid "Cloud Download"
+msgstr "离线下载"
+
+#: ../gcloud/CloudPage.py:41
+msgid "New BT Task"
+msgstr "新建BT任务"
+
+#: ../gcloud/CloudPage.py:44
+msgid "New Link Task"
+msgstr "新建链接任务"
+
+#: ../gcloud/CloudPage.py:48 ../gcloud/IconWindow.py:141
+#: ../gcloud/TrashPage.py:55
+msgid "Reload"
+msgstr "重新载入"
+
+#: ../gcloud/CloudPage.py:53 ../gcloud/DownloadPage.py:92
+msgid "Open Directory"
+msgstr "打开所在目录"
+
+#: ../gcloud/CloudPage.py:57
+msgid "Cancel"
+msgstr "取消"
+
+#: ../gcloud/CloudPage.py:58
+msgid "Cancel selected tasks"
+msgstr "取消选中的任务"
+
+#: ../gcloud/CloudPage.py:63 ../gcloud/DownloadPage.py:88
+msgid "Remove"
+msgstr "删除"
+
+#: ../gcloud/CloudPage.py:64
+msgid "Remove selected tasks"
+msgstr "删除选中的的任务"
+
+#: ../gcloud/CloudPage.py:68
+msgid "Clear"
+msgstr "清空"
+
+#: ../gcloud/CloudPage.py:69
+msgid "Clear finished or canceled tasks"
+msgstr "清空已完成或已取消的任务"
+
+#: ../gcloud/CloudPage.py:94 ../gcloud/DownloadPage.py:122
+msgid "Progress"
+msgstr "进度"
+
+#: ../gcloud/CloudPage.py:207 ../gcloud/CloudPage.py:267
+msgid "Save to.."
+msgstr "保存到.."
+
+#: ../gcloud/CloudPage.py:215
+msgid "Choose.."
+msgstr "选择.."
+
+#: ../gcloud/CloudPage.py:236
+msgid "Add new link task"
+msgstr "新建链接任务"
+
+#: ../gcloud/CloudPage.py:244
+msgid "Link .."
+msgstr "链接.."
+
+#: ../gcloud/CloudPage.py:252
+msgid "Support http/https/ftp/eMule/Magnet format"
+msgstr "支持 HTTP/HTTPS/FTP/电驴/磁链 等格式"
+
+#: ../gcloud/Config.py:25
+msgid "GCloud"
+msgstr "GCloud"
+
+#: ../gcloud/Config.py:30
+msgid "Baidu Pan client for GNU/Linux desktop users."
+msgstr "百度网盘的Linux客户端"
+
+#: ../gcloud/DownloadPage.py:33
+msgid "WAITING"
+msgstr "等待中"
+
+#: ../gcloud/DownloadPage.py:34
+msgid "PAUSED"
+msgstr "已暂停"
+
+#: ../gcloud/DownloadPage.py:36
+msgid "CANCELED"
+msgstr "已取消"
+
+#: ../gcloud/DownloadPage.py:37
+msgid "ERROR"
+msgstr "错误"
+
+#: ../gcloud/DownloadPage.py:64
+msgid "Download"
+msgstr "下载"
+
+#: ../gcloud/DownloadPage.py:65
+msgid "Downloading tasks"
+msgstr "正在下载的任务"
+
+#: ../gcloud/DownloadPage.py:80
+msgid "Start"
+msgstr "开始"
+
+#: ../gcloud/DownloadPage.py:84
+msgid "Pause"
+msgstr "暂停"
+
+#: ../gcloud/DownloadPage.py:132
+msgid "State"
+msgstr "状态"
+
+#: ../gcloud/FolderBrowserDialog.py:41
+msgid "Folder"
+msgstr "目录"
+
+#: ../gcloud/HomePage.py:47
+msgid "Home"
+msgstr "主页"
+
+#: ../gcloud/HomePage.py:48
+msgid "Show all of your files on Cloud"
+msgstr "显示网盘中的所有文件"
+
+#: ../gcloud/HomePage.py:75
+msgid "Search documents and folders by name"
+msgstr "搜索文件名"
+
+#: ../gcloud/IconWindow.py:135 ../gcloud/NewFolderDialog.py:19
+#: ../gcloud/NewFolderDialog.py:33
+msgid "New Folder"
+msgstr "新建目录"
+
+#: ../gcloud/IconWindow.py:147 ../gcloud/IconWindow.py:260
+msgid "Properties"
+msgstr "属性"
+
+#: ../gcloud/IconWindow.py:175
+msgid "Open"
+msgstr "打开"
+
+#: ../gcloud/IconWindow.py:192 ../gcloud/IconWindow.py:214
+msgid "Open With {0}"
+msgstr "使用 {0} 打开"
+
+#: ../gcloud/IconWindow.py:196
+msgid "Open With"
+msgstr "打开方式"
+
+#: ../gcloud/IconWindow.py:207
+msgid "Other Application..."
+msgstr "其它程序..."
+
+#: ../gcloud/IconWindow.py:218
+msgid "Open With Other Application..."
+msgstr "使用其它程序打开..."
+
+#: ../gcloud/IconWindow.py:225
+msgid "Copy Link"
+msgstr "复制链接地址"
+
+#: ../gcloud/IconWindow.py:233
+msgid "Download..."
+msgstr "下载..."
+
+#: ../gcloud/IconWindow.py:236
+msgid "Share..."
+msgstr "分享..."
+
+#: ../gcloud/IconWindow.py:242 ../gcloud/IconWindow.py:370
+msgid "Move To..."
+msgstr "移动到..."
+
+#: ../gcloud/IconWindow.py:245 ../gcloud/IconWindow.py:396
+msgid "Copy To..."
+msgstr "复制到..."
+
+#: ../gcloud/IconWindow.py:248
+msgid "Rename..."
+msgstr "重命名..."
+
+#: ../gcloud/IconWindow.py:254
+msgid "Move to Trash"
+msgstr "丢弃到回收站"
+
+#: ../gcloud/InboxPage.py:15 ../gcloud/InboxPage.py:16
+msgid "Inbox"
+msgstr "收件箱"
+
+#: ../gcloud/PreferencesDialog.py:34
+msgid "General"
+msgstr "一般"
+
+#: ../gcloud/PreferencesDialog.py:36
+msgid "Save To:"
+msgstr "保存到.."
+
+#: ../gcloud/PreferencesDialog.py:45
+msgid "Use Notification:"
+msgstr "使用消息通知:"
+
+#: ../gcloud/PreferencesDialog.py:52
+msgid "Minimize To System Tray:"
+msgstr "使用系统托盘:"
+
+#: ../gcloud/PropertiesDialog.py:22
+msgid " Properties"
+msgstr " 的属性"
+
+#: ../gcloud/PropertiesDialog.py:36
+msgid "Name:"
+msgstr "文件名:"
+
+#: ../gcloud/PropertiesDialog.py:41
+msgid "Location:"
+msgstr "位置:"
+
+#: ../gcloud/PropertiesDialog.py:54 ../gcloud/PropertiesDialog.py:56
+msgid " bytes"
+msgstr " 字节"
+
+#: ../gcloud/PropertiesDialog.py:69
+msgid "Created:"
+msgstr "创建:"
+
+#: ../gcloud/PropertiesDialog.py:75
+msgid "Modified:"
+msgstr "修改:"
+
+#: ../gcloud/RenameDialog.py:19
+msgid "Rename files"
+msgstr "重命名文件"
+
+#: ../gcloud/RenameDialog.py:35
+msgid "Old Name:"
+msgstr "旧名称"
+
+#: ../gcloud/RenameDialog.py:36
+msgid "New Name:"
+msgstr "新名称"
+
+#: ../gcloud/SharePage.py:15 ../gcloud/SharePage.py:16
+msgid "Share"
+msgstr "分享"
+
+#: ../gcloud/SigninDialog.py:19
+msgid "Sign in now"
+msgstr "现在登录"
+
+#: ../gcloud/SigninDialog.py:38
+msgid "Username/Email/Phone..."
+msgstr "用户名/Email/手机号..."
+
+#: ../gcloud/SigninDialog.py:43
+msgid "Password .."
+msgstr "密码 .."
+
+#: ../gcloud/SigninDialog.py:47
+msgid "Remember Password"
+msgstr "记住密码"
+
+#: ../gcloud/SigninDialog.py:52
+msgid "Signin Automatically"
+msgstr "自动登录"
+
+#: ../gcloud/SigninDialog.py:57
+msgid "Sign in"
+msgstr "登录"
+
+#: ../gcloud/SigninDialog.py:66
+msgid "Failed to sign in, please try again."
+msgstr "登录失败, 请重试"
+
+#: ../gcloud/TrashPage.py:26
+msgid "Trash"
+msgstr "回收站"
+
+#: ../gcloud/TrashPage.py:27
+msgid "Files deleted."
+msgstr "已删除的文件"
+
+#: ../gcloud/TrashPage.py:41
+msgid "Restore"
+msgstr "恢复"
+
+#: ../gcloud/TrashPage.py:45
+msgid "Delete"
+msgstr "删除"
+
+#: ../gcloud/TrashPage.py:46
+msgid "Delete selected files permanently"
+msgstr "永久删除选中的文件"
+
+#: ../gcloud/TrashPage.py:50
+msgid "Clear Trash"
+msgstr "清空回收站"
+
+#: ../gcloud/TrashPage.py:51
+msgid "Will delete all files in trash"
+msgstr "永久删除所有文件"
+
+#: ../gcloud/TrashPage.py:87
+msgid "Time"
+msgstr "时间"
+
+#: ../gcloud/TrashPage.py:91
+msgid "Remaining"
+msgstr "剩余时间"
+
+#: ../gcloud/UploadPage.py:15
+msgid "Upload"
+msgstr "上传"
+
+#: ../gcloud/UploadPage.py:16
+msgid "Uploading tasks"
+msgstr "上传任务"
+
+#: ../gcloud/VCodeDialog.py:19
+msgid "Verification.."
+msgstr "请验证.."

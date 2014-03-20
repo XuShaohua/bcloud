@@ -57,7 +57,7 @@ class BTBrowserDialog(Gtk.Dialog):
         check_cell = Gtk.CellRendererToggle()
         check_cell.connect('toggled', self.on_check_cell_toggled)
         check_col = Gtk.TreeViewColumn(
-            _('Check'), check_cell, active=CHECK_COL)
+            '', check_cell, active=CHECK_COL)
         self.treeview.append_column(check_col)
         name_cell = Gtk.CellRendererText(
                 ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)

@@ -72,7 +72,7 @@ class TrashPage(Gtk.Box):
         icon_cell = Gtk.CellRendererPixbuf()
         name_cell = Gtk.CellRendererText()
         name_col = Gtk.TreeViewColumn()
-        name_col.set_title(_('File Name'))
+        name_col.set_title(_('Name'))
         name_col.pack_start(icon_cell, False)
         name_col.pack_start(name_cell, True)
         name_col.set_attributes(icon_cell, icon_name=ICON_COL)

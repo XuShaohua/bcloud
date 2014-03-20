@@ -121,16 +121,19 @@ class DownloadPage(Gtk.Box):
         percent_col = Gtk.TreeViewColumn(
                 _('Progress'), percent_cell, value=PERCENT_COL)
         self.treeview.append_column(percent_col)
+        percent_col.props.min_width = 145
 
         size_cell = Gtk.CellRendererText()
         size_col = Gtk.TreeViewColumn(
                 _('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
+        size_col.props.min_width = 100
 
         state_cell = Gtk.CellRendererText()
         state_col = Gtk.TreeViewColumn(
                 _('State'), state_cell, text=STATENAME_COL)
         self.treeview.append_column(state_col)
+        state_col.props.min_width = 100
 
         self.init_db()
         self.load_tasks()

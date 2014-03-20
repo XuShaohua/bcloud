@@ -23,10 +23,10 @@ gettext.textdomain(NAME)
 _ = gettext.gettext
 
 APPNAME = _('GCloud')
-VERSION = '1.0.0'
+VERSION = '1.1'
 HOMEPAGE = 'https://github.com/LiuLang/gcloud'
 AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
-COPYRIGHT = _('Copyright (c) 2014 LiuLang')
+COPYRIGHT = 'Copyright (c) 2014 LiuLang'
 DESCRIPTION = _('Baidu Pan client for GNU/Linux desktop users.')
 
 HOME_DIR = os.path.expanduser('~')

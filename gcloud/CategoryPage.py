@@ -77,6 +77,6 @@ class OtherPage(CategoryPage):
 class BTPage(CategoryPage):
 
     icon_name = 'bittorrent-symbolic'
-    disname = _('Bittorrents')
+    disname = _('BT')
     tooltip = _('BT seeds')
     category = 7

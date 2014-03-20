@@ -16,7 +16,7 @@ class NewFolderDialog(Gtk.Dialog):
     
     def __init__(self, parent, app, path):
         super().__init__(
-                _('Create New Folder'), app.window, Gtk.DialogFlags.MODAL,
+                _('New Folder'), app.window, Gtk.DialogFlags.MODAL,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                  Gtk.STOCK_OK, Gtk.ResponseType.OK))
         self.set_default_response(Gtk.ResponseType.OK)

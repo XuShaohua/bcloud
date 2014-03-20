@@ -28,7 +28,7 @@ class CloudPage(Gtk.Box):
 
     icon_name = 'cloud-symbolic'
     disname = _('Cloud')
-    tooltip = _('Cloud downloading')
+    tooltip = _('Cloud Download')
     first_run = True
 
     def __init__(self, app):
@@ -50,7 +50,7 @@ class CloudPage(Gtk.Box):
         reload_button.connect('clicked', self.on_reload_button_clicked)
         control_box.pack_start(reload_button, False, False, 0)
 
-        open_button = Gtk.Button(_('Open'))
+        open_button = Gtk.Button(_('Open Directory'))
         open_button.connect('clicked', self.on_open_button_clicked)
         control_box.pack_start(open_button, False, False, 0)
 
@@ -89,10 +89,13 @@ class CloudPage(Gtk.Box):
         size_col = Gtk.TreeViewColumn(
                 _('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
+        #size_col.props.sizing = Gtk.TreeViewColumnSizing.AUTOSIZE
+        size_col.props.min_width = 145
         percent_cell = Gtk.CellRendererProgress()
         percent_col = Gtk.TreeViewColumn(
                 _('Progress'), percent_cell, value=PERCENT_COL)
         self.treeview.append_column(percent_col)
+        percent_col.props.min_width = 145
         self.treeview.set_tooltip_column(PATH_COL)
         scrolled_win.add(self.treeview)
 
