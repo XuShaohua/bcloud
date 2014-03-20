@@ -251,6 +251,8 @@ class App:
 
     def on_nav_selection_changed(self, nav_selection):
         model, iter_ = nav_selection.get_selected()
+        if not iter_:
+            return
         path = model.get_path(iter_)
         index = path.get_indices()[0]
         self.switch_page_by_index(index)
