@@ -14,10 +14,11 @@ _ = Config._
 
 class SigninDialog(Gtk.Dialog):
 
-    def __init__(self, app):
+    def __init__(self, app, auto_signin=True):
         super().__init__(
                 _('Sign in now'), app.window, Gtk.DialogFlags.MODAL)
         self.app = app
+        self.auto_signin = auto_signin
 
         self.set_default_size(460, 260)
         self.set_border_width(15)
@@ -46,11 +47,13 @@ class SigninDialog(Gtk.Dialog):
 
         self.remember_check = Gtk.CheckButton(_('Remember Password'))
         self.remember_check.props.margin_top = 20
+        self.remember_check.props.margin_left = 20
         box.pack_start(self.remember_check, False, False, 0)
         self.remember_check.connect('toggled', self.on_remember_check_toggled)
 
         self.signin_check = Gtk.CheckButton(_('Signin Automatically'))
         self.signin_check.set_sensitive(False)
+        self.signin_check.props.margin_left = 20
         box.pack_start(self.signin_check, False, False, 0)
         self.signin_check.connect('toggled', self.on_signin_check_toggled)
 
@@ -74,7 +77,8 @@ class SigninDialog(Gtk.Dialog):
     def load_defualt_profile(self):
         if self.conf['default']:
             self.use_profile(self.conf['default'])
-            if self.signin_check.get_active():
+            # auto_signin here
+            if self.signin_check.get_active() and self.auto_signin:
                 self.signin()
         return False
 
@@ -146,6 +150,3 @@ class SigninDialog(Gtk.Dialog):
             self.destroy()
         else:
             self.infobar.show_all()
-
-    def get_profile(self):
-        return self.profile

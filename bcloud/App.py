@@ -60,6 +60,7 @@ class App:
 
         app_menu = Gio.Menu.new()
         app_menu.append(_('Preferences'), 'app.preferences')
+        app_menu.append(_('Sign out'), 'app.signout')
         app_menu.append(_('About'), 'app.about')
         app_menu.append(_('Quit'), 'app.quit')
         app.set_app_menu(app_menu)
@@ -68,6 +69,9 @@ class App:
         preferences_action.connect(
                 'activate', self.on_preferences_action_activated)
         app.add_action(preferences_action)
+        signout_action = Gio.SimpleAction.new('signout', None)
+        signout_action.connect('activate', self.on_signout_action_activated)
+        app.add_action(signout_action)
         about_action = Gio.SimpleAction.new('about', None)
         about_action.connect('activate', self.on_about_action_activated)
         app.add_action(about_action)
@@ -120,7 +124,22 @@ class App:
 
     def on_app_activate(self, app):
         self.window.show_all()
-        signin = SigninDialog(self)
+        self.show_signin_dialog()
+
+    def on_app_shutdown(self, app):
+        '''Dump profile content to disk'''
+        if self.profile:
+            Config.dump_profile(self.profile)
+
+    def run(self, argv):
+        self.app.run(argv)
+
+    def quit(self):
+        self.app.quit()
+
+    def show_signin_dialog(self, auto_signin=True):
+        self.profile = None
+        signin = SigninDialog(self, auto_signin=auto_signin)
         signin.run()
         signin.destroy()
 
@@ -135,17 +154,6 @@ class App:
             self.download_page.load()
         else:
             self.quit()
-
-    def on_app_shutdown(self, app):
-        '''Dump profile content to disk'''
-        if self.profile:
-            Config.dump_profile(self.profile)
-
-    def run(self, argv):
-        self.app.run(argv)
-
-    def quit(self):
-        self.app.quit()
 
     def on_main_window_resized(self, window):
         if self.profile:
@@ -162,6 +170,9 @@ class App:
         dialog.destroy()
         if self.profile:
             Config.dump_profile(self.profile)
+
+    def on_signout_action_activated(self, action, params):
+        self.show_signin_dialog(auto_signin=False)
 
     def on_about_action_activated(self, action, params):
         dialog = Gtk.AboutDialog()
