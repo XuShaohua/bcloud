@@ -4,6 +4,16 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 
 现在只写了一部分主要功能, 其它功能还要等有空再加入. gloud 还处于早期的开发阶段, 欢迎各位朋友提交问题.
 
+支持的系统:
+* Fedora 20
+* Debian sid
+* Debian testing
+* Ubuntu 13.10
+
+不支持的系统:
+* Ubuntu 14.04
+
+
 安装
 ====
 请用户直接到 [bcloud-packages](https://github.com/LiuLang/bcloud-packages)
@@ -24,3 +34,7 @@ COPYRIGHT
 Copyright (C) 2014 [LiuLang](mailto:gsushzhsosgsu@gmail.com)
 
 基于GNU通用许可协议第三版发布, 详细的许可信息请参考 [LICENSE](LICENSE)
+
+SCREENSHOTS
+==========
+![MainWindow](screenshots/bcloud.png)
