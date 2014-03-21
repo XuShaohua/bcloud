@@ -29,7 +29,6 @@ class SigninDialog(Gtk.Dialog):
         box = self.get_content_area()
         box.set_spacing(8)
 
-        # username
         username_ls = Gtk.ListStore(str)
         for username in self.conf['profiles']:
             username_ls.append([username,])
@@ -42,7 +41,7 @@ class SigninDialog(Gtk.Dialog):
 
         self.password_entry = Gtk.Entry()
         self.password_entry.set_placeholder_text(_('Password ..'))
-        self.password_entry.props.invisible_char_set = True
+        self.password_entry.props.visibility = False
         box.pack_start(self.password_entry, False, False, 0)
 
         self.remember_check = Gtk.CheckButton(_('Remember Password'))
@@ -124,8 +123,9 @@ class SigninDialog(Gtk.Dialog):
     def signin(self):
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
-        auth_cache = os.path.join(Config.CACHE_DIR, username, 'auth.json')
-        cookie, tokens = auth.get_auth_info(username, password, auth_cache)
+        cookie, tokens = auth.get_auth_info(username, password)
+        print('cookie:', cookie)
+        print('tokens:', tokens)
         if cookie and tokens:
             if not self.profile:
                 self.profile = Config.load_profile(username)

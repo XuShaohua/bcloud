@@ -107,8 +107,13 @@ class CloudPage(Gtk.Box):
     def load(self):
         '''获取当前的离线任务列表'''
         def on_list_task(info, error=None):
+            print('on list task() --', info)
             if error or not info:
                 print('Error: failed to list cloud tasks')
+                return
+            if 'error_code' in info and info['error_code'] != 0:
+                print('Error: ', info['error_msg'])
+                print(info)
                 return
             tasks = info['task_info']
             for task in tasks:
