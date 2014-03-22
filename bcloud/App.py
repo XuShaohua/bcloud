@@ -6,7 +6,6 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(__file__))
 
-from gi.repository import GdkPixbuf
 from gi.repository import Gio
 from gi.repository import GObject
 from gi.repository import Gtk
@@ -29,7 +28,9 @@ from SigninDialog import SigninDialog
 from TrashPage import TrashPage
 from UploadPage import UploadPage
 
-GObject.threads_init()
+if Gtk.MAJOR_VERSION <= 3 and Gtk.MINOR_VERSION <= 11:
+    GObject.threads_init()
+#GObject.threads_init()
 DBUS_APP_NAME = 'org.liulang.bcloud'
 
 class App:
@@ -45,11 +46,11 @@ class App:
         self.app.connect('shutdown', self.on_app_shutdown)
 
     def on_app_startup(self, app):
-        self.icon_theme = Gtk.IconTheme.new()
+        self.icon_theme = Gtk.IconTheme.get_default()
         #self.icon_theme.append_search_path(Config.ICON_PATH)
         self.mime = MimeProvider(self)
 
-        self.window = Gtk.ApplicationWindow(application=app)
+        self.window = Gtk.ApplicationWindow.new(application=app)
         self.window.set_default_size(*Config._default_profile['window-size'])
         self.window.set_title(Config.APPNAME)
         self.window.props.hide_titlebar_when_maximized = True
@@ -233,7 +234,7 @@ class App:
         pages.append(self.upload_page)
 
         for page in pages:
-            self.notebook.append_page(page, Gtk.Label(page.disname))
+            self.notebook.append_page(page, Gtk.Label.new(page.disname))
             self.nav_liststore.append([
                 page.icon_name, page.disname, page.tooltip])
 
