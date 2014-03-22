@@ -23,8 +23,8 @@ gettext.bindtextdomain(NAME, LOCALEDIR)
 gettext.textdomain(NAME)
 _ = gettext.gettext
 
-APPNAME = _('BCloud')
-VERSION = '2.1.3'
+APPNAME = 'BCloud'
+VERSION = '2.1.4'
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
 AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
