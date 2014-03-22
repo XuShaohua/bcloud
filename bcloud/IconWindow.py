@@ -132,19 +132,19 @@ class IconWindow(Gtk.ScrolledWindow):
         menu = Gtk.Menu()
         self.menu = menu
         
-        new_folder_item = Gtk.MenuItem(_('New Folder'))
+        new_folder_item = Gtk.MenuItem.new_with_label(_('New Folder'))
         new_folder_item.connect('activate', self.on_new_folder_activated)
         menu.append(new_folder_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
-        reload_item = Gtk.MenuItem(_('Reload'))
+        reload_item = Gtk.MenuItem.new_with_label(_('Reload'))
         reload_item.connect('activate', self.on_reload_activated)
         menu.append(reload_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
-        props_item = Gtk.MenuItem(_('Properties'))
+        props_item = Gtk.MenuItem.new_with_label(_('Properties'))
         props_item.connect('activate', self.on_props_activated)
         menu.append(props_item)
 
@@ -172,14 +172,15 @@ class IconWindow(Gtk.ScrolledWindow):
             tree_path = tree_paths[0]
             file_type = self.liststore[tree_path][TYPE_COL]
             if file_type == 'folder':
-                open_dir_item = Gtk.MenuItem(_('Open'))
+                open_dir_item = Gtk.MenuItem.new_with_label(_('Open'))
                 open_dir_item.connect(
                         'activate', self.on_open_dir_item_activated)
                 menu.append(open_dir_item)
             # 不是目录的话, 就显示出程序菜单
             else:
                 if file_type == TYPE_TORRENT:
-                    cloud_download_item = Gtk.MenuItem(_('Cloud Download'))
+                    cloud_download_item = Gtk.MenuItem.new_with_label(
+                            _('Cloud Download'))
                     cloud_download_item.connect(
                             'activate',
                             self.on_cloud_download_item_activated)
@@ -188,33 +189,35 @@ class IconWindow(Gtk.ScrolledWindow):
                 # 第一个app_info是默认的app.
                 if len(app_infos) > 2:
                     app_info = app_infos[0]
-                    launch_item = Gtk.ImageMenuItem(
+                    launch_item = Gtk.ImageMenuItem.new_with_label(
                         _('Open With {0}').format(
                             app_info.get_display_name()))
                     build_app_menu(menu, launch_item, app_info)
 
-                    more_app_item = Gtk.MenuItem(_('Open With'))
+                    more_app_item = Gtk.MenuItem.new_with_label(
+                            _('Open With'))
                     menu.append(more_app_item)
                     sub_menu = Gtk.Menu()
                     more_app_item.set_submenu(sub_menu)
 
                     for app_info in app_infos[1:]:
-                        launch_item = Gtk.ImageMenuItem(
+                        launch_item = Gtk.ImageMenuItem.new_with_label(
                                 app_info.get_display_name())
                         build_app_menu(sub_menu, launch_item, app_info)
                     sep_item = Gtk.SeparatorMenuItem()
                     sub_menu.append(sep_item)
-                    choose_app_item = Gtk.MenuItem(_('Other Application...'))
+                    choose_app_item = Gtk.MenuItem.new_with_label(
+                            _('Other Application...'))
                     choose_app_item.connect(
                             'activate', self.on_choose_app_activated)
                     sub_menu.append(choose_app_item)
                 else:
                     for app_info in app_infos:
-                        launch_item = Gtk.ImageMenuItem(
-                        _('Open With {0}').format(
-                            app_info.get_display_name()))
+                        launch_item = Gtk.ImageMenuItem.new_with_label(
+                            _('Open With {0}').format(
+                                app_info.get_display_name()))
                         build_app_menu(menu, launch_item, app_info)
-                    choose_app_item = Gtk.MenuItem(
+                    choose_app_item = Gtk.MenuItem.new_with_label(
                             _('Open With Other Application...'))
                     choose_app_item.connect(
                             'activate', self.on_choose_app_activated)
@@ -222,7 +225,7 @@ class IconWindow(Gtk.ScrolledWindow):
 
                 sep_item = Gtk.SeparatorMenuItem()
                 menu.append(sep_item)
-                copy_link_item = Gtk.MenuItem(_('Copy Link'))
+                copy_link_item = Gtk.MenuItem.new_with_label(_('Copy Link'))
                 copy_link_item.connect(
                         'activate', self.on_copy_link_activated)
                 menu.append(copy_link_item)
@@ -230,34 +233,34 @@ class IconWindow(Gtk.ScrolledWindow):
             sep_item = Gtk.SeparatorMenuItem()
             menu.append(sep_item)
 
-        download_item = Gtk.MenuItem(_('Download...'))
+        download_item = Gtk.MenuItem.new_with_label(_('Download...'))
         download_item.connect('activate', self.on_download_activated)
         menu.append(download_item)
-        share_item = Gtk.MenuItem(_('Share...'))
+        share_item = Gtk.MenuItem.new_with_label(_('Share...'))
         share_item.connect('activate', self.on_share_activated)
         menu.append(share_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
-        moveto_item = Gtk.MenuItem(_('Move To...'))
+        moveto_item = Gtk.MenuItem.new_with_label(_('Move To...'))
         moveto_item.connect('activate', self.on_moveto_activated)
         menu.append(moveto_item)
-        copyto_item = Gtk.MenuItem(_('Copy To...'))
+        copyto_item = Gtk.MenuItem.new_with_label(_('Copy To...'))
         copyto_item.connect('activate', self.on_copyto_activated)
         menu.append(copyto_item)
-        rename_item = Gtk.MenuItem(_('Rename...'))
+        rename_item = Gtk.MenuItem.new_with_label(_('Rename...'))
         rename_item.connect('activate', self.on_rename_activated)
         menu.append(rename_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
-        trash_item = Gtk.MenuItem(_('Move to Trash'))
+        trash_item = Gtk.MenuItem.new_with_label(_('Move to Trash'))
         trash_item.connect('activate', self.on_trash_activated)
         menu.append(trash_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
-        props_item = Gtk.MenuItem(_('Properties'))
+        props_item = Gtk.MenuItem.new_with_label(_('Properties'))
         props_item.connect('activate', self.on_props_activated)
         menu.append(props_item)
 
