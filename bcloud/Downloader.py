@@ -11,6 +11,7 @@ from gi.repository import GObject
 import urllib3
 
 from bcloud.const import State
+from bcloud import pcs
 
 CHUNK = 2 ** 18  # 256k 
 RETRIES = 3
@@ -29,6 +30,7 @@ class Downloader(threading.Thread, GObject.GObject):
 
     times_to_flush = 0
     fh = None
+    red_url = ''
 
     __gsignals__ = {
             'received': (GObject.SIGNAL_RUN_LAST,
@@ -54,7 +56,7 @@ class Downloader(threading.Thread, GObject.GObject):
         self.tokens = tokens
 
         self.row = row[:]  # 复制一份
-        print('new worker inited:')
+        print('Downloader.__init__(), new worker inited:')
         print(self.row)
 
         self.pool = urllib3.PoolManager()
@@ -66,8 +68,10 @@ class Downloader(threading.Thread, GObject.GObject):
         self.filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL]) 
         truncated = False
         if os.path.exists(self.filepath):
+            print('Downloader.init_file(), file exists! ', self.filepath)
             truncated = True
             stat = os.stat(self.filepath)
+            print(stat.st_size, stat.st_blocks)
             if (row[SIZE_COL] == stat.st_size and 
                     stat.st_size == stat.st_blocks * 512):
                 print('File exists and has same size, quit!')
@@ -88,7 +92,23 @@ class Downloader(threading.Thread, GObject.GObject):
         print('Downloader.run() --')
         self.init_files()
         if self.fh:
-            self.download()
+            self.get_download_link()
+
+    def get_download_link(self):
+        print('self.row:', self.row[PATH_COL])
+        meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
+        if not meta or meta['errno'] != 0 or 'info' not in meta:
+            print('Error: failed to get meta info:', meta)
+            self.emit('network-error', self.row[FSID_COL])
+        else:
+            dlink = meta['info'][0]['dlink']
+            red_url, req_id = pcs.get_download_link(self.cookie, dlink)
+            if not req_id:
+                print('Error: failed to get req_id:', req_id)
+                self.emit('network-error', self.row[FSID_COL])
+            else:
+                self.red_url = red_url
+                self.download()
 
     def download(self):
         while True:
@@ -131,7 +151,7 @@ class Downloader(threading.Thread, GObject.GObject):
         return (start, stop)
 
     def request_bytes(self, range_):
-        resp = self.pool.urlopen('GET', self.row[LINK_COL], headers={
+        resp = self.pool.urlopen('GET', self.red_url, headers={
             'Range': 'bytes={0}-{1}'.format(range_[0], range_[1]-1),
             'Connection': 'Keep-Alive',
             #'Cookie': self.cookie.header_output(),

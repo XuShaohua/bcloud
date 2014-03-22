@@ -8,13 +8,13 @@ from gi.repository import Gtk
 class LeftLabel(Gtk.Label):
     '''左对齐的标签'''
 
-    def __init__(self, *args, **kwds):
-        super().__init__(*args, **kwds)
+    def __init__(self, label):
+        super().new(label)
         self.props.xalign = 0.0
 
 class SelectableLeftLabel(LeftLabel):
     '''左对齐的标签, 标签内容可选中'''
 
-    def __init__(self, *args, **kwds):
-        super().__init__(*args, **kwds)
+    def __init__(self, label):
+        super().new(label)
         self.props.selectable = True

@@ -444,10 +444,13 @@ def get_download_link(cookie, dlink):
 def get_metas(cookie, tokens, filelist):
     '''获取文件的metadata.
 
-    filelist - 一个list, 里面是文件的绝对路径.
+    filelist - 一个list, 里面是每个文件的绝对路径.
+               也可以是一个字符串, 只包含一个文件的绝对路径.
 
     @return 包含了文件的下载链接dlink, 通过它可以得到最终的下载链接.
     '''
+    if isinstance(filelist, str):
+        filelist = [filelist, ]
     url = ''.join([
         const.PAN_API_URL,
         'filemetas?channel=chunlei&clienttype=0&web=1',

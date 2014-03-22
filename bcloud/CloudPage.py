@@ -9,6 +9,7 @@ from gi.repository import Pango
 
 from bcloud import Config
 _ = Config._
+from bcloud import decoder
 from bcloud.BTBrowserDialog import BTBrowserDialog
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.VCodeDialog import VCodeDialog
@@ -38,34 +39,34 @@ class CloudPage(Gtk.Box):
         control_box = Gtk.Box()
         self.pack_start(control_box, False, False, 0)
 
-        bt_button = Gtk.Button(_('New BT Task'))
+        bt_button = Gtk.Button.new_with_label(_('New BT Task'))
         control_box.pack_start(bt_button, False, False, 0)
 
-        link_button = Gtk.Button(_('New Link Task'))
+        link_button = Gtk.Button.new_with_label(_('New Link Task'))
         link_button.connect('clicked', self.on_link_button_clicked)
         control_box.pack_start(link_button, False, False, 0)
 
-        reload_button = Gtk.Button(_('Reload'))
+        reload_button = Gtk.Button.new_with_label(_('Reload'))
         reload_button.props.margin_left = 40
         reload_button.connect('clicked', self.on_reload_button_clicked)
         control_box.pack_start(reload_button, False, False, 0)
 
-        open_button = Gtk.Button(_('Open Directory'))
+        open_button = Gtk.Button.new_with_label(_('Open Directory'))
         open_button.connect('clicked', self.on_open_button_clicked)
         control_box.pack_start(open_button, False, False, 0)
 
-        cancel_button = Gtk.Button(_('Cancel'))
+        cancel_button = Gtk.Button.new_with_label(_('Cancel'))
         cancel_button.set_tooltip_text(_('Cancel selected tasks'))
         cancel_button.props.margin_left = 40
         cancel_button.connect('clicked', self.on_cancel_button_clicked)
         control_box.pack_start(cancel_button, False, False, 0)
 
-        remove_button = Gtk.Button(_('Remove'))
+        remove_button = Gtk.Button.new_with_label(_('Remove'))
         remove_button.set_tooltip_text(_('Remove selected tasks'))
         remove_button.connect('clicked', self.on_remove_button_clicked)
         control_box.pack_start(remove_button, False, False, 0)
 
-        clear_button = Gtk.Button(_('Clear'))
+        clear_button = Gtk.Button.new_with_label(_('Clear'))
         clear_button.set_tooltip_text(_('Clear finished or canceled tasks'))
         clear_button.connect('clicked', self.on_clear_button_clicked)
         control_box.pack_start(clear_button, False, False, 0)
@@ -256,8 +257,8 @@ class CloudPage(Gtk.Box):
         infobar.set_message_type(Gtk.MessageType.INFO)
         box.pack_start(infobar, False, False, 5)
         info_content = infobar.get_content_area()
-        info_label = Gtk.Label(
-                _('Support http/https/ftp/eMule/Magnet format'))
+        info_label = Gtk.Label.new(
+            _('Support http/https/ftp/thunder/qqdl/flashget/eMule/Magnet format'))
         info_content.pack_start(info_label, False, False, 0)
 
         box.show_all()
@@ -271,6 +272,12 @@ class CloudPage(Gtk.Box):
             self.add_cloud_bt_task(source_url)
             return
 
+        priv_url = decoder.decode(source_url)
+        if priv_url:
+            print('private link:', priv_url)
+            source_url = priv_url 
+        else:
+            print('Failed to parse private link:', source_url)
         folder_browser = FolderBrowserDialog(
                 self, self.app, _('Save to..'))
         response = folder_browser.run()

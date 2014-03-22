@@ -15,7 +15,7 @@ import zlib
 sys.path.insert(0, os.path.dirname(__file__))
 import const
 
-RETRIES = 1
+RETRIES = 3
 
 default_headers = {
     'User-agent': const.USER_AGENT,

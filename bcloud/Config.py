@@ -9,13 +9,14 @@ import os
 
 from gi.repository import Gtk
 
-NAME = 'bcloud'
 if __file__.startswith('/usr/local/'):
     PREF = '/usr/local/share'
 elif __file__.startswith('/usr/'):
     PREF = '/usr/share'
 else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
+NAME = 'bcloud'
+ICON_PATH = os.path.join(PREF, NAME, 'icons')
 
 LOCALEDIR = os.path.join(PREF, 'locale')
 gettext.bindtextdomain(NAME, LOCALEDIR)

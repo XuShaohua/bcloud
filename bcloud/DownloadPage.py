@@ -77,19 +77,19 @@ class DownloadPage(Gtk.Box):
         control_box = Gtk.Box()
         self.pack_start(control_box, False, False, 0)
 
-        start_button = Gtk.Button(_('Start'))
+        start_button = Gtk.Button.new_with_label(_('Start'))
         start_button.connect('clicked', self.on_start_button_clicked)
         control_box.pack_start(start_button, False, False, 0)
 
-        pause_button = Gtk.Button(_('Pause'))
+        pause_button = Gtk.Button.new_with_label(_('Pause'))
         pause_button.connect('clicked', self.on_pause_button_clicked)
         control_box.pack_start(pause_button, False, False, 0)
 
-        remove_button = Gtk.Button(_('Remove'))
+        remove_button = Gtk.Button.new_with_label(_('Remove'))
         remove_button.connect('clicked', self.on_remove_button_clicked)
         control_box.pack_start(remove_button, False, False, 0)
 
-        open_folder_button = Gtk.Button(_('Open Directory'))
+        open_folder_button = Gtk.Button.new_with_label(_('Open Directory'))
         open_folder_button.connect(
                 'clicked', self.on_open_folder_button_clicked)
         control_box.pack_end(open_folder_button, False, False, 10)
@@ -227,30 +227,6 @@ class DownloadPage(Gtk.Box):
     def add_task(self, pcs_file, saveDir=None, saveName=None):
         '''加入新的下载任务'''
         print('add_task() --')
-        def _add_task(resp, error=None):
-            print('_add task')
-            if error:
-                print('Error occured will adding task:', resp)
-                return
-            red_url, req_id = resp
-            human_size, _ = util.get_human_size(pcs_file['size'])
-            task = (
-                pcs_file['server_filename'],
-                pcs_file['path'],
-                pcs_file['fs_id'],
-                pcs_file['size'],
-                0,
-                red_url,
-                pcs_file['isdir'],
-                saveName,
-                saveDir,
-                State.WAITING,
-                StateNames[State.WAITING],
-                human_size,
-                0,
-                )
-            self.liststore.append(task)
-            self.scan_tasks()
 
         # 目前还不支持下载目录.
         if pcs_file['isdir']:
@@ -270,9 +246,24 @@ class DownloadPage(Gtk.Box):
         if not saveName:
             saveName = pcs_file['server_filename']
 
-        gutil.async_call(
-                pcs.get_download_link, self.app.cookie, pcs_file['dlink'],
-                callback=_add_task)
+        human_size, _ = util.get_human_size(pcs_file['size'])
+        task = (
+            pcs_file['server_filename'],
+            pcs_file['path'],
+            pcs_file['fs_id'],
+            pcs_file['size'],
+            0,
+            pcs_file['dlink'],
+            pcs_file['isdir'],
+            saveName,
+            saveDir,
+            State.WAITING,
+            StateNames[State.WAITING],
+            human_size,
+            0,
+            )
+        self.liststore.append(task)
+        self.scan_tasks()
 
     def scan_tasks(self):
         '''扫描所有下载任务, 并在需要时启动新的下载'''

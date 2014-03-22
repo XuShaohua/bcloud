@@ -40,7 +40,7 @@ class BTBrowserDialog(Gtk.Dialog):
         self.set_border_width(10)
         box = self.get_content_area()
 
-        select_all_button = Gtk.ToggleButton(_('Select All'))
+        select_all_button = Gtk.ToggleButton.new_with_label(_('Select All'))
         select_all_button.props.halign = Gtk.Align.START
         select_all_button.props.margin_bottom = 5
         select_all_button.connect('toggled', self.on_select_all_toggled)

@@ -66,7 +66,10 @@ def get_UBI(cookie, token):
         #'&callback=bd__cbs__7sxvvm',
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    return req.headers.get_all('Set-Cookie')
+    if req:
+        return req.headers.get_all('Set-Cookie')
+    else:
+        return None
 
 
 def check_login(cookie, token, username):
@@ -126,7 +129,10 @@ def get_bduss(cookie, token, username, password):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM,
         }, data=data.encode())
-    return req.headers.get_all('Set-Cookie')
+    if req:
+        return req.headers.get_all('Set-Cookie')
+    else:
+        return None
 
 def parse_bdstoken(content):
     '''从页面中解析出bdstoken等信息.

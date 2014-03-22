@@ -32,8 +32,8 @@ class RenameDialog(Gtk.Dialog):
         grid.props.margin_bottom = 20
         box.pack_start(grid, True, True, 0)
 
-        grid.attach(Gtk.Label(_('Old Name:')), 0, 0, 1, 1)
-        grid.attach(Gtk.Label(_('New Name:')), 1, 0, 1, 1)
+        grid.attach(Gtk.Label.new(_('Old Name:')), 0, 0, 1, 1)
+        grid.attach(Gtk.Label.new(_('New Name:')), 1, 0, 1, 1)
 
         self.rows = []
         i = 1

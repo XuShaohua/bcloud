@@ -38,21 +38,21 @@ class TrashPage(Gtk.Box):
         control_box.props.margin_bottom = 10
         self.pack_start(control_box, False, False, 0)
 
-        restore_button = Gtk.Button(_('Restore'))
+        restore_button = Gtk.Button.new_with_label(_('Restore'))
         restore_button.connect('clicked', self.on_restore_button_clicked)
         control_box.pack_start(restore_button, False, False, 0)
 
-        delete_button = Gtk.Button(_('Delete'))
+        delete_button = Gtk.Button.new_with_label(_('Delete'))
         delete_button.set_tooltip_text(_('Delete selected files permanently'))
         delete_button.connect('clicked', self.on_delete_button_clicked)
         control_box.pack_start(delete_button, False, False, 0)
 
-        clear_button = Gtk.Button(_('Clear Trash'))
+        clear_button = Gtk.Button.new_with_label(_('Clear Trash'))
         clear_button.set_tooltip_text(_('Will delete all files in trash'))
         clear_button.connect('clicked', self.on_clear_button_clicked)
         control_box.pack_end(clear_button, False, False, 0)
 
-        reload_button = Gtk.Button(_('Reload'))
+        reload_button = Gtk.Button.new_with_label(_('Reload'))
         control_box.pack_end(reload_button, False, False, 20)
 
         scrolled_win = Gtk.ScrolledWindow()

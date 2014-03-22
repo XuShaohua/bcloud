@@ -24,7 +24,7 @@ class PathBox(Gtk.Box):
             self.remove(button)
 
     def append_button(self, abspath, name):
-        button = Gtk.Button(gutil.ellipse_text(name))
+        button = Gtk.Button.new_with_label(gutil.ellipse_text(name))
         button.abspath = abspath
         button.set_tooltip_text(name)
         self.pack_start(button, False, False, 0)
@@ -69,7 +69,8 @@ class HomePage(Gtk.Box):
         path_item.add(self.path_box)
 
         # search button
-        search_button = Gtk.ToggleToolButton('Search')
+        search_button = Gtk.ToggleToolButton()
+        search_button.set_label(_('Search'))
         search_button.set_icon_name('folder-saved-search-symbolic')
         search_button.set_tooltip_text(
                 _('Search documents and folders by name'))
