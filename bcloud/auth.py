@@ -47,10 +47,13 @@ def get_token(cookie):
         #'&callback=bd__cbs__d1ypgy',
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    content = req.data
-    content = content.decode().replace("'", '"')
-    content_obj = json.loads(content)
-    return content_obj['data']['token']
+    if req:
+        content = req.data
+        content = content.decode().replace("'", '"')
+        content_obj = json.loads(content)
+        return content_obj['data']['token']
+    else:
+        return None
 
 def get_UBI(cookie, token):
     '''检查登录历史, 可以获得一个Cookie - UBI.'''
@@ -83,11 +86,14 @@ def check_login(cookie, token, username):
         '&isphone=false',
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    content = req.data
-    print('content:', content)
-    # TODO: FIXME: 如果返回的codestring非空, 我们就需要解析验证码了.
-    content_obj = json.loads(content.decode())
-    return int(content_obj['errInfo']['no'])
+    if req:
+        content = req.data
+        print('content:', content)
+        # TODO: FIXME: 如果返回的codestring非空, 我们就需要解析验证码了.
+        content_obj = json.loads(content.decode())
+        return int(content_obj['errInfo']['no'])
+    else:
+        return None
 
 def get_bduss(cookie, token, username, password):
     '''获取最重要的登录cookie, 拿到这个cookie后, 就得到了最终的访问授权.
@@ -154,7 +160,10 @@ def get_bdstoken(cookie):
     '''
     url = 'http://pan.baidu.com/disk/home'
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    return parse_bdstoken(req.data.decode())
+    if req:
+        return parse_bdstoken(req.data.decode())
+    else:
+        return None
 
 def get_auth_info(username, password):
     '''获取授权信息.
@@ -164,8 +173,15 @@ def get_auth_info(username, password):
     '''
     cookie = RequestCookie()
     cookie.load('cflag=65535%3A1; PANWEB=1;')
-    cookie.load_list(get_BAIDUID())
+    uid_cookie = get_BAIDUID()
+    if not uid_cookie:
+        print('Failed to get BAIDUID cookie, please try again.')
+        return (None, None)
+    cookie.load_list(uid_cookie)
     token = get_token(cookie)
+    if not token:
+        print('Failed to get tokens, please try again.')
+        return (None, None)
     cookie.load_list(get_UBI(cookie, token))
     status = check_login(cookie, token, username)
     if status != 0:
