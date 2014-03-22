@@ -9,14 +9,12 @@ class LeftLabel(Gtk.Label):
     '''左对齐的标签'''
 
     def __init__(self, label):
-        super().__init__()
-        self.set_text(label)
+        super().__init__(label)
         self.props.xalign = 0.0
 
 class SelectableLeftLabel(LeftLabel):
     '''左对齐的标签, 标签内容可选中'''
 
     def __init__(self, label):
-        super().__init__()
-        self.set_text(label)
+        super().__init__(label)
         self.props.selectable = True
