@@ -27,6 +27,7 @@ bcloud/Widgets.py
 bcloud/__init__.py
 bcloud/auth.py
 bcloud/const.py
+bcloud/decoder.py
 bcloud/encoder.py
 bcloud/gutil.py
 bcloud/net.py
@@ -46,4 +47,5 @@ share/icons/hicolor/scalable/actions/upload-symbolic.svg
 share/icons/hicolor/scalable/apps/bcloud.svg
 share/icons/hicolor/scalable/mimetypes/bittorrent-symbolic.svg
 share/locale/zh_CN/LC_MESSAGES/bcloud.mo
+test/test-mime.py
 test/test-pcs.py
