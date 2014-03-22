@@ -11,6 +11,7 @@ from gi.repository import Gtk
 from bcloud import auth
 from bcloud import Config
 _ = Config._
+from bcloud import gutil
 
 class SigninDialog(Gtk.Dialog):
 
@@ -44,29 +45,32 @@ class SigninDialog(Gtk.Dialog):
         self.password_entry.props.visibility = False
         box.pack_start(self.password_entry, False, False, 0)
 
-        self.remember_check = Gtk.CheckButton(_('Remember Password'))
+        self.remember_check = Gtk.CheckButton.new_with_label(
+                _('Remember Password'))
         self.remember_check.props.margin_top = 20
         self.remember_check.props.margin_left = 20
         box.pack_start(self.remember_check, False, False, 0)
         self.remember_check.connect('toggled', self.on_remember_check_toggled)
 
-        self.signin_check = Gtk.CheckButton(_('Signin Automatically'))
+        self.signin_check = Gtk.CheckButton.new_with_label(
+                _('Signin Automatically'))
         self.signin_check.set_sensitive(False)
         self.signin_check.props.margin_left = 20
         box.pack_start(self.signin_check, False, False, 0)
         self.signin_check.connect('toggled', self.on_signin_check_toggled)
 
-        signin_button = Gtk.Button(_('Sign in'))
-        signin_button.props.margin_top = 10
-        box.pack_start(signin_button, False, False, 0)
-        signin_button.connect('clicked', self.on_signin_button_clicked)
+        self.signin_button = Gtk.Button.new_with_label(_('Sign in'))
+        self.signin_button.props.margin_top = 10
+        self.signin_button.connect('clicked', self.on_signin_button_clicked)
+        box.pack_start(self.signin_button, False, False, 0)
 
         self.infobar = Gtk.InfoBar()
         self.infobar.set_message_type(Gtk.MessageType.ERROR)
         box.pack_end(self.infobar, False, False, 0)
         info_content = self.infobar.get_content_area()
-        info_label = Gtk.Label(_('Failed to sign in, please try again.'))
-        info_content.pack_start(info_label, False, False, 0)
+        self.info_label = Gtk.Label.new(
+                _('Failed to sign in, please try again.'))
+        info_content.pack_start(self.info_label, False, False, 0)
 
         box.show_all()
         self.infobar.hide()
@@ -107,6 +111,11 @@ class SigninDialog(Gtk.Dialog):
         else:
             self.signin_check.set_active(False)
 
+    def signin_failed(self):
+        self.infobar.show_all()
+        self.signin_button.set_sensitive(True)
+        self.signin_button.set_label(_('Sign in'))
+
     def on_remember_check_toggled(self, button):
         if button.get_active():
             self.signin_check.set_sensitive(True)
@@ -118,15 +127,20 @@ class SigninDialog(Gtk.Dialog):
         pass
 
     def on_signin_button_clicked(self, button):
+        button.set_label(_('In process...'))
+        button.set_sensitive(False)
         self.signin()
 
     def signin(self):
-        username = self.username_combo.get_child().get_text()
-        password = self.password_entry.get_text()
-        cookie, tokens = auth.get_auth_info(username, password)
-        print('cookie:', cookie)
-        print('tokens:', tokens)
-        if cookie and tokens:
+        def deal_cookie(resp, error=None):
+            if error or not resp:
+                print('Failed to get cookie, please try again!')
+                self.sho_error()
+                return
+
+            cookie, tokens = resp
+            if not cookie or not tokens:
+                return
             if not self.profile:
                 self.profile = Config.load_profile(username)
             self.profile['username'] = username
@@ -137,16 +151,23 @@ class SigninDialog(Gtk.Dialog):
             else:
                 self.profile['password'] = ''
             Config.dump_profile(self.profile)
+            print('profile:', self.profile)
 
             if username not in self.conf['profiles']:
                 self.conf['profiles'].append(username)
             if self.profile['auto-signin']:
                 self.conf['default'] = username
             Config.dump_conf(self.conf)
+            print('conf:', self.conf)
             self.app.cookie = cookie
             self.app.tokens = tokens
             self.app.profile = self.profile
+            print('resize main window:')
             self.app.window.set_default_size(*self.profile['window-size'])
-            self.destroy()
-        else:
-            self.infobar.show_all()
+            self.hide()
+
+        username = self.username_combo.get_child().get_text()
+        password = self.password_entry.get_text()
+        gutil.async_call(
+            auth.get_auth_info, username, password,
+            callback=deal_cookie)
