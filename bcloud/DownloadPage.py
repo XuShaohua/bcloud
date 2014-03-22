@@ -292,7 +292,8 @@ class DownloadPage(Gtk.Box):
         '''为task新建一个后台下载线程, 并开始下载.'''
         print('start_worker() --', row[:])
         def on_worker_received(worker, fs_id, current_size):
-            row = self.get_task_by_fsid(fs_id)
+            if fs_id not in self.workers:
+                return
             _, row = self.workers[fs_id]
             row[CURRSIZE_COL] = current_size
             total_size, _ = util.get_human_size(row[SIZE_COL])
@@ -311,6 +312,7 @@ class DownloadPage(Gtk.Box):
             row[STATENAME_COL] = StateNames[State.FINISHED]
             del self.workers[fs_id]
             self.launch_app(fs_id)
+            self.scan_tasks()
 
         def on_worker_network_error(worker, fs_id):
             row = self.get_task_by_fsid(fs_id)
