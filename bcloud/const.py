@@ -9,8 +9,9 @@
 '''
 
 BAIDU_URL = 'http://www.baidu.com/'
-PASSPORT_URL = 'https://passport.baidu.com/v2/api/'
-REFERER = 'https://passport.baidu.com/v2/?login'
+PASSPORT_BASE = 'https://passport.baidu.com/'
+PASSPORT_URL = PASSPORT_BASE + 'v2/api/'
+REFERER = PASSPORT_BASE + 'v2/?login'
 USER_AGENT = 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0;'
 PAN_URL = 'http://pan.baidu.com/'
 PAN_API_URL = PAN_URL + 'api/'

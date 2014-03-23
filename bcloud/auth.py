@@ -92,19 +92,56 @@ def check_login(cookie, token, username):
     if req:
         content = req.data
         print('content:', content)
-        # TODO: FIXME: 如果返回的codestring非空, 我们就需要解析验证码了.
-        content_obj = json.loads(content.decode())
-        return int(content_obj['errInfo']['no'])
+        return json.loads(content.decode())
     else:
         return None
 
-def get_bduss(cookie, token, username, password):
+def get_signin_vcode(cookie, codeString):
+    '''获取登录时的验证码图片.
+
+
+    codeString - 调用check_login()时返回的codeString.
+    '''
+    url = ''.join([
+        const.PASSPORT_BASE,
+        'cgi-bin/genimage?',
+        codeString,
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        return req.data
+    else:
+        return None
+
+def refresh_sigin_vcode(cookie, token, vcodetype):
+    '''刷新验证码.
+
+    vcodetype - 在调用check_login()时返回的vcodetype.
+    '''
+    url = ''.join([
+        const.PASSPORT_BASE,
+        'v2/?reggetcodestr',
+        '&token=', token,
+        '&tpl=netdisk&apiver=v3',
+        '&tt=', util.timestamp(),
+        '&fr=ligin',
+        '&vcodetype=', vcodetype,
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        return json.loads(req.data)
+    else:
+        return None
+
+def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
     '''获取最重要的登录cookie, 拿到这个cookie后, 就得到了最终的访问授权.
 
-    token - 使用get_token()得到的token值.
-    cookie - BAIDUID 这个cookie.
-    username - 用户名
-    password - 明文密码
+    token      - 使用get_token()得到的token值.
+    cookie     - BAIDUID 这个cookie.
+    username   - 用户名
+    password   - 明文密码
+    verifycode - 用户根据图片输入的四位验证码, 可以为空
+    codeString - 获取验证码图片时用到的codeString, 可以为空
 
     @return 最后会返回一个list, 里面包含了登录*.baidu.com需要的授权cookies.
     '''
@@ -115,21 +152,46 @@ def get_bduss(cookie, token, username, password):
         '&token=', token,
         '&tpl=mn&apiver=v3',
         '&tt=', util.timestamp(),
-        '&codestring=&safeflg=0&u=https%3A%2F%2Fpassport.baidu.com%2F',
+        '&codestring=', codeString,
+        '&safeflg=0&u=https%3A%2F%2Fpassport.baidu.com%2F',
         '&isPhone=false&quick_user=0',
-        #'&loginmerge=true&logintype=basicLogin',
-        '&usernamelogin=1&spligin=rate',
+        '&loginmerge=true&logintype=basicLogin&logLoginType=pc_loginBasic',
         '&username=', username,
         '&password=', password,
-        '&verifycode=&mem_pass=on',
+        '&verifycode=', verifycode,
+        '&mem_pass=on',
         '&ppui_logintime=', get_ppui_logintime(),
         '&callback=parent.bd__pcbs__cb',
         ])
+
+#    data = ''.join([
+#        'staticpage=http%3A%2F%2Fwww.baidu.com%2Fcache%2Fuser%2Fhtml%2Fv3Jump.html',
+#        '&charset=utf-8',
+#        '&token=', token,
+#        '&tpl=mn&apiver=v3',
+#        '&tt=', util.timestamp(),
+#        '&codestring=', codeString,
+#        '&safeflg=0&u=https%3A%2F%2Fpassport.baidu.com%2F',
+#        '&isPhone=false&quick_user=0',
+#        #'&loginmerge=true&logintype=basicLogin',
+#        '&usernamelogin=1&spligin=rate',
+#        '&username=', username,
+#        '&password=', password,
+#        '&verifycode=', verifycode,
+#        '&mem_pass=on',
+#        '&ppui_logintime=', get_ppui_logintime(),
+#        '&callback=parent.bd__pcbs__cb',
+#        ])
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM,
+        'Accept': const.ACCEPT_HTML,
         }, data=data.encode())
+    print('get_bduss:', data)
+    print(req)
     if req:
+        print('req data:', req.data)
+        print(req.headers)
         return req.headers.get_all('Set-Cookie')
     else:
         return None
@@ -192,12 +254,12 @@ def get_auth_info(username, password):
     status = check_login(cookie, token, username)
     if status != 0:
         print('Error: failed to check login!')
-        return (None, None)
+        return (cookie, None)
     cookie.load_list(get_bduss(cookie, token, username, password))
     tokens = get_bdstoken(cookie)
     tokens['token'] = token
     auth_info = [str(cookie), tokens]
     if 'bdstoken' not in tokens or not tokens['bdstoken']:
-        return (None, None)
+        return (cookie, None)
     return (cookie, tokens)
 
