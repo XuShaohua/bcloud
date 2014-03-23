@@ -28,7 +28,6 @@ class Downloader(threading.Thread, GObject.GObject):
     断点续传功能基于HTTP/1.1 的Range, 百度网盘对它有很好的支持.
     '''
 
-    times_to_flush = 0
     fh = None
     red_url = ''
 
@@ -66,22 +65,22 @@ class Downloader(threading.Thread, GObject.GObject):
         if not os.path.exists(self.row[SAVEDIR_COL]):
             os.makedirs(row[SAVEDIR_COL], exist_ok=True)
         self.filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL]) 
-        truncated = False
         if os.path.exists(self.filepath):
-            print('Downloader.init_file(), file exists! ', self.filepath)
-            truncated = True
             stat = os.stat(self.filepath)
-            print(stat.st_size, stat.st_blocks)
+            print('stat:', stat.st_size, row[CURRSIZE_COL], row[SIZE_COL])
+            print('Downloader.init_file(), file exists! ', self.filepath)
+            # TODO: check MD5 to verify same file
             if (row[SIZE_COL] == stat.st_size and 
-                    stat.st_size == stat.st_blocks * 512):
+                    stat.st_size <= stat.st_blocks * 512):
                 print('File exists and has same size, quit!')
                 self.finished()
                 return
-        self.fh = open(self.filepath, 'wb')
-        if not truncated:
-            self.fh.truncate(row[SIZE_COL])
+            if stat.st_size == row[CURRSIZE_COL]:
+                self.fh = open(self.filepath, 'ab')
+                self.fh.seek(row[CURRSIZE_COL])
         else:
-            self.fh.seek(row[CURRSIZE_COL])
+            self.fh = open(self.filepath, 'wb')
+            self.row[CURRSIZE_COL] = 0
 
     def destroy(self):
         '''自毁'''
@@ -116,18 +115,13 @@ class Downloader(threading.Thread, GObject.GObject):
                 range_ = self.get_range()
                 if range_:
                     self.request_bytes(range_)
-                continue
-            elif (self.row[STATE_COL] == State.FINISHED or 
-                    self.row[STATE_COL] == State.PAUSED):
+            else:
+                print('finished/paused/canceled:', self.row)
                 self.fh.flush()
                 self.fh.close()
                 self.fh = None
-                break
-            elif self.row[STATE_COL] == State.CANCELED:
-                self.fh.flush()
-                self.fh.close()
-                self.fh = None
-                os.remove(self.filepath)
+                if self.row[STATE_COL] == State.CANCELED:
+                    os.remove(self.filepath)
                 break
 
     def pause(self):
@@ -165,12 +159,8 @@ class Downloader(threading.Thread, GObject.GObject):
         self.emit('network-error', self.row[FSID_COL])
 
     def write_bytes(self, range_, block):
-        print('write bytes() :', len(block))
+        print('write bytes() :', len(block), range_)
         self.row[CURRSIZE_COL] = range_[1]
         self.emit('received', self.row[FSID_COL], self.row[CURRSIZE_COL])
         self.fh.write(block)
-        self.times_to_flush = self.times_to_flush + 1
-        if self.times_to_flush >= THRESHOLD_TO_FLUSH:
-            self.fh.flush()
-            self.times_to_flush = 0
 GObject.type_register(Downloader)

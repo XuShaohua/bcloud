@@ -283,6 +283,7 @@ class DownloadPage(Gtk.Box):
         '''为task新建一个后台下载线程, 并开始下载.'''
         print('start_worker() --', row[:])
         def on_worker_received(worker, fs_id, current_size):
+            print('on worker received:', current_size)
             if fs_id not in self.workers:
                 return
             _, row = self.workers[fs_id]

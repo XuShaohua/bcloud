@@ -42,7 +42,7 @@ class PreferencesDialog(Gtk.Dialog):
         dir_button.connect('file-set', self.on_dir_update)
         general_grid.attach(dir_button, 1, 0, 1, 1)
 
-        notify_label = Gtk.Label.ne(_('Use Notification:'))
+        notify_label = Gtk.Label.new(_('Use Notification:'))
         notify_label.props.xalign = 1
         general_grid.attach(notify_label, 0, 1, 1, 1)
         notify_switch = Gtk.Switch()
