@@ -67,8 +67,6 @@ class Downloader(threading.Thread, GObject.GObject):
         self.filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL]) 
         if os.path.exists(self.filepath):
             stat = os.stat(self.filepath)
-            print('stat:', stat.st_size, row[CURRSIZE_COL], row[SIZE_COL])
-            print('Downloader.init_file(), file exists! ', self.filepath)
             # TODO: check MD5 to verify same file
             if (row[SIZE_COL] == stat.st_size and 
                     stat.st_size <= stat.st_blocks * 512):
@@ -78,6 +76,10 @@ class Downloader(threading.Thread, GObject.GObject):
             if stat.st_size == row[CURRSIZE_COL]:
                 self.fh = open(self.filepath, 'ab')
                 self.fh.seek(row[CURRSIZE_COL])
+            else:
+                self.fh = open(self.filepath, 'wb')
+                self.row[CURRSIZE_COL] = 0
+
         else:
             self.fh = open(self.filepath, 'wb')
             self.row[CURRSIZE_COL] = 0
@@ -94,7 +96,8 @@ class Downloader(threading.Thread, GObject.GObject):
             self.get_download_link()
 
     def get_download_link(self):
-        print('self.row:', self.row[PATH_COL])
+        print('Downloader.get_download_link:', self.row[PATH_COL])
+        print('get meta info..')
         meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
         if not meta or meta['errno'] != 0 or 'info' not in meta:
             print('Error: failed to get meta info:', meta)
@@ -106,6 +109,7 @@ class Downloader(threading.Thread, GObject.GObject):
                 print('Error: failed to get req_id:', req_id)
                 self.emit('network-error', self.row[FSID_COL])
             else:
+                print('target url:', red_url)
                 self.red_url = red_url
                 self.download()
 
@@ -116,7 +120,6 @@ class Downloader(threading.Thread, GObject.GObject):
                 if range_:
                     self.request_bytes(range_)
             else:
-                print('finished/paused/canceled:', self.row)
                 self.fh.flush()
                 self.fh.close()
                 self.fh = None
@@ -126,13 +129,16 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def pause(self):
         '''暂停下载任务'''
+        print('Downloader.pause()')
         self.row[STATE_COL] = State.PAUSED
 
     def stop(self):
         '''停止下载, 并删除之前下载的片段'''
+        print('Downloader.stop()')
         self.row[STATE_COL] = State.CANCELED
 
     def finished(self):
+        print('Downloader.finished()')
         self.row[STATE_COL] = State.FINISHED
         self.emit('downloaded', self.row[FSID_COL])
 

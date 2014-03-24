@@ -9,6 +9,7 @@ import sqlite3
 import threading
 
 from gi.repository import Gio
+from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -171,8 +172,8 @@ class DownloadPage(Gtk.Box):
         self.cursor.execute(sql)
 
     def on_destroyed(self, *args):
-        for worker, task in self.workers.values():
-            worker.destroy()
+        for _, row in self.workers.values():
+            self.pause_worker(row)
         self.dump_tasks()
         self.conn.commit()
         self.conn.close()
@@ -283,28 +284,37 @@ class DownloadPage(Gtk.Box):
         '''为task新建一个后台下载线程, 并开始下载.'''
         print('start_worker() --', row[:])
         def on_worker_received(worker, fs_id, current_size):
+            def _on_worker_received():
+                row = None
+                if fs_id in self.workers:
+                    _, row = self.workers[fs_id]
+                else:
+                    row = self.get_task_by_fsid(fs_id)
+                if not row:
+                    print('on worker received, row is None:', row)
+                    return
+                row[CURRSIZE_COL] = current_size
+                total_size, _ = util.get_human_size(row[SIZE_COL])
+                curr_size, _ = util.get_human_size(row[CURRSIZE_COL])
+                row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
+                row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
             print('on worker received:', current_size)
-            if fs_id not in self.workers:
-                return
-            _, row = self.workers[fs_id]
-            row[CURRSIZE_COL] = current_size
-            total_size, _ = util.get_human_size(row[SIZE_COL])
-            curr_size, _ = util.get_human_size(row[CURRSIZE_COL])
-            row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
-            row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
+            GLib.idle_add(_on_worker_received)
 
         def on_worker_downloaded(worker, fs_id):
-            row = self.get_task_by_fsid(fs_id)
-            _, row = self.workers[fs_id]
-            row[CURRSIZE_COL] = row[SIZE_COL]
-            row[STATE_COL] = State.FINISHED
-            row[PERCENT_COL] = 100
-            total_size, _ = util.get_human_size(row[SIZE_COL])
-            row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
-            row[STATENAME_COL] = StateNames[State.FINISHED]
-            del self.workers[fs_id]
-            self.launch_app(fs_id)
-            self.scan_tasks()
+            def _on_worker_downloaded():
+                row = self.get_task_by_fsid(fs_id)
+                _, row = self.workers[fs_id]
+                row[CURRSIZE_COL] = row[SIZE_COL]
+                row[STATE_COL] = State.FINISHED
+                row[PERCENT_COL] = 100
+                total_size, _ = util.get_human_size(row[SIZE_COL])
+                row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
+                row[STATENAME_COL] = StateNames[State.FINISHED]
+                del self.workers[fs_id]
+                self.launch_app(fs_id)
+                self.scan_tasks()
+            GLib.idle_add(_on_worker_downloaded)
 
         def on_worker_network_error(worker, fs_id):
             row = self.get_task_by_fsid(fs_id)
@@ -325,14 +335,11 @@ class DownloadPage(Gtk.Box):
         worker.connect('network-error', on_worker_network_error)
         worker.start()
 
-    def on_task_downloaded(self, worker, fs_id):
-        '''下载完成后要更新界面'''
-        pass
-        
     def pause_worker(self, row):
         try:
             worker, _ = self.workers[row[FSID_COL]]
             worker.pause()
+            del self.workers[row[FSID_COL]]
         except KeyError:
             pass
 
@@ -341,6 +348,7 @@ class DownloadPage(Gtk.Box):
         try:
             worker, _ = self.workers[row[FSID_COL]]
             worker.stop()
+            del self.workers[row[FSID_COL]]
         except KeyError:
             pass
 

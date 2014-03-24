@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 
 from gi.repository import Gio
+from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gtk
 
@@ -28,9 +29,8 @@ from SigninDialog import SigninDialog
 from TrashPage import TrashPage
 from UploadPage import UploadPage
 
-if Gtk.MAJOR_VERSION <= 3 and Gtk.MINOR_VERSION <= 11:
+if Gtk.MAJOR_VERSION <= 3 and Gtk.MINOR_VERSION < 10:
     GObject.threads_init()
-#GObject.threads_init()
 DBUS_APP_NAME = 'org.liulang.bcloud'
 
 class App:
@@ -173,7 +173,8 @@ class App:
             Config.dump_profile(self.profile)
 
     def on_signout_action_activated(self, action, params):
-        self.show_signin_dialog(auto_signin=False)
+        if self.profile:
+            self.show_signin_dialog(auto_signin=False)
 
     def on_about_action_activated(self, action, params):
         dialog = Gtk.AboutDialog()
