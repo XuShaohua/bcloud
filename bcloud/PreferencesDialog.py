@@ -42,19 +42,28 @@ class PreferencesDialog(Gtk.Dialog):
         dir_button.connect('file-set', self.on_dir_update)
         general_grid.attach(dir_button, 1, 0, 1, 1)
 
+        concurr_label = Gtk.Label.new(_('Concurrent Downloads:'))
+        concurr_label.props.xalign = 1
+        general_grid.attach(concurr_label, 0, 1, 1, 1)
+        concurr_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
+        concurr_spin.set_value(self.app.profile['concurr-tasks'])
+        concurr_spin.props.halign = Gtk.Align.START
+        concurr_spin.connect('value-changed', self.on_concurr_value_changed)
+        general_grid.attach(concurr_spin, 1, 1, 1, 1)
+
         notify_label = Gtk.Label.new(_('Use Notification:'))
         notify_label.props.xalign = 1
-        general_grid.attach(notify_label, 0, 1, 1, 1)
+        general_grid.attach(notify_label, 0, 2, 1, 1)
         notify_switch = Gtk.Switch()
         notify_switch.props.halign = Gtk.Align.START
-        general_grid.attach(notify_switch, 1, 1, 1, 1)
+        general_grid.attach(notify_switch, 1, 2, 1, 1)
 
         tray_label = Gtk.Label.new(_('Minimize To System Tray:'))
         tray_label.props.xalign = 1
-        general_grid.attach(tray_label, 0, 2, 1, 1)
+        general_grid.attach(tray_label, 0, 3, 1, 1)
         tray_switch = Gtk.Switch()
         tray_switch.props.halign = Gtk.Align.START
-        general_grid.attach(tray_switch, 1, 2, 1, 1)
+        general_grid.attach(tray_switch, 1, 3, 1, 1)
 
         box.show_all()
 
@@ -62,3 +71,6 @@ class PreferencesDialog(Gtk.Dialog):
         dir_name = file_button.get_filename()
         if dir_name:
             self.app.profile['save-dir'] = dir_name
+
+    def on_concurr_value_changed(self, concurr_spin):
+        self.app.profile['concurr-tasks'] = concurr_spin.get_value()
