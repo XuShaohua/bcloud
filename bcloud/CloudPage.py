@@ -237,6 +237,7 @@ class CloudPage(Gtk.Box):
     def add_local_bt_task(self):
         '''从本地上传种子到服务器, 再创建离线下载任务'''
         self.check_first()
+        print('Local BT task not supported right now.')
 
     # Open API
     def add_link_task(self):
@@ -268,7 +269,7 @@ class CloudPage(Gtk.Box):
         if response != Gtk.ResponseType.OK or not len(source_url):
             return
 
-        if source_url.startswith('magent'):
+        if source_url.startswith('magnet'):
             self.add_cloud_bt_task(source_url)
             return
 
