@@ -98,3 +98,10 @@ def get_cache_path(profile_name):
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
     return path
+
+def get_tmp_path(profile_name):
+    '''获取这个帐户的临时文件目录, 可以存放验证码图片, 上传时的文件分片等'''
+    path = os.path.join(CACHE_DIR, profile_name, 'tmp')
+    if not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
+    return path

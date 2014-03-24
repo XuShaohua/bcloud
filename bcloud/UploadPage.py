@@ -9,7 +9,7 @@ from bcloud import Config
 _ = Config._
 
 
-class UploadPage(Gtk.ScrolledWindow):
+class UploadPage(Gtk.Box):
 
     icon_name = 'upload-symbolic'
     disname = _('Upload')

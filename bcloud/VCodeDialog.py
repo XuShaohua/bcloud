@@ -48,7 +48,9 @@ class VCodeDialog(Gtk.Dialog):
         if error or not request:
             print('failed to get vcode image')
             return
-        vcode_path = '/tmp/bcloud-vcode.jpg'
+        vcode_path = os.path.join(
+                Config.get_tmp_path(self.app.profile['username']),
+                'bcloud-download-vcode.jpg')
         with open(vcode_path, 'wb') as fh:
             fh.write(request.data)
         self.img.set_from_file(vcode_path)

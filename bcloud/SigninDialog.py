@@ -15,12 +15,13 @@ from bcloud import gutil
 from bcloud.RequestCookie import RequestCookie
 
 class SigninVcodeDialog(Gtk.Dialog):
-    def __init__(self, parent, cookie, token, codeString, vcodetype):
+    def __init__(self, parent, username, cookie, token, codeString, vcodetype):
         super().__init__(
             _('Verification..'), parent, Gtk.DialogFlags.MODAL)
 
         self.set_default_size(280, 160)
         self.set_border_width(10)
+        self.username = username
         self.cookie = cookie
         self.token = token
         self.codeString = codeString
@@ -61,7 +62,9 @@ class SigninVcodeDialog(Gtk.Dialog):
         if error or not req_data:
             self.refresh_vcode()
             return
-        vcode_path = '/tmp/bcloud-vcode.jpg'
+        vcode_path = os.path.join(
+                Config.get_tmp_path(self.username),
+                'bcloud-signin-vcode.jpg')
         with open(vcode_path, 'wb') as fh:
             fh.write(req_data)
         self.vcode_img.set_from_file(vcode_path)
@@ -270,7 +273,8 @@ class SigninDialog(Gtk.Dialog):
                 codeString = status['data']['codeString']
                 vcodetype = status['data']['vcodetype']
                 dialog = SigninVcodeDialog(
-                    self, cookie, tokens['token'], codeString, vcodetype)
+                    self, username, cookie, tokens['token'],
+                    codeString, vcodetype)
                 dialog.run()
                 vcode, codeString = dialog.get_vcode()
                 dialog.destroy()
