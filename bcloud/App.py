@@ -57,6 +57,8 @@ class App:
         #self.icon_theme.append_search_path(Config.ICON_PATH)
         self.mime = MimeProvider(self)
         self.color_schema = Config.load_color_schema()
+        settings = Gtk.Settings.get_default()
+        settings.props.gtk_application_prefer_dark_theme = True
 
         self.window = Gtk.ApplicationWindow.new(application=app)
         self.window.set_default_size(*Config._default_profile['window-size'])
