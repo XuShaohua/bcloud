@@ -3,7 +3,9 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import json
 import os
+import time
 
 from gi.repository import GLib
 from gi.repository import Gtk
@@ -13,6 +15,8 @@ from bcloud import Config
 _ = Config._
 from bcloud import gutil
 from bcloud.RequestCookie import RequestCookie
+
+DELTA = 7 * 24 * 60 * 60   # 7 days
 
 class SigninVcodeDialog(Gtk.Dialog):
     def __init__(self, parent, username, cookie, token, codeString, vcodetype):
@@ -212,29 +216,6 @@ class SigninDialog(Gtk.Dialog):
         self.signin()
 
     def signin(self):
-        def update_profile():
-            if not self.profile:
-                self.profile = Config.load_profile(username)
-            self.profile['username'] = username
-            self.profile['remember-password'] = self.remember_check.get_active()
-            self.profile['auto-signin'] = self.signin_check.get_active()
-            if self.profile['remember-password']:
-                self.profile['password'] = password
-            else:
-                self.profile['password'] = ''
-            Config.dump_profile(self.profile)
-
-            if username not in self.conf['profiles']:
-                self.conf['profiles'].append(username)
-            if self.profile['auto-signin']:
-                self.conf['default'] = username
-            Config.dump_conf(self.conf)
-            self.app.cookie = cookie
-            self.app.tokens = tokens
-            self.app.profile = self.profile
-            self.app.window.set_default_size(*self.profile['window-size'])
-            self.hide()
-
         def on_get_bdstoken(bdstokens, error=None):
             if error or not bdstokens:
                 self.signin_failed(
@@ -243,7 +224,7 @@ class SigninDialog(Gtk.Dialog):
                 nonlocal tokens
                 for token in bdstokens:
                     tokens[token] = bdstokens[token]
-                update_profile()
+                self.update_profile(username, password, cookie, tokens, True)
 
         def on_get_bduss(bduss, error=None):
             if error or not bduss:
@@ -318,9 +299,56 @@ class SigninDialog(Gtk.Dialog):
 
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
+        cookie, tokens = self.load_auth(username)
+        if cookie and tokens:
+            self.update_profile(username, password, cookie, tokens)
+            return
+
         cookie = RequestCookie()
         tokens = {}
         cookie.load('cflag=65535%3A1; PANWEB=1;')
         self.signin_button.set_label(_('Get cookie...'))
         gutil.async_call(
                 auth.get_BAIDUID, callback=on_get_BAIDUID)
+
+    def load_auth(self, username):
+        auth_file = os.path.join(Config.get_tmp_path(username), 'auth.json')
+        # 如果授权信息被缓存, 并且没过期, 就直接读取它.
+        if os.path.exists(auth_file):
+            if time.time() - os.stat(auth_file).st_mtime < DELTA:
+                with open(auth_file) as fh:
+                    c, tokens = json.load(fh)
+                cookie = RequestCookie(c)
+                return cookie, tokens
+        return None, None
+
+    def dump_auth(self, username, cookie, tokens):
+        auth_file = os.path.join(Config.get_tmp_path(username), 'auth.json')
+        with open(auth_file, 'w') as fh:
+            json.dump([str(cookie), tokens], fh)
+
+    def update_profile(self, username, password, cookie, tokens, dump=False):
+        if not self.profile:
+            self.profile = Config.load_profile(username)
+        self.profile['username'] = username
+        self.profile['remember-password'] = self.remember_check.get_active()
+        self.profile['auto-signin'] = self.signin_check.get_active()
+        if self.profile['remember-password']:
+            self.profile['password'] = password
+        else:
+            self.profile['password'] = ''
+        Config.dump_profile(self.profile)
+
+        if username not in self.conf['profiles']:
+            self.conf['profiles'].append(username)
+        if self.profile['auto-signin']:
+            self.conf['default'] = username
+        Config.dump_conf(self.conf)
+        self.app.cookie = cookie
+        self.app.tokens = tokens
+        # dump auth info
+        if dump:
+            self.dump_auth(username, cookie, tokens)
+        self.app.profile = self.profile
+        self.app.window.set_default_size(*self.profile['window-size'])
+        self.hide()
