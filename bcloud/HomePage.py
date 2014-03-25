@@ -43,7 +43,7 @@ class PathBox(Gtk.Box):
 
 class HomePage(Gtk.Box):
 
-    icon_name = 'go-home-symbolic'
+    icon_name = 'home-symbolic'
     disname = _('Home')
     tooltip = _('Show all of your files on Cloud')
     first_run = False
@@ -71,7 +71,7 @@ class HomePage(Gtk.Box):
         # search button
         search_button = Gtk.ToggleToolButton()
         search_button.set_label(_('Search'))
-        search_button.set_icon_name('folder-saved-search-symbolic')
+        search_button.set_icon_name('search-symbolic')
         search_button.set_tooltip_text(
                 _('Search documents and folders by name'))
         search_button.connect('toggled', self.on_search_button_toggled)

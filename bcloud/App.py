@@ -112,7 +112,7 @@ class App:
         nav_col.pack_start(icon_cell, False)
         nav_col.pack_start(name_cell, True)
         if Config.GTK_LE_36:
-            nav_col.add_attribute(icon_tell, 'icon_name', ICON_COL)
+            nav_col.add_attribute(icon_cell, 'icon_name', ICON_COL)
             nav_col.add_attribute(name_cell, 'text', NAME_COL)
             nav_col.add_attribute(name_cell, 'foreground_rgba', COLOR_COL)
         else:

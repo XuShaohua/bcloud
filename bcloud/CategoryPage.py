@@ -36,7 +36,7 @@ class CategoryPage(IconWindow):
 
 class VideoPage(CategoryPage):
 
-    icon_name = 'folder-videos-symbolic'
+    icon_name = 'videos-symbolic'
     disname = _('Videos')
     tooltip = _('Videos')
     category = 1
@@ -44,7 +44,7 @@ class VideoPage(CategoryPage):
 
 class MusicPage(CategoryPage):
 
-    icon_name = 'folder-music-symbolic'
+    icon_name = 'music-symbolic'
     disname = _('Music')
     tooltip = _('Music')
     category = 2
@@ -52,7 +52,7 @@ class MusicPage(CategoryPage):
 
 class PicturePage(CategoryPage):
 
-    icon_name = 'folder-pictures-symbolic'
+    icon_name = 'pictures-symbolic'
     disname = _('Pictures')
     tooltip = _('Pictures')
     category = 3
@@ -60,7 +60,7 @@ class PicturePage(CategoryPage):
 
 class DocPage(CategoryPage):
 
-    icon_name = 'folder-documents-symbolic'
+    icon_name = 'documents-symbolic'
     disname = _('Documents')
     tooltip = _('Documents')
     category = 4
@@ -68,7 +68,7 @@ class DocPage(CategoryPage):
 
 class OtherPage(CategoryPage):
 
-    icon_name = 'content-loading-symbolic'
+    icon_name = 'others-symbolic'
     disname = _('Others')
     tooltip = _('Others')
     category = 6

@@ -61,7 +61,7 @@ class DownloadPage(Gtk.Box):
     link - 文件的下载最终URL, 有效期大约是8小时, 超时后要重新获取.
     '''
 
-    icon_name = 'folder-download-symbolic'
+    icon_name = 'download-symbolic'
     disname = _('Download')
     tooltip = _('Downloading tasks')
     first_run = True
