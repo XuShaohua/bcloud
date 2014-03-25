@@ -22,6 +22,7 @@ bcloud/SharePage.py
 bcloud/SigninDialog.py
 bcloud/TrashPage.py
 bcloud/UploadPage.py
+bcloud/Uploader.py
 bcloud/VCodeDialog.py
 bcloud/Widgets.py
 bcloud/__init__.py
@@ -30,14 +31,16 @@ bcloud/const.py
 bcloud/decoder.py
 bcloud/encoder.py
 bcloud/gutil.py
+bcloud/hasher.py
 bcloud/net.py
 bcloud/pcs.py
 bcloud/util.py
 share/applications/bcloud.desktop
 share/icons/hicolor/128x128/apps/bcloud.png
+share/icons/hicolor/16x16/apps/bcloud.png
 share/icons/hicolor/24x24/apps/bcloud.png
 share/icons/hicolor/256x256/apps/bcloud.png
-share/icons/hicolor/32x32/aps/bcloud.png
+share/icons/hicolor/32x32/apps/bcloud.png
 share/icons/hicolor/48x48/apps/bcloud.png
 share/icons/hicolor/512x512/apps/bcloud.png
 share/icons/hicolor/64x64/apps/bcloud.png
@@ -49,3 +52,4 @@ share/icons/hicolor/scalable/mimetypes/bittorrent-symbolic.svg
 share/locale/zh_CN/LC_MESSAGES/bcloud.mo
 test/test-mime.py
 test/test-pcs.py
+test/test-post.py

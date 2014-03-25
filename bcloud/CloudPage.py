@@ -3,6 +3,8 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import os
+
 from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -168,7 +170,8 @@ class CloudPage(Gtk.Box):
                 row[SIZE_COL] = int(task['file_size'])
                 row[FINISHED_COL] = int(task['finished_size'])
                 row[STATUS_COL] = int(task['status'])
-                row[PERCENT_COL] = int(row[FINISHED_COL] / row[SIZE_COL] * 100)
+                if row[SIZE_COL]:
+                    row[PERCENT_COL] = int(row[FINISHED_COL] / row[SIZE_COL] * 100)
                 size, _ = util.get_human_size(row[SIZE_COL])
                 finished_size, _ = util.get_human_size(row[FINISHED_COL])
                 if row[SIZE_COL] == row[FINISHED_COL]:
@@ -307,7 +310,8 @@ class CloudPage(Gtk.Box):
             return
         tree_path = tree_paths[0]
         path = model[tree_path][PATH_COL]
-        self.app.home_page.load(path)
+        dir_name, _ = os.path.split(path)
+        self.app.home_page.load(dir_name)
         self.app.switch_page(self.app.home_page)
 
     def on_cancel_button_clicked(self, button):
