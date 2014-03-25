@@ -330,6 +330,7 @@ class IconWindow(Gtk.ScrolledWindow):
         if tree_paths and len(tree_paths) == 1:
             self.app.cloud_page.add_cloud_bt_task(
                 self.liststore[tree_paths[0]][PATH_COL])
+            self.app.blink_page(self.app.cloud_page)
 
     def on_copy_link_activated(self, menu_item):
         def copy_link_to_clipboard(res, error=None):

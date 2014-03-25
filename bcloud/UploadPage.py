@@ -120,16 +120,23 @@ class UploadPage(Gtk.Box):
         print('on destroy')
 
     def on_start_button_clicked(self, button):
-        pass
+        print('暂不支持')
 
     def on_pause_button_clicked(self, button):
-        pass
+        print('暂不支持')
 
     def on_remove_button_clicked(self, button):
-        pass
+        print('暂不支持')
 
     def on_open_folder_button_clicked(self, button):
-        pass
+        model, tree_paths = self.selection.get_selected_rows()
+        if not tree_paths or len(tree_paths) != 1:
+            return
+        tree_path = tree_paths[0]
+        path = model[tree_path][PATH_COL]
+        dir_name, _ = os.path.split(path)
+        self.app.home_page.load(dir_name)
+        self.app.switch_page(self.app.home_page)
 
     def on_upload_button_clicked(self, button):
         self.add_task()

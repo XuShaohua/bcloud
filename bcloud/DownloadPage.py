@@ -178,8 +178,8 @@ class DownloadPage(Gtk.Box):
 
     def on_destroyed(self, *args):
         if not self.first_run:
-            for _, row in self.workers.values():
-                self.pause_worker(row)
+            for worker, _ in self.workers.values():
+                worker.pause()
             self.dump_tasks()
             self.conn.commit()
             self.conn.close()
