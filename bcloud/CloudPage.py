@@ -216,6 +216,7 @@ class CloudPage(Gtk.Box):
                 self, self.app, _('Save to..'))
         response = folder_browser.run()
         if response != Gtk.ResponseType.OK:
+            folder_browser.destroy()
             return
         save_path = folder_browser.get_path()
         folder_browser.destroy()
@@ -283,6 +284,7 @@ class CloudPage(Gtk.Box):
                 self, self.app, _('Save to..'))
         response = folder_browser.run()
         if response != Gtk.ResponseType.OK:
+            folder_browser.destroy()
             return
         save_path = folder_browser.get_path()
         folder_browser.destroy()

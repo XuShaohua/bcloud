@@ -17,7 +17,7 @@ class FolderBrowserDialog(Gtk.Dialog):
 
     is_loading = False
 
-    def __init__(self, parent, app, title):
+    def __init__(self, parent, app, title=_('Save to..')):
         super().__init__(
                 title, app.window, Gtk.DialogFlags.MODAL,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,

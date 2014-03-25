@@ -58,7 +58,6 @@ class SigninVcodeDialog(Gtk.Dialog):
         return (self.vcode_entry.get_text(), self.codeString)
 
     def update_img(self, req_data, error=None):
-        print('update_img:',  type(req_data))
         if error or not req_data:
             self.refresh_vcode()
             return
@@ -76,7 +75,6 @@ class SigninVcodeDialog(Gtk.Dialog):
                 auth.get_signin_vcode, self.cookie, self.codeString,
                 callback=self.update_img)
 
-        print('refresh vcode')
         gutil.async_call(
             auth.refresh_sigin_vcode, self.cookie, self.token,
             self.vcodetype, callback=_refresh_vcode)
@@ -89,7 +87,6 @@ class SigninVcodeDialog(Gtk.Dialog):
         self.refresh_vcode()
 
     def on_vcode_confirm_clicked(self, button):
-        print('confirm vcode')
         self.check_entry()
 
 
@@ -216,9 +213,6 @@ class SigninDialog(Gtk.Dialog):
 
     def signin(self):
         def update_profile():
-            print('upate profile:')
-            print('cookie:', cookie)
-            print('tokens:', tokens)
             if not self.profile:
                 self.profile = Config.load_profile(username)
             self.profile['username'] = username
@@ -229,7 +223,6 @@ class SigninDialog(Gtk.Dialog):
             else:
                 self.profile['password'] = ''
             Config.dump_profile(self.profile)
-            print('profile:', self.profile)
 
             if username not in self.conf['profiles']:
                 self.conf['profiles'].append(username)
@@ -253,7 +246,6 @@ class SigninDialog(Gtk.Dialog):
                 update_profile()
 
         def on_get_bduss(bduss, error=None):
-            print('bduss:', bduss)
             if error or not bduss:
                 self.signin_failed(
                     _('Please check username and password are correct!'))
@@ -264,12 +256,10 @@ class SigninDialog(Gtk.Dialog):
                     auth.get_bdstoken, cookie, callback=on_get_bdstoken)
 
         def on_check_login(status, error=None):
-            print('status:', status)
             if error or not status:
                 self.signin_failed(
                         _('Failed to get check login, please try again.'))
             elif len(status['data']['codeString']):
-                print('show verification dialog!')
                 codeString = status['data']['codeString']
                 vcodetype = status['data']['vcodetype']
                 dialog = SigninVcodeDialog(
@@ -278,7 +268,6 @@ class SigninDialog(Gtk.Dialog):
                 dialog.run()
                 vcode, codeString = dialog.get_vcode()
                 dialog.destroy()
-                print('L257: vcode:', vcode)
                 if not vcode or len(vcode) != 4:
                     self.signin_failed(
                         _('Please input verification code!'))
@@ -295,7 +284,6 @@ class SigninDialog(Gtk.Dialog):
                         password, callback=on_get_bduss)
 
         def on_get_UBI(ubi_cookie, error=None):
-            print('ubi cookie:', ubi_cookie)
             if error or not ubi_cookie:
                 self.signin_failed(
                         _('Failed to get UBI cookie, please try again.'))
@@ -307,7 +295,6 @@ class SigninDialog(Gtk.Dialog):
                         callback=on_check_login)
 
         def on_get_token(token, error=None):
-            print('token:', token)
             if error or not token:
                 self.signin_failed(
                         _('Failed to get tokens, please try again.'))
@@ -319,7 +306,6 @@ class SigninDialog(Gtk.Dialog):
                         auth.get_UBI, cookie, token, callback=on_get_UBI)
 
         def on_get_BAIDUID(uid_cookie, error=None):
-            print('uid cookie', uid_cookie)
             if error or not uid_cookie:
                 self.signin_failed(
                         _('Failed to get BAIDUID cookie, please try agin.'))
@@ -330,13 +316,11 @@ class SigninDialog(Gtk.Dialog):
                         auth.get_token, cookie, callback=on_get_token)
 
 
-        print('SigninDialog.singin()-- ')
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
         cookie = RequestCookie()
         tokens = {}
         cookie.load('cflag=65535%3A1; PANWEB=1;')
         self.signin_button.set_label(_('Get cookie...'))
-        print('get cookie: --')
         gutil.async_call(
                 auth.get_BAIDUID, callback=on_get_BAIDUID)

@@ -72,7 +72,7 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
     url = pcs_file['thumbs']['url1']
 
     if len(url) < 10:
-        print('url is to short')
+        print('url is too short')
         return
     filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
     if os.path.exists(filepath) and os.stat(filepath).st_blocks:

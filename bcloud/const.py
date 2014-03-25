@@ -22,6 +22,7 @@ SHARE_REFERER = PAN_URL + 'share/manage'
 PCS_URL = 'http://pcs.baidu.com/rest/2.0/pcs/'
 # 上传的服务器名
 PCS_URL_C = 'http://c.pcs.baidu.com/rest/2.0/pcs/'
+PCS_URLS_C = 'https://c.pcs.baidu.com/rest/2.0/pcs/'
 # 下载的服务器名
 PCS_URL_D = 'http://d.pcs.baidu.com/rest/2.0/pcs/'
 

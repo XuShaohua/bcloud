@@ -90,9 +90,7 @@ def check_login(cookie, token, username):
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     if req:
-        content = req.data
-        print('content:', content)
-        return json.loads(content.decode())
+        return json.loads(req.data.decode())
     else:
         return None
 
@@ -164,34 +162,12 @@ def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
         '&callback=parent.bd__pcbs__cb',
         ])
 
-#    data = ''.join([
-#        'staticpage=http%3A%2F%2Fwww.baidu.com%2Fcache%2Fuser%2Fhtml%2Fv3Jump.html',
-#        '&charset=utf-8',
-#        '&token=', token,
-#        '&tpl=mn&apiver=v3',
-#        '&tt=', util.timestamp(),
-#        '&codestring=', codeString,
-#        '&safeflg=0&u=https%3A%2F%2Fpassport.baidu.com%2F',
-#        '&isPhone=false&quick_user=0',
-#        #'&loginmerge=true&logintype=basicLogin',
-#        '&usernamelogin=1&spligin=rate',
-#        '&username=', username,
-#        '&password=', password,
-#        '&verifycode=', verifycode,
-#        '&mem_pass=on',
-#        '&ppui_logintime=', get_ppui_logintime(),
-#        '&callback=parent.bd__pcbs__cb',
-#        ])
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM,
         'Accept': const.ACCEPT_HTML,
         }, data=data.encode())
-    print('get_bduss:', data)
-    print(req)
     if req:
-        print('req data:', req.data)
-        print(req.headers)
         return req.headers.get_all('Set-Cookie')
     else:
         return None
@@ -252,7 +228,7 @@ def get_auth_info(username, password):
         return (None, None)
     cookie.load_list(get_UBI(cookie, token))
     status = check_login(cookie, token, username)
-    if status != 0:
+    if len(status['data']['codeString']):
         print('Error: failed to check login!')
         return (cookie, None)
     cookie.load_list(get_bduss(cookie, token, username, password))
@@ -262,4 +238,3 @@ def get_auth_info(username, password):
     if 'bdstoken' not in tokens or not tokens['bdstoken']:
         return (cookie, None)
     return (cookie, tokens)
-

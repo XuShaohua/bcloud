@@ -65,7 +65,7 @@ class DownloadPage(Gtk.Box):
     disname = _('Download')
     tooltip = _('Downloading tasks')
     first_run = False
-    workers = {} # { `fs_id': worker }
+    workers = {} # { `fs_id': (worker,row) }
     app_infos = {} # { `fs_id': app }
 
     def __init__(self, app):
@@ -205,15 +205,12 @@ class DownloadPage(Gtk.Box):
     # Open API
     def add_launch_task(self, pcs_file, app_info, saveDir=None,
                         saveName=None):
-        print('DownloadPage.add_launch_task()--')
         if pcs_file['fs_id'] in self.app_infos:
-            print('fs id already in self.app_infs')
             return
         self.app_infos[pcs_file['fs_id']] = app_info
         self.add_task(pcs_file, saveDir, saveName)
 
     def launch_app(self, fs_id):
-        print('launch app() --')
         if fs_id in self.app_infos:
             row = self.get_task_by_fsid(fs_id)
             app_info = self.app_infos[fs_id]
@@ -227,8 +224,6 @@ class DownloadPage(Gtk.Box):
     # Open API
     def add_task(self, pcs_file, saveDir=None, saveName=None):
         '''加入新的下载任务'''
-        print('add_task() --')
-
         # 目前还不支持下载目录.
         if pcs_file['isdir']:
             return
@@ -268,21 +263,15 @@ class DownloadPage(Gtk.Box):
 
     def scan_tasks(self):
         '''扫描所有下载任务, 并在需要时启动新的下载'''
-        print('scan_tasks() -- ')
         for row in self.liststore:
             if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
-                print('max concurrent tasks reached:', self.workers.keys(),
-                        self.app.profile['concurr-tasks'])
                 break
             if row[STATE_COL] == State.WAITING:
                 self.start_worker(row)
-            else:
-                print('state is not waiting:', row[STATENAME_COL])
         return True
 
     def start_worker(self, row):
         '''为task新建一个后台下载线程, 并开始下载.'''
-        print('start_worker() --', row[:])
         def on_worker_received(worker, fs_id, current_size):
             def _on_worker_received():
                 row = None
@@ -298,7 +287,6 @@ class DownloadPage(Gtk.Box):
                 curr_size, _ = util.get_human_size(row[CURRSIZE_COL])
                 row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
                 row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
-            print('on worker received:', current_size)
             GLib.idle_add(_on_worker_received)
 
         def on_worker_downloaded(worker, fs_id):
@@ -311,7 +299,7 @@ class DownloadPage(Gtk.Box):
                 total_size, _ = util.get_human_size(row[SIZE_COL])
                 row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
                 row[STATENAME_COL] = StateNames[State.FINISHED]
-                del self.workers[fs_id]
+                del self.workers[row[FSID_COL]]
                 self.launch_app(fs_id)
                 self.scan_tasks()
             GLib.idle_add(_on_worker_downloaded)
@@ -321,36 +309,35 @@ class DownloadPage(Gtk.Box):
             _, row = self.workers[fs_id]
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
+            self.remove_worker(row[FSID_COL])
 
         if row[FSID_COL] in self.workers:
             return
         row[STATE_COL] = State.DOWNLOADING
         row[STATENAME_COL] = StateNames[State.DOWNLOADING]
-        tree_iter = row.iter
         worker = Downloader(self, row, self.app.cookie, self.app.tokens)
         self.workers[row[FSID_COL]] = (worker, row)
-        # TODO: add to main thread
         worker.connect('received', on_worker_received)
         worker.connect('downloaded', on_worker_downloaded)
         worker.connect('network-error', on_worker_network_error)
         worker.start()
 
     def pause_worker(self, row):
-        try:
-            worker, _ = self.workers[row[FSID_COL]]
-            worker.pause()
-            del self.workers[row[FSID_COL]]
-        except KeyError:
-            pass
+        self.remove_worker(row[FSID_COL], stop=False)
 
     def stop_worker(self, row):
         '''停止这个task的后台下载线程'''
-        try:
-            worker, _ = self.workers[row[FSID_COL]]
+        self.remove_worker(row[FSID_COL])
+
+    def remove_worker(self, fs_id, stop=True):
+        if fs_id not in self.workers:
+            return
+        worker, _ = self.workers[fs_id]
+        if stop:
             worker.stop()
-            del self.workers[row[FSID_COL]]
-        except KeyError:
-            pass
+        else:
+            worker.pause()
+        del self.workers[fs_id]
 
     def start_task(self, row):
         '''启动下载任务.
@@ -358,14 +345,13 @@ class DownloadPage(Gtk.Box):
         将任务状态设定为Downloading, 如果没有超过最大任务数的话;
         否则将它设定为Waiting.
         '''
-        print('start_task() --')
         if row[STATE_COL] == State.DOWNLOADING:
             return
         row[STATE_COL] = State.WAITING
+        row[STATENAME_COL] = StateNames[State.WAITING]
         self.scan_tasks()
 
     def pause_task(self, row):
-        print('pause_task() --')
         if row[STATE_COL] == State.PAUSED:
             return
         elif row[STATE_COL] == State.DOWNLOADING:
@@ -376,18 +362,13 @@ class DownloadPage(Gtk.Box):
         row[STATENAME_COL] = StateNames[State.PAUSED]
 
     def remove_task(self, tree_iter):
-        print('remove_task() --')
         tree_path = self.liststore.get_path(tree_iter)
         index = tree_path.get_indices()[0]
-        print('index:', index)
         row = self.liststore[index]
-        print('row:', row[:])
         # 当删除正在下载的任务时, 直接调用stop_worker(), 它会自动删除本地的
         # 文件片段
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)
-            del self.workers[row[FSID_COL]]
-            print('worker deleted:', self.workers.keys())
         elif row[CURRSIZE_COL] < row[SIZE_COL]:
         # 当文件没有下载完, 就被暂停, 之后又被删除时, 务必删除本地的文件片段
             filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
@@ -399,10 +380,8 @@ class DownloadPage(Gtk.Box):
             self.liststore.remove(tree_iter)
 
     def on_start_button_clicked(self, button):
-        print('on_start_button_clicked() --')
         model, tree_paths = self.selection.get_selected_rows()
         if not tree_paths:
-            print('tree_paths is none')
             return
         for tree_path in tree_paths:
             index = tree_path.get_indices()[0]

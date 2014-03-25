@@ -15,9 +15,12 @@ sys.path.insert(0, os.path.dirname(__file__))
 import auth
 import const
 import encoder
+import hasher
 import net
 from RequestCookie import RequestCookie
 import util
+
+RAPIDUPLOAD_THRESHOLD = 256 * 1024  # 256K
 
 
 def get_quota(cookie, tokens):
@@ -440,6 +443,83 @@ def get_download_link(cookie, dlink):
 #    content = req.data
 #    with open(targ_path, 'wb') as fh:
 #        fh.write(content)
+
+def upload_option(cookie, path):
+    '''上传之前的检查.
+
+    path   - 准备在服务器上放到的绝对路径.
+    '''
+    dir_name, file_name = os.path.split(path)
+    url = ''.join([
+        const.PCS_URL_C,
+        'file?method=upload&app_id=250528&ondup=newcopy',
+        '&dir=', encoder.encode_uri_component(dir_name),
+        '&filename=', encoder.encode_uri_component(file_name),
+        '&', cookie.sub_output('BDUSS'),
+        ])
+    resp = net.urloption(url, headers={'Accept': const.ACCEPT_HTML})
+    if resp:
+        return resp.getheaders()
+    else:
+        return None
+
+def upload(cookie, source_path, path):
+    '''上传一个文件.
+
+    这个是使用的网页中的上传接口.
+    '''
+    dir_name, file_name = os.path.split(path)
+    url = ''.join([
+        const.PCS_URL_C,
+        'file?method=upload&app_id=250528',
+        '&ondup=newcopy',
+        '&dir=', encoder.encode_uri_component(dir_name),
+        '&filename=', encoder.encode_uri_component(file_name),
+        '&', cookie.sub_output('BDUSS'),
+        ])
+    with open(source_path, 'rb') as fh:
+        data = fh.read()
+    fields = []
+    files = [
+        ('file', file_name, data),
+        ]
+    headers = {
+        'Accept': const.ACCEPT_HTML,
+        'Origin': const.PAN_URL,
+        }
+    req = net.post_multipart(url, headers, fields, files)
+    if req:
+        return json.loads(req.data.decode())
+    else:
+        return None
+
+def rapid_upload(cookie, tokens, source_path, path):
+    content_length = os.path.getsize(source_path)
+    assert content_length > RAPIDUPLOAD_THRESHOLD, 'file size is not satisfied!'
+    dir_name, file_name = os.path.split(path)
+    content_md5 = hasher.md5(source_path)
+    slice_md5 = hasher.md5(source_path, 0, RAPIDUPLOAD_THRESHOLD)
+    url = ''.join([
+        const.PCS_URL_C,
+        'file?method=rapidupload&app_id=250528',
+        '&ondup=newcopy',
+        '&dir=', encoder.encode_uri_component(dir_name),
+        '&filename=', encoder.encode_uri_component(file_name),
+        '&content-length=', str(content_length),
+        '&content-md5=', content_md5,
+        '&slice-md5=', slice_md5,
+        '&path=', encoder.encode_uri_component(path),
+        '&', cookie.sub_output('BDUSS'),
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        })
+    if req:
+        return json.loads(req.data.decode())
+    else:
+        return None
+
 
 def get_metas(cookie, tokens, filelist):
     '''获取文件的metadata.

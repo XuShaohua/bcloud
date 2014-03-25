@@ -20,7 +20,6 @@ class VCodeDialog(Gtk.Dialog):
             _('Verification..'), app.window, Gtk.DialogFlags.MODAL,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
             Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        print('VCodeDialog inited:', info)
 
         self.set_default_size(320, 200)
         self.set_border_width(10)
@@ -45,8 +44,8 @@ class VCodeDialog(Gtk.Dialog):
         return self.entry.get_text()
 
     def update_img(self, request, error=None):
-        print('update_img:',  request)
         if error or not request:
+            # TODO: add a refresh button
             print('failed to get vcode image')
             return
         vcode_path = os.path.join(

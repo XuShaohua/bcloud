@@ -6,6 +6,8 @@
 import copy
 import gzip
 import http
+import http.client
+import mimetypes
 import os
 import sys
 import urllib.parse
@@ -27,6 +29,23 @@ default_headers = {
     'Pragma': 'no-cache',
     'Cache-control': 'no-cache',
     }
+
+def urloption(url, headers={}, retries=RETRIES):
+    '''发送OPTION 请求'''
+    headers_merged = copy.copy(default_headers)
+    for key in headers.keys():
+        headers_merged[key] = headers[key]
+    schema = urllib.parse.urlparse(url)
+    for _ in range(retries):
+        try:
+            conn = http.client.HTTPConnection(schema.netloc)
+            conn.request('OPTIONS', url, headers=headers_merged)
+            resp = conn.getresponse()
+            return resp
+        except OSError as e:
+            print('Error in net.urloption:', e, ', with url:', url)
+    return None
+
 
 class ForbiddenHandler(urllib.request.HTTPErrorProcessor):
 
@@ -65,7 +84,7 @@ def urlopen(url, headers={}, data=None, retries=RETRIES):
             return req
         except OSError as e:
             print('Error in net.urlopen :', e, ', with url:', url)
-        return None
+    return None
 
 def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
     '''请求一个URL, 并返回一个Response对象. 不处理重定向.
@@ -86,4 +105,60 @@ def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
             return conn.getresponse()
         except OSError as e:
             print(e)
-        return None
+    return None
+
+
+def post_multipart(url, headers, fields, files, retries=RETRIES):
+    content_type, body = encode_multipart_formdata(fields, files)
+    schema = urllib.parse.urlparse(url)
+
+    headers_merged = copy.copy(default_headers)
+    for key in headers.keys():
+        headers_merged[key] = headers[key]
+    headers_merged['Content-Type'] = content_type
+    headers_merged['Content-length'] = str(len(body))
+
+    for _ in range(retries):
+        try:
+            h = http.client.HTTPConnection(schema.netloc)
+            h.request('POST', url, body=body, headers=headers_merged)
+            req = h.getresponse()
+            encoding = req.getheader('Content-encoding')
+            req.data = req.read()
+            if encoding == 'gzip':
+                req.data = gzip.decompress(req.data)
+            elif encoding == 'deflate':
+                req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
+            return req
+        except OSError as e:
+            print('Error: net.post_multipart ', e, ', with url:', url)
+    return None
+
+def encode_multipart_formdata(fields, files):
+    BOUNDARY = b'----------ThIs_Is_tHe_bouNdaRY_$'
+    S_BOUNDARY = b'--' + BOUNDARY
+    E_BOUNARY = S_BOUNDARY + b'--'
+    CRLF = b'\r\n'
+    BLANK = b''
+    l = []
+    for (key, value) in fields:
+        l.append(S_BOUNDARY)
+        l.append(
+            'Content-Disposition: form-data; name="{0}"'.format(key).encode())
+        l.append(BLANK)
+        l.append(value.encode())
+    for (key, filename, content) in files:
+        l.append(S_BOUNDARY)
+        l.append(
+            'Content-Disposition: form-data; name="{0}"; filename="{1}"'.format(
+                key, filename).encode())
+        l.append(BLANK)
+        l.append(content)
+    l.append(E_BOUNARY)
+    l.append(BLANK)
+    body = CRLF.join(l)
+    content_type = 'multipart/form-data; boundary={0}'.format(BOUNDARY.decode())
+    return content_type, body
+
+def get_content_type(filename):
+    return mimetypes.guess_type(filename)[0] or 'application/octet-stream'

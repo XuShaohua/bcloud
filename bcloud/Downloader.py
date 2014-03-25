@@ -90,14 +90,11 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def run(self):
         '''实现了Thread的方法, 线程启动入口'''
-        print('Downloader.run() --')
         self.init_files()
         if self.fh:
             self.get_download_link()
 
     def get_download_link(self):
-        print('Downloader.get_download_link:', self.row[PATH_COL])
-        print('get meta info..')
         meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
         if not meta or meta['errno'] != 0 or 'info' not in meta:
             print('Error: failed to get meta info:', meta)
@@ -109,7 +106,6 @@ class Downloader(threading.Thread, GObject.GObject):
                 print('Error: failed to get req_id:', req_id)
                 self.emit('network-error', self.row[FSID_COL])
             else:
-                print('target url:', red_url)
                 self.red_url = red_url
                 self.download()
 
@@ -129,16 +125,13 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def pause(self):
         '''暂停下载任务'''
-        print('Downloader.pause()')
         self.row[STATE_COL] = State.PAUSED
 
     def stop(self):
         '''停止下载, 并删除之前下载的片段'''
-        print('Downloader.stop()')
         self.row[STATE_COL] = State.CANCELED
 
     def finished(self):
-        print('Downloader.finished()')
         self.row[STATE_COL] = State.FINISHED
         self.emit('downloaded', self.row[FSID_COL])
 
@@ -165,7 +158,6 @@ class Downloader(threading.Thread, GObject.GObject):
         self.emit('network-error', self.row[FSID_COL])
 
     def write_bytes(self, range_, block):
-        print('write bytes() :', len(block), range_)
         self.row[CURRSIZE_COL] = range_[1]
         self.emit('received', self.row[FSID_COL], self.row[CURRSIZE_COL])
         self.fh.write(block)

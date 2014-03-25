@@ -54,7 +54,6 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def load(self, filelist, error=None):
         '''载入一个目录并显示里面的内容.'''
-        print('IconWindow.load() --')
         self.filelist = []
         self.pathlist = []
         self.liststore.clear()
@@ -105,7 +104,6 @@ class IconWindow(Gtk.ScrolledWindow):
         if type_ == 'folder':
             self.app.home_page.load(path)
         else:
-            #print('will load:', path)
             self.launch_app(tree_path)
 
     def on_iconview_button_pressed(self, iconview, event):
@@ -287,13 +285,11 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def launch_app_with_app_info(self, app_info):
         def open_video_link(resp, error=None):
-            print('IconWindow.open_video_ink:', resp)
             if error or not resp:
                 return
             red_url, req_id = resp
             gutil.async_call(app_info.launch_uris, [red_url, ], None)
 
-        print('open with ', app_info.get_display_name())
         # first, download this to load dir
         # then open it with app_info
         tree_paths = self.iconview.get_selected_items()
@@ -320,7 +316,7 @@ class IconWindow(Gtk.ScrolledWindow):
         self.launch_app_with_app_info(app_info)
 
     def on_choose_app_activated(self, menu_item):
-        print('choose app')
+        print('TODO:choose app')
 
     def on_open_dir_item_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
@@ -339,6 +335,7 @@ class IconWindow(Gtk.ScrolledWindow):
             if error:
                 return
             red_url, req_id = res
+            # TODO: add a notification here
             print('will copy link to clipboard:', red_url)
             clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
             clipboard.set_text(red_url, -1)
@@ -363,7 +360,7 @@ class IconWindow(Gtk.ScrolledWindow):
             self.app.download_page.add_task(pcs_file)
 
     def on_share_activated(self, menu_item):
-        print('share activated')
+        print('TODO: share activated')
 
     def on_moveto_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
@@ -373,11 +370,11 @@ class IconWindow(Gtk.ScrolledWindow):
         dialog = FolderBrowserDialog(self.parent, self.app, _('Move To...'))
         response = dialog.run()
         targ_path = ''
-        if response == Gtk.ResponseType.OK:
-            targ_path = dialog.get_path()
-        dialog.destroy()
-        if not targ_path:
+        if response != Gtk.ResponseType.OK:
+            dialog.destroy()
             return
+        targ_path = dialog.get_path()
+        dialog.destroy()
 
         filelist = []
         for tree_path in tree_paths:
@@ -399,11 +396,11 @@ class IconWindow(Gtk.ScrolledWindow):
         dialog = FolderBrowserDialog(self.parent, self.app, _('Copy To...'))
         response = dialog.run()
         targ_path = ''
-        if response == Gtk.ResponseType.OK:
-            targ_path = dialog.get_path()
-        dialog.destroy()
-        if not targ_path:
+        if response != Gtk.ResponseType.OK:
+            dialog.destroy()
             return
+        targ_path = dialog.get_path()
+        dialog.destroy()
 
         filelist = []
         for tree_path in tree_paths:

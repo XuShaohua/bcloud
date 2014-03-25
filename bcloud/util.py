@@ -4,6 +4,7 @@
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
 import datetime
+import hashlib
 import os
 import random
 import time
