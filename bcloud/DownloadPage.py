@@ -210,9 +210,10 @@ class DownloadPage(Gtk.Box):
     def add_launch_task(self, pcs_file, app_info, saveDir=None,
                         saveName=None):
         self.check_first()
-        if pcs_file['fs_id'] in self.app_infos:
+        fs_id = str(pcs_file['fs_id'])
+        if fs_id in self.app_infos:
             return
-        self.app_infos[pcs_file['fs_id']] = app_info
+        self.app_infos[fs_id] = app_info
         self.add_task(pcs_file, saveDir, saveName)
 
     def launch_app(self, fs_id):
@@ -264,7 +265,6 @@ class DownloadPage(Gtk.Box):
             human_size,
             0,
             )
-        print(task)
         self.liststore.append(task)
         self.scan_tasks()
 
