@@ -135,7 +135,8 @@ class App:
 
     def on_app_activate(self, app):
         self.window.show_all()
-        self.show_signin_dialog()
+        if not self.profile:
+            self.show_signin_dialog()
 
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
@@ -249,6 +250,10 @@ class App:
 
         self.default_color = self.get_default_color()
         self.nav_liststore.clear()
+        pages_num = self.notebook.get_n_pages()
+        children = self.notebook.get_children()
+        for child in children:
+            self.notebook.remove(child)
 
         for page in pages:
             self.notebook.append_page(page, Gtk.Label.new(page.disname))
