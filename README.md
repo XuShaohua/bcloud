@@ -8,6 +8,7 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 * Fedora 20
 * Debian sid
 * Debian testing
+* Debian stable
 * Ubuntu 13.10
 * Ubuntu 14.04
 

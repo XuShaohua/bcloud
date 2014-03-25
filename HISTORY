@@ -1,3 +1,24 @@
+v2.2.1 - 2014.3.26
+* Fixed: Python int too long to convert to C long; reported by @youzhiyili
+* Using Gtk3 dark theme
+* Fixed: hide signin dialog
+* Assemble symbolic icons
+* Support Gtk3.4.2
+* Fixed: iteration RuntimeError
+* encoding username; bug reported by @eagle5678
+* Add blink font style
+* Fixed: divided by zero
+* Cache authorization information
+* Support uploading files
+* Fixed: show file chooser dialog when downloading magent files
+* tmp dir changed
+* Logo redesigned
+* Fixed: delete workers from pool after it is paused/stoped
+* Fixed: resume download task from last status
+* Signin dialog supports vertification code
+* Fixed: TypeError: Label constructor cannot be used to create instances of a subclass LeftLabel
+* i18n updated
+
 v2.1.4 - 2014.3.22
 * Replacing MenuItem default constructor with .new_with_label()
 * Support PyGObject 3.11

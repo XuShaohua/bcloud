@@ -36,6 +36,7 @@ bcloud/net.py
 bcloud/pcs.py
 bcloud/util.py
 share/applications/bcloud.desktop
+share/bcloud/color_schema.json
 share/icons/hicolor/128x128/apps/bcloud.png
 share/icons/hicolor/16x16/apps/bcloud.png
 share/icons/hicolor/24x24/apps/bcloud.png
@@ -46,9 +47,17 @@ share/icons/hicolor/512x512/apps/bcloud.png
 share/icons/hicolor/64x64/apps/bcloud.png
 share/icons/hicolor/scalable/actions/cloud-download-symbolic.svg
 share/icons/hicolor/scalable/actions/cloud-symbolic.svg
+share/icons/hicolor/scalable/actions/download-symbolic.svg
+share/icons/hicolor/scalable/actions/home-symbolic.svg
+share/icons/hicolor/scalable/actions/search-symbolic.svg
 share/icons/hicolor/scalable/actions/upload-symbolic.svg
 share/icons/hicolor/scalable/apps/bcloud.svg
 share/icons/hicolor/scalable/mimetypes/bittorrent-symbolic.svg
+share/icons/hicolor/scalable/mimetypes/documents-symbolic.svg
+share/icons/hicolor/scalable/mimetypes/music-symbolic.svg
+share/icons/hicolor/scalable/mimetypes/others-symbolic.svg
+share/icons/hicolor/scalable/mimetypes/pictures-symbolic.svg
+share/icons/hicolor/scalable/mimetypes/videos-symbolic.svg
 share/locale/zh_CN/LC_MESSAGES/bcloud.mo
 test/test-mime.py
 test/test-pcs.py

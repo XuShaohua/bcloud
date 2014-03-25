@@ -26,7 +26,7 @@ gettext.textdomain(NAME)
 _ = gettext.gettext
 
 APPNAME = 'BCloud'
-VERSION = '2.1.4'
+VERSION = '2.2.1'
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
 AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
