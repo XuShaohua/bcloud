@@ -64,7 +64,7 @@ class DownloadPage(Gtk.Box):
     icon_name = 'folder-download-symbolic'
     disname = _('Download')
     tooltip = _('Downloading tasks')
-    first_run = False
+    first_run = True
     workers = {} # { `fs_id': (worker,row) }
     app_infos = {} # { `fs_id': app }
 
@@ -171,12 +171,18 @@ class DownloadPage(Gtk.Box):
         '''
         self.cursor.execute(sql)
 
+    def check_first(self):
+        if self.first_run:
+            self.frist_run = True
+            self.load()
+
     def on_destroyed(self, *args):
-        for _, row in self.workers.values():
-            self.pause_worker(row)
-        self.dump_tasks()
-        self.conn.commit()
-        self.conn.close()
+        if not self.first_run:
+            for _, row in self.workers.values():
+                self.pause_worker(row)
+            self.dump_tasks()
+            self.conn.commit()
+            self.conn.close()
     
     def load_tasks(self):
         req = self.cursor.execute('SELECT * FROM queue')
@@ -205,6 +211,7 @@ class DownloadPage(Gtk.Box):
     # Open API
     def add_launch_task(self, pcs_file, app_info, saveDir=None,
                         saveName=None):
+        self.check_first()
         if pcs_file['fs_id'] in self.app_infos:
             return
         self.app_infos[pcs_file['fs_id']] = app_info
@@ -224,6 +231,7 @@ class DownloadPage(Gtk.Box):
     # Open API
     def add_task(self, pcs_file, saveDir=None, saveName=None):
         '''加入新的下载任务'''
+        self.check_first()
         # 目前还不支持下载目录.
         if pcs_file['isdir']:
             return

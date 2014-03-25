@@ -128,10 +128,6 @@ class App:
         self.notebook.props.show_tabs = False
         paned.add2(self.notebook)
 
-        self.init_notebook()
-        self.notebook.connect('switch-page', self.on_notebook_switched)
-        self.init_status_icon()
-
     def on_app_activate(self, app):
         self.window.show_all()
         self.show_signin_dialog()
@@ -154,6 +150,10 @@ class App:
         signin.destroy()
 
         if self.profile:
+            self.init_notebook()
+            self.notebook.connect('switch-page', self.on_notebook_switched)
+            self.init_status_icon()
+
             if self.profile['first-run']:
                 self.profile['first-run'] = False
                 preferences = PreferencesDialog(self)
@@ -161,7 +161,6 @@ class App:
                 preferences.destroy()
 
             self.home_page.load()
-            self.download_page.load()
         else:
             self.quit()
 
@@ -244,6 +243,7 @@ class App:
         pages.append(self.upload_page)
 
         self.default_color = self.get_default_color()
+        self.nav_liststore.clear()
 
         for page in pages:
             self.notebook.append_page(page, Gtk.Label.new(page.disname))
@@ -251,6 +251,7 @@ class App:
                 page.icon_name, page.disname,
                 page.tooltip, self.default_color,
                 ])
+        self.notebook.show_all()
 
     def reload_current_page(self, *args, **kwds):
         '''重新载入当前页面.
@@ -298,7 +299,6 @@ class App:
         for index, p in enumerate(self.notebook):
             if p == page:
                 break
-        print('index:', index)
         row = self.nav_liststore[index]
         GLib.timeout_add(BLINK_DELTA, blink)
 

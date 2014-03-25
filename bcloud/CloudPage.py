@@ -41,9 +41,6 @@ class CloudPage(Gtk.Box):
         control_box = Gtk.Box()
         self.pack_start(control_box, False, False, 0)
 
-        bt_button = Gtk.Button.new_with_label(_('New BT Task'))
-        control_box.pack_start(bt_button, False, False, 0)
-
         link_button = Gtk.Button.new_with_label(_('New Link Task'))
         link_button.connect('clicked', self.on_link_button_clicked)
         control_box.pack_start(link_button, False, False, 0)
@@ -235,13 +232,6 @@ class CloudPage(Gtk.Box):
             pcs.cloud_add_bt_task, self.app.cookie, self.app.tokens,
             source_url, save_path, selected_idx, file_sha1,
             callback=check_vcode)
-
-
-    # Open API
-    def add_local_bt_task(self):
-        '''从本地上传种子到服务器, 再创建离线下载任务'''
-        self.check_first()
-        print('Local BT task not supported right now.')
 
     # Open API
     def add_link_task(self):

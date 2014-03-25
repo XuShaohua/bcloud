@@ -85,7 +85,7 @@ def check_login(cookie, token, username):
         '&token=', token,
         '&tpl=mm&apiver=v3',
         '&tt=', util.timestamp(),
-        '&username=', username,
+        '&username=', encoder.encode_uri_component(username),
         '&isphone=false',
         ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
@@ -154,7 +154,7 @@ def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
         '&safeflg=0&u=https%3A%2F%2Fpassport.baidu.com%2F',
         '&isPhone=false&quick_user=0',
         '&loginmerge=true&logintype=basicLogin&logLoginType=pc_loginBasic',
-        '&username=', username,
+        '&username=', encoder.encode_uri_component(username),
         '&password=', password,
         '&verifycode=', verifycode,
         '&mem_pass=on',
