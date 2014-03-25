@@ -111,9 +111,14 @@ class App:
         nav_col.set_title('Places')
         nav_col.pack_start(icon_cell, False)
         nav_col.pack_start(name_cell, True)
-        nav_col.set_attributes(icon_cell, icon_name=ICON_COL)
-        nav_col.set_attributes(
-            name_cell, text=NAME_COL, foreground_rgba=COLOR_COL)
+        if Config.GTK_LE_36:
+            nav_col.add_attribute(icon_tell, 'icon_name', ICON_COL)
+            nav_col.add_attribute(name_cell, 'text', NAME_COL)
+            nav_col.add_attribute(name_cell, 'foreground_rgba', COLOR_COL)
+        else:
+            nav_col.set_attributes(icon_cell, icon_name=ICON_COL)
+            nav_col.set_attributes(
+                name_cell, text=NAME_COL, foreground_rgba=COLOR_COL)
         nav_treeview.append_column(nav_col)
         nav_selection = nav_treeview.get_selection()
         nav_selection.connect('changed', self.on_nav_selection_changed)

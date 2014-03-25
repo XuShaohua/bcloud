@@ -41,7 +41,10 @@ class FolderBrowserDialog(Gtk.Dialog):
         name_col = Gtk.TreeViewColumn(_('Folder'))
         name_col.pack_start(icon_cell, False)
         name_col.pack_start(name_cell, True)
-        name_col.set_attributes(name_cell, text=NAME_COL)
+        if Config.GTK_LE_36:
+            name_col.add_attribute(name_cell, 'text', NAME_COL)
+        else:
+            name_col.set_attributes(name_cell, text=NAME_COL)
         self.treeview.append_column(name_col)
         self.treeview.connect('row-expanded', self.on_row_expanded)
 

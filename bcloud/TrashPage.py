@@ -75,8 +75,12 @@ class TrashPage(Gtk.Box):
         name_col.set_title(_('Name'))
         name_col.pack_start(icon_cell, False)
         name_col.pack_start(name_cell, True)
-        name_col.set_attributes(icon_cell, icon_name=ICON_COL)
-        name_col.set_attributes(name_cell, text=DISNAME_COL)
+        if Config.GTK_LE_36:
+            name_col.add_attribute(icon_cell, 'icon_name', ICON_COL)
+            name_col.add_attribute(name_cell, 'text', DISNAME_COL)
+        else:
+            name_col.set_attributes(icon_cell, icon_name=ICON_COL)
+            name_col.set_attributes(name_cell, text=DISNAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
         size_cell = Gtk.CellRendererText()
