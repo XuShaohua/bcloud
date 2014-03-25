@@ -34,16 +34,16 @@ class Downloader(threading.Thread, GObject.GObject):
     __gsignals__ = {
             'received': (GObject.SIGNAL_RUN_LAST,
                 # fs-id, current-size
-                GObject.TYPE_NONE, (GObject.TYPE_LONG, GObject.TYPE_LONG)),
+                GObject.TYPE_NONE, (str, GObject.TYPE_LONG)),
             'downloaded': (GObject.SIGNAL_RUN_LAST, 
                 # fs_id
-                GObject.TYPE_NONE, (GObject.TYPE_LONG, )),
+                GObject.TYPE_NONE, (str, )),
             'disk-error': (GObject.SIGNAL_RUN_LAST,
                 # fs_id
-                GObject.TYPE_NONE, (GObject.TYPE_LONG, )),
+                GObject.TYPE_NONE, (str, )),
             'network-error': (GObject.SIGNAL_RUN_LAST,
                 # fs_id
-                GObject.TYPE_NONE, (GObject.TYPE_LONG, )),
+                GObject.TYPE_NONE, (str, )),
             }
 
     def __init__(self, parent, row, cookie, tokens):

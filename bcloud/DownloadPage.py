@@ -102,10 +102,8 @@ class DownloadPage(Gtk.Box):
         # isdir, saveDir, saveName, state, statename,
         # humansize, percent
         self.liststore = Gtk.ListStore(
-                str, str, GObject.TYPE_LONG, GObject.TYPE_LONG,
-                GObject.TYPE_LONG, str,
-                int, str, str, int, str,
-                str, int)
+                str, str, str, GObject.TYPE_LONG, GObject.TYPE_LONG, str,
+                int, str, str, int, str, str, int)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_tooltip_column(PATH_COL)
         self.selection = self.treeview.get_selection()
@@ -153,10 +151,10 @@ class DownloadPage(Gtk.Box):
         db = os.path.join(cache_path, TASK_FILE)
         self.conn = sqlite3.connect(db)
         self.cursor = self.conn.cursor()
-        sql = '''CREATE TABLE IF NOT EXISTS queue (
+        sql = '''CREATE TABLE IF NOT EXISTS download (
         name CHAR NOT NULL,
         path CHAR NOT NULL,
-        fsid INTEGER NOT NULL,
+        fsid CHAR NOT NULL,
         size INTEGER NOT NULL,
         currsize INTEGER NOT NULL,
         link CHAR,
@@ -173,7 +171,7 @@ class DownloadPage(Gtk.Box):
 
     def check_first(self):
         if self.first_run:
-            self.frist_run = True
+            self.first_run = False
             self.load()
 
     def on_destroyed(self, *args):
@@ -185,14 +183,14 @@ class DownloadPage(Gtk.Box):
             self.conn.close()
     
     def load_tasks(self):
-        req = self.cursor.execute('SELECT * FROM queue')
+        req = self.cursor.execute('SELECT * FROM download')
         for task in req:
             self.liststore.append(task)
 
     def dump_tasks(self):
-        sql = 'DELETE FROM queue'
+        sql = 'DELETE FROM download'
         self.cursor.execute(sql)
-        sql = 'INSERT INTO queue VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        sql = 'INSERT INTO download VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
         for row in self.liststore:
             if (row[STATE_COL] == State.DOWNLOADING or 
                     row[STATE_COL] == State.WAITING):
@@ -254,7 +252,7 @@ class DownloadPage(Gtk.Box):
         task = (
             pcs_file['server_filename'],
             pcs_file['path'],
-            pcs_file['fs_id'],
+            str(pcs_file['fs_id']),
             pcs_file['size'],
             0,
             pcs_file['dlink'],
@@ -266,6 +264,7 @@ class DownloadPage(Gtk.Box):
             human_size,
             0,
             )
+        print(task)
         self.liststore.append(task)
         self.scan_tasks()
 

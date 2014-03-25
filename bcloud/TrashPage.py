@@ -16,7 +16,7 @@ from bcloud import pcs
 from bcloud import util
 
 (ICON_COL, DISNAME_COL, PATH_COL, FSID_COL, TOOLTIP_COL,
-    SIZE_COL, DELETING_COL, REMAINING_COL) = list(range(8))
+    HUMANSIZE_COL, DELETING_COL, REMAINING_COL) = list(range(8))
 MAX_DAYS = 10  # 10天后会自动从回收站中删除
 ICON_SIZE = 24
 
@@ -61,8 +61,7 @@ class TrashPage(Gtk.Box):
         # icon name, disname, path, fs_id, tooltip,
         # size, deleting time, remaining days
         self.liststore = Gtk.ListStore(
-                str, str, str, GObject.TYPE_ULONG, str,
-                str, str, str)
+                str, str, str, str, str, str, str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         selection = self.treeview.get_selection()
         selection.set_mode(Gtk.SelectionMode.MULTIPLE)
@@ -84,7 +83,8 @@ class TrashPage(Gtk.Box):
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=SIZE_COL)
+        size_col = Gtk.TreeViewColumn(
+                _('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
         time_cell = Gtk.CellRendererText()
         time_col = Gtk.TreeViewColumn(
@@ -122,9 +122,9 @@ class TrashPage(Gtk.Box):
             icon_name = self.app.mime.get_icon_name(path, pcs_file['isdir'])
             tooltip = path
             if pcs_file['isdir']:
-                size = ''
+                humansize = ''
             else:
-                size, _ = util.get_human_size(pcs_file['size'])
+                humansize, _ = util.get_human_size(pcs_file['size'])
             remaining_days = util.get_delta_days(
                     int(pcs_file['server_mtime']), time.time())
             remaining_days = str(MAX_DAYS - remaining_days) + ' days'
@@ -132,9 +132,9 @@ class TrashPage(Gtk.Box):
                 icon_name,
                 pcs_file['server_filename'],
                 path,
-                pcs_file['fs_id'],
+                str(pcs_file['fs_id']),
                 tooltip,
-                size,
+                humansize,
                 time.ctime(pcs_file['server_mtime']),
                 remaining_days,
                 ])

@@ -285,8 +285,8 @@ class App:
 
     def on_notebook_switched(self, notebook, page, index):
         if page.first_run:
-            page.load()
             page.first_run = False
+            page.load()
 
     def on_nav_selection_changed(self, nav_selection):
         model, iter_ = nav_selection.get_selected()
