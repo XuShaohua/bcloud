@@ -7,6 +7,7 @@ import gettext
 import json
 import os
 
+from gi.repository import Gdk
 from gi.repository import Gtk
 
 if __file__.startswith('/usr/local/'):
@@ -17,6 +18,7 @@ else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
 NAME = 'bcloud'
 ICON_PATH = os.path.join(PREF, NAME, 'icons')
+COLOR_SCHEMA = os.path.join(PREF, NAME, 'color_schema.json')
 
 LOCALEDIR = os.path.join(PREF, 'locale')
 gettext.bindtextdomain(NAME, LOCALEDIR)
@@ -105,3 +107,19 @@ def get_tmp_path(profile_name):
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
     return path
+
+def load_color_schema():
+    if not os.path.exists(COLOR_SCHEMA):
+        return []
+    with open(COLOR_SCHEMA) as fh:
+        color_list = json.load(fh)
+
+    schema = []
+    for color in color_list:
+        rgba = Gdk.RGBA()
+        rgba.red = int(color[:2], base=16) / 255
+        rgba.green = int(color[2:4], base=16) / 255
+        rgba.blue = int(color[4:6], base=16) / 255
+        rgba.alpha = int(color[6:], base=16) / 255
+        schema.append(rgba)
+    return schema

@@ -309,6 +309,7 @@ class IconWindow(Gtk.ScrolledWindow):
                     pcs.get_download_link, self.app.cookie,
                     pcs_file['dlink'], callback=open_video_link)
         else:
+            self.app.blink_page(self.app.download_page)
             self.app.download_page.add_launch_task(pcs_file, app_info)
 
     # item popup menu
@@ -357,6 +358,7 @@ class IconWindow(Gtk.ScrolledWindow):
             return
         for tree_path in tree_paths:
             pcs_file = self.filelist[tree_path.get_indices()[0]]
+            self.app.blink_page(self.app.download_page)
             self.app.download_page.add_task(pcs_file)
 
     def on_share_activated(self, menu_item):

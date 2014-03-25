@@ -3,9 +3,12 @@
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
 import os
+import random
 import sys
 sys.path.insert(0, os.path.dirname(__file__))
+import time
 
+from gi.repository import Gdk
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
@@ -32,12 +35,16 @@ from UploadPage import UploadPage
 if Gtk.MAJOR_VERSION <= 3 and Gtk.MINOR_VERSION < 10:
     GObject.threads_init()
 DBUS_APP_NAME = 'org.liulang.bcloud'
+(ICON_COL, NAME_COL, TOOLTIP_COL, COLOR_COL) = list(range(4))
+BLINK_DELTA = 250    # 字体闪烁间隔, 250 miliseconds 
+BLINK_SUSTAINED = 3  # 字体闪烁持续时间, 5 seconds
 
 class App:
 
     profile = None
     cookie = None
     tokens = None
+    default_color = Gdk.RGBA(0.9, 0.9, 0.9, 1)
 
     def __init__(self):
         self.app = Gtk.Application.new(DBUS_APP_NAME, 0)
@@ -49,6 +56,7 @@ class App:
         self.icon_theme = Gtk.IconTheme.get_default()
         #self.icon_theme.append_search_path(Config.ICON_PATH)
         self.mime = MimeProvider(self)
+        self.color_schema = Config.load_color_schema()
 
         self.window = Gtk.ApplicationWindow.new(application=app)
         self.window.set_default_size(*Config._default_profile['window-size'])
@@ -91,20 +99,21 @@ class App:
         #nav_window.props.border_width = 5
         left_box.pack_start(nav_window, True, True, 0)
 
-        # icon_name, disname, tooltip
-        self.nav_liststore = Gtk.ListStore(str, str, str)
+        # icon_name, disname, tooltip, color
+        self.nav_liststore = Gtk.ListStore(str, str, str, Gdk.RGBA)
         nav_treeview = Gtk.TreeView(model=self.nav_liststore)
         self.nav_selection = nav_treeview.get_selection()
         nav_treeview.props.headers_visible = False
-        nav_treeview.set_tooltip_column(2)
+        nav_treeview.set_tooltip_column(TOOLTIP_COL)
         icon_cell = Gtk.CellRendererPixbuf()
         name_cell = Gtk.CellRendererText()
         nav_col = Gtk.TreeViewColumn.new()
         nav_col.set_title('Places')
         nav_col.pack_start(icon_cell, False)
         nav_col.pack_start(name_cell, True)
-        nav_col.set_attributes(icon_cell, icon_name=0)
-        nav_col.set_attributes(name_cell, text=1)
+        nav_col.set_attributes(icon_cell, icon_name=ICON_COL)
+        nav_col.set_attributes(
+            name_cell, text=NAME_COL, foreground_rgba=COLOR_COL)
         nav_treeview.append_column(nav_col)
         nav_selection = nav_treeview.get_selection()
         nav_selection.connect('changed', self.on_nav_selection_changed)
@@ -234,10 +243,14 @@ class App:
         self.upload_page = UploadPage(self)
         pages.append(self.upload_page)
 
+        self.default_color = self.get_default_color()
+
         for page in pages:
             self.notebook.append_page(page, Gtk.Label.new(page.disname))
             self.nav_liststore.append([
-                page.icon_name, page.disname, page.tooltip])
+                page.icon_name, page.disname,
+                page.tooltip, self.default_color,
+                ])
 
     def reload_current_page(self, *args, **kwds):
         '''重新载入当前页面.
@@ -272,3 +285,23 @@ class App:
 
     def init_status_icon(self):
         pass
+
+    def blink_page(self, page):
+        def blink():
+            row[COLOR_COL] = random.choice(self.color_schema)
+            if time.time() - start_time > BLINK_SUSTAINED:
+                row[COLOR_COL] = self.default_color
+                return False
+            return True
+        
+        start_time = time.time()
+        for index, p in enumerate(self.notebook):
+            if p == page:
+                break
+        print('index:', index)
+        row = self.nav_liststore[index]
+        GLib.timeout_add(BLINK_DELTA, blink)
+
+    def get_default_color(self):
+        context = self.window.get_style_context()
+        return context.get_color(Gtk.StateFlags.NORMAL)
