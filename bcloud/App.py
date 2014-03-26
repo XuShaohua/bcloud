@@ -45,6 +45,7 @@ class App:
     cookie = None
     tokens = None
     default_color = Gdk.RGBA(0.9, 0.9, 0.9, 1)
+    status_icon = None
 
     def __init__(self):
         self.app = Gtk.Application.new(Config.DBUS_APP_NAME, 0)
@@ -177,16 +178,18 @@ class App:
             self.profile['window-size'] = window.get_size()
 
     def on_main_window_deleted(self, window, event):
-        print('on main window deleted')
-        # TODO: minimize to sys tray
-        #return False
+        if self.profile and self.profile['use-status-icon']:
+            window.hide()
+            return True
+        else:
+            return False
 
     def on_preferences_action_activated(self, action, params):
         dialog = PreferencesDialog(self)
         dialog.run()
         dialog.destroy()
         if self.profile:
-            Config.dump_profile(self.profile)
+            gutil.dump_profile(self.profile)
 
     def on_signout_action_activated(self, action, params):
         if self.profile:
@@ -297,7 +300,49 @@ class App:
         self.switch_page_by_index(index)
 
     def init_status_icon(self):
-        pass
+        if (self.profile and self.profile['use-status-icon'] and
+                not self.status_icon):
+            self.status_icon = Gtk.StatusIcon()
+            self.status_icon.set_from_icon_name(Config.NAME)
+            # left click
+            self.status_icon.connect(
+                    'activate', self.on_status_icon_activate)
+            # right click
+            self.status_icon.connect(
+                    'popup_menu', self.on_status_icon_popup_menu)
+        else:
+            self.status_icon = None
+
+    def on_status_icon_activate(self, status_icon):
+        if self.window.props.visible:
+            self.window.hide()
+        else:
+            self.window.present()
+
+    def on_status_icon_popup_menu(self, status_icon, event_button,
+                                event_time):
+        menu = Gtk.Menu()
+        show_item = Gtk.MenuItem(label=_('Show App') )
+        show_item.connect('activate', self.on_status_icon_show_app_activate)
+        menu.append(show_item)
+
+        sep_item = Gtk.SeparatorMenuItem()
+        menu.append(sep_item)
+
+        quit_item = Gtk.MenuItem(label=_('Quit'))
+        quit_item.connect('activate', self.on_status_icon_quit_activate)
+        menu.append(quit_item)
+
+        menu.show_all()
+        menu.popup(None, None,
+                lambda a,b: Gtk.StatusIcon.position_menu(menu, status_icon),
+                None, event_button, event_time)
+
+    def on_status_icon_show_app_activate(self, menuitem):
+        self.window.present()
+
+    def on_status_icon_quit_activate(self, menuitem):
+        self.quit()
 
     def blink_page(self, page):
         def blink():

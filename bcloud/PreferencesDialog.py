@@ -58,12 +58,13 @@ class PreferencesDialog(Gtk.Dialog):
         notify_switch.props.halign = Gtk.Align.START
         general_grid.attach(notify_switch, 1, 2, 1, 1)
 
-        tray_label = Gtk.Label.new(_('Minimize To System Tray:'))
-        tray_label.props.xalign = 1
-        general_grid.attach(tray_label, 0, 3, 1, 1)
-        tray_switch = Gtk.Switch()
-        tray_switch.props.halign = Gtk.Align.START
-        general_grid.attach(tray_switch, 1, 3, 1, 1)
+        status_label = Gtk.Label.new(_('Minimize To System Tray:'))
+        status_label.props.xalign = 1
+        general_grid.attach(status_label, 0, 3, 1, 1)
+        status_switch = Gtk.Switch()
+        status_switch.connect('activate', self.on_status_switch_activate)
+        status_switch.props.halign = Gtk.Align.START
+        general_grid.attach(status_switch, 1, 3, 1, 1)
 
         box.show_all()
 
@@ -74,3 +75,6 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_concurr_value_changed(self, concurr_spin):
         self.app.profile['concurr-tasks'] = concurr_spin.get_value()
+
+    def on_status_switch_activate(self, switch):
+        self.app.profile['use-status-icon'] = switch.get_active()
