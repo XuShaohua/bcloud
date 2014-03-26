@@ -14,6 +14,13 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 
 不支持的版本:
 * Ubuntu 12.04
+* OpenSuse-13.1 我安装了opensuse, 并且使用pip3安装了bcloud, 发现bcloud的share
+目录没有被合并到/usr/share或者/usr/local/share, 而是被放到了python的模块路
+径里了. 这样一来, bcloud运行时需要的图标等文件就不能被桌面主题引擎搜索到了,
+所以bcloud在opensuse里面会缺少很多图标,
+而且bcloud的启动器也不能在应用程序列表中显示出来. 为了有更安的使用体验, 不建
+议suse用户现在手动安装bcloud, 还是等有社区的朋友帮忙制作好安装包之后再用rpm
+安装包直接安装, 这样既省事儿也简单.
 
 
 安装
