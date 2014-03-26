@@ -96,6 +96,8 @@ class SigninVcodeDialog(Gtk.Dialog):
 
 class SigninDialog(Gtk.Dialog):
 
+    profile = None
+
     def __init__(self, app, auto_signin=True):
         super().__init__(
                 _('Sign in now'), app.window, Gtk.DialogFlags.MODAL)
@@ -205,11 +207,19 @@ class SigninDialog(Gtk.Dialog):
         else:
             self.signin_check.set_sensitive(False)
             self.signin_check.set_active(False)
+        if self.profile:
+            self.profile['remember-password'] = self.remember_check.get_active()
+            gutil.dump_profile(self.profile)
 
     def on_signin_check_toggled(self, button):
-        pass
+        if self.profile:
+            self.profile['auto-signin'] = self.signin_check.get_active()
+            gutil.dump_profile(self.profile)
 
     def on_signin_button_clicked(self, button):
+        if (len(self.password_entry.get_text()) <= 1 or
+                not self.username_combo.get_child().get_text()):
+            return
         self.infobar.hide()
         button.set_label(_('In process...'))
         button.set_sensitive(False)

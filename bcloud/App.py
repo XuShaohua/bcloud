@@ -170,8 +170,8 @@ class App:
                 preferences.destroy()
 
             self.home_page.load()
-        else:
-            self.quit()
+            return
+        self.quit()
 
     def on_main_window_resized(self, window):
         if self.profile:
