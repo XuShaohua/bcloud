@@ -25,6 +25,7 @@ gettext.bindtextdomain(NAME, LOCALEDIR)
 gettext.textdomain(NAME)
 _ = gettext.gettext
 
+DBUS_APP_NAME = 'org.liulang.bcloud'
 APPNAME = 'BCloud'
 VERSION = '2.2.1'
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
@@ -40,20 +41,6 @@ GTK_LE_36 = (Gtk.MAJOR_VERSION == 3) and (Gtk.MINOR_VERSION <= 6)
 
 CONF_DIR = os.path.join(HOME_DIR, '.config', NAME)
 _conf_file = os.path.join(CONF_DIR, 'conf.json')
-
-_default_profile = {
-    'version': VERSION,
-    'window-size': (960, 680),
-    'use-status-icon': True,
-    'use-notify': False,
-    'first-run': True,
-    'save-dir': HOME_DIR,
-    'concurr-tasks': 2,
-    'username': '',
-    'password': '',
-    'remember-password': False,
-    'auto-signin': False,
-    }
 
 _base_conf = {
     'default': '',
@@ -79,20 +66,6 @@ def load_conf():
 def dump_conf(conf):
     with open(_conf_file, 'w') as fh:
         json.dump(conf, fh)
-
-def load_profile(profile_name):
-    '''读取特定帐户的配置信息'''
-    path = os.path.join(CONF_DIR, profile_name)
-    if os.path.exists(path):
-        with open(path) as fh:
-            return json.load(fh)
-    else:
-        return _default_profile
-
-def dump_profile(profile):
-    path = os.path.join(CONF_DIR, profile['username'])
-    with open(path, 'w') as fh:
-        json.dump(profile, fh)
 
 def get_cache_path(profile_name):
     '''获取这个帐户的缓存目录, 如果不存在, 就创建它'''

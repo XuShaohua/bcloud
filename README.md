@@ -29,6 +29,8 @@ DEPENDENCIES
 * python3-gi  Gtk3 的python3 绑定
 * python3-urllib3 urllib的封装, 更易用, 在这里 https://pypi.python.org/pypi/urllib3.
 * gnome-icon-theme-symbolic Gnome3 提供的一套按纽.
+* python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到gnome-keyring
+或者kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
 
 
 COPYRIGHT

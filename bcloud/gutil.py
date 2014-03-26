@@ -3,13 +3,37 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import copy
+import json
 import os
 import subprocess
 import threading
 
 from gi.repository import GdkPixbuf
 from gi.repository import GLib
+try:
+    import keyring
+    keyring_imported = True
+except ImportError:
+    keyring_imported = False
+
+from bcloud import Config
 from bcloud import net
+
+PASSWORD_MAGIC_CHAR = 'x'
+DEFAULT_PROFILE = {
+    'version': Config.VERSION,
+    'window-size': (960, 680),
+    'use-status-icon': True,
+    'use-notify': False,
+    'first-run': True,
+    'save-dir': Config.HOME_DIR,
+    'concurr-tasks': 2,
+    'username': '',
+    'password': '',
+    'remember-password': False,
+    'auto-signin': False,
+    }
 
 # calls f on another thread
 def async_call(func, *args, callback=None):
@@ -85,3 +109,36 @@ def ellipse_text(text, length=10):
         return text
     else:
         return text[:8] + '..'
+
+def load_profile(profile_name):
+    '''读取特定帐户的配置信息'''
+    path = os.path.join(Config.CONF_DIR, profile_name)
+    if not os.path.exists(path):
+        return DEFAULT_PROFILE
+    with open(path) as fh:
+        profile = json.load(fh)
+    if profile['password'] == PASSWORD_MAGIC_CHAR and keyring_imported:
+        profile['password'] = keyring.get_password(
+                Config.DBUS_APP_NAME, profile['username'])
+    return profile
+
+def dump_profile(profile):
+    '''保存帐户的配置信息.
+
+    这里会检查用户是否愿意保存密码, 如果需要保存密码的话, 就会检查是否存在
+    keyring这个模块, 如果存在, 就使用它来管理密码;
+    如果不存存, 就会把密码明文存放(这个很不安全).
+    '''
+    profile = copy.copy(profile)
+    path = os.path.join(Config.CONF_DIR, profile['username'])
+    if not profile['remember-password']:
+        profile['password'] = ''
+    elif keyring_imported:
+        keyring.set_password(
+                Config.DBUS_APP_NAME, profile['username'],
+                profile['password'])
+        profile['password'] = PASSWORD_MAGIC_CHAR
+    else:
+        print('警告: 密码被明文存储!')
+    with open(path, 'w') as fh:
+        json.dump(profile, fh)

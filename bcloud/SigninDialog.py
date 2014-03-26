@@ -184,7 +184,7 @@ class SigninDialog(Gtk.Dialog):
             if row[0] == username:
                 self.username_combo.set_active_iter(row.iter)
                 break
-        self.profile = Config.load_profile(username)
+        self.profile = gutil.load_profile(username)
         self.password_entry.set_text(self.profile['password'])
         self.remember_check.set_active(self.profile['remember-password'])
         if self.profile['remember-password']:
@@ -329,7 +329,7 @@ class SigninDialog(Gtk.Dialog):
 
     def update_profile(self, username, password, cookie, tokens, dump=False):
         if not self.profile:
-            self.profile = Config.load_profile(username)
+            self.profile = gutil.load_profile(username)
         self.profile['username'] = username
         self.profile['remember-password'] = self.remember_check.get_active()
         self.profile['auto-signin'] = self.signin_check.get_active()
@@ -337,7 +337,7 @@ class SigninDialog(Gtk.Dialog):
             self.profile['password'] = password
         else:
             self.profile['password'] = ''
-        Config.dump_profile(self.profile)
+        gutil.dump_profile(self.profile)
 
         if username not in self.conf['profiles']:
             self.conf['profiles'].append(username)

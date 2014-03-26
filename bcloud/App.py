@@ -17,6 +17,7 @@ from gi.repository import Gtk
 import Config
 Config.check_first()
 _ = Config._
+import gutil
 import util
 from MimeProvider import MimeProvider
 from PreferencesDialog import PreferencesDialog
@@ -34,7 +35,6 @@ from UploadPage import UploadPage
 
 if Gtk.MAJOR_VERSION <= 3 and Gtk.MINOR_VERSION < 10:
     GObject.threads_init()
-DBUS_APP_NAME = 'org.liulang.bcloud'
 (ICON_COL, NAME_COL, TOOLTIP_COL, COLOR_COL) = list(range(4))
 BLINK_DELTA = 250    # 字体闪烁间隔, 250 miliseconds 
 BLINK_SUSTAINED = 3  # 字体闪烁持续时间, 5 seconds
@@ -47,7 +47,7 @@ class App:
     default_color = Gdk.RGBA(0.9, 0.9, 0.9, 1)
 
     def __init__(self):
-        self.app = Gtk.Application.new(DBUS_APP_NAME, 0)
+        self.app = Gtk.Application.new(Config.DBUS_APP_NAME, 0)
         self.app.connect('startup', self.on_app_startup)
         self.app.connect('activate', self.on_app_activate)
         self.app.connect('shutdown', self.on_app_shutdown)
@@ -61,7 +61,7 @@ class App:
         settings.props.gtk_application_prefer_dark_theme = True
 
         self.window = Gtk.ApplicationWindow.new(application=app)
-        self.window.set_default_size(*Config._default_profile['window-size'])
+        self.window.set_default_size(*gutil.DEFAULT_PROFILE['window-size'])
         self.window.set_title(Config.APPNAME)
         self.window.props.hide_titlebar_when_maximized = True
         self.window.set_icon_name(Config.NAME)
@@ -143,7 +143,7 @@ class App:
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
         if self.profile:
-            Config.dump_profile(self.profile)
+            gutil.dump_profile(self.profile)
 
     def run(self, argv):
         self.app.run(argv)
