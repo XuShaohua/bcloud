@@ -53,6 +53,7 @@ class TrashPage(Gtk.Box):
         control_box.pack_end(clear_button, False, False, 0)
 
         reload_button = Gtk.Button.new_with_label(_('Reload'))
+        reload_button.connect('clicked', self.on_reload_button_clicked)
         control_box.pack_end(reload_button, False, False, 20)
 
         scrolled_win = Gtk.ScrolledWindow()
@@ -150,6 +151,7 @@ class TrashPage(Gtk.Box):
         gutil.async_call(
                 pcs.restore_trash, self.app.cookie, self.app.tokens,
                 fidlist, callback=self.reload)
+        self.app.blink_page(self.app.home_page)
 
     def on_delete_button_clicked(self, button):
         selection = self.treeview.get_selection()
@@ -167,3 +169,6 @@ class TrashPage(Gtk.Box):
         gutil.async_call(
                 pcs.clear_trash, self.app.cookie, self.app.tokens,
                 callback=self.reload)
+
+    def on_reload_button_clicked(self, button):
+        self.load()

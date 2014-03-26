@@ -438,6 +438,7 @@ class IconWindow(Gtk.ScrolledWindow):
         gutil.async_call(
                 pcs.delete_files, self.app.cookie, self.app.tokens,
                 path_list, callback=self.parent.reload)
+        self.app.blink_page(self.app.trash_page)
 
     def on_props_activated(self, menu_item):
         '''显示选中的文件或者当前目录的属性'''
