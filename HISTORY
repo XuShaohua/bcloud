@@ -1,3 +1,8 @@
+v2.2.2 - 2014.3.26
+* Using keyring to encrypt account password
+* Support status icon
+* i18n updated
+
 v2.2.1 - 2014.3.26
 * Fixed: Python int too long to convert to C long; reported by @youzhiyili
 * Using Gtk3 dark theme
