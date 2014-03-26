@@ -21,7 +21,9 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 请用户直接到 [bcloud-packages](https://github.com/LiuLang/bcloud-packages)
 下载发行版相对应的安装包, 比如deb, rpm等.
 
-如果需要手动安装的话, 也可以用pip3来安装, 比如: ` $ pip3 install bcloud`
+如果需要手动安装的话, 也可以用pip3来安装, 比如: `# pip3 install bcloud`
+
+如果不想安装安装, 请至少把blcoud/share目录合并到~/.local/share, 不然图标会显示不全.
 
 DEPENDENCIES
 ===========
