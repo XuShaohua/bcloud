@@ -1,3 +1,9 @@
+v2.2.3 - 2014.3.26
+* Fixed: saving download status when terminated
+* Automatically update user profile
+* Support restroing files in Trash
+* Add more comments to README
+
 v2.2.2 - 2014.3.26
 * Using keyring to encrypt account password
 * Support status icon
