@@ -70,7 +70,6 @@ class DownloadPage(Gtk.Box):
 
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
-        self.connect('destroy', self.on_destroyed)
         self.app = app
 
     def load(self):
@@ -174,7 +173,7 @@ class DownloadPage(Gtk.Box):
             self.first_run = False
             self.load()
 
-    def on_destroyed(self, *args):
+    def do_destroy(self, *args):
         if not self.first_run:
             for worker, _ in self.workers.values():
                 worker.pause()

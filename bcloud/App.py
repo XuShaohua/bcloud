@@ -145,6 +145,7 @@ class App:
         '''Dump profile content to disk'''
         if self.profile:
             gutil.dump_profile(self.profile)
+            self.download_page.emit('destroy')
 
     def run(self, argv):
         self.app.run(argv)
@@ -225,47 +226,46 @@ class App:
         self.progressbar.set_fraction(used / total)
 
     def init_notebook(self):
-        pages = []
-        self.home_page = HomePage(self)
-        pages.append(self.home_page)
-        self.picture_page = PicturePage(self)
-        pages.append(self.picture_page)
-        self.doc_page = DocPage(self)
-        pages.append(self.doc_page)
-        self.video_page = VideoPage(self)
-        pages.append(self.video_page)
-        self.bt_page = BTPage(self)
-        pages.append(self.bt_page)
-        self.music_page = MusicPage(self)
-        pages.append(self.music_page)
-        self.other_page = OtherPage(self)
-        pages.append(self.other_page)
-        self.share_page = SharePage(self)
-        pages.append(self.share_page)
-        self.inbox_page = InboxPage(self)
-        pages.append(self.inbox_page)
-        self.trash_page = TrashPage(self)
-        pages.append(self.trash_page)
-        self.cloud_page = CloudPage(self)
-        pages.append(self.cloud_page)
-        self.download_page = DownloadPage(self)
-        pages.append(self.download_page)
-        self.upload_page = UploadPage(self)
-        pages.append(self.upload_page)
-
-        self.default_color = self.get_default_color()
-        self.nav_liststore.clear()
-        pages_num = self.notebook.get_n_pages()
-        children = self.notebook.get_children()
-        for child in children:
-            self.notebook.remove(child)
-
-        for page in pages:
+        def append_page(page):
             self.notebook.append_page(page, Gtk.Label.new(page.disname))
             self.nav_liststore.append([
                 page.icon_name, page.disname,
                 page.tooltip, self.default_color,
                 ])
+
+        self.default_color = self.get_default_color()
+        self.nav_liststore.clear()
+        children = self.notebook.get_children()
+        for child in children:
+            self.notebook.remove(child)
+
+        self.home_page = HomePage(self)
+        append_page(self.home_page)
+        self.picture_page = PicturePage(self)
+        append_page(self.picture_page)
+        self.doc_page = DocPage(self)
+        append_page(self.doc_page)
+        self.video_page = VideoPage(self)
+        append_page(self.video_page)
+        self.bt_page = BTPage(self)
+        append_page(self.bt_page)
+        self.music_page = MusicPage(self)
+        append_page(self.music_page)
+        self.other_page = OtherPage(self)
+        append_page(self.other_page)
+        self.share_page = SharePage(self)
+        append_page(self.share_page)
+        self.inbox_page = InboxPage(self)
+        append_page(self.inbox_page)
+        self.trash_page = TrashPage(self)
+        append_page(self.trash_page)
+        self.cloud_page = CloudPage(self)
+        append_page(self.cloud_page)
+        self.download_page = DownloadPage(self)
+        append_page(self.download_page)
+        self.upload_page = UploadPage(self)
+        append_page(self.upload_page)
+
         self.notebook.show_all()
 
     def reload_current_page(self, *args, **kwds):

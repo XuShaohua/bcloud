@@ -234,7 +234,8 @@ class SigninDialog(Gtk.Dialog):
                 nonlocal tokens
                 for token in bdstokens:
                     tokens[token] = bdstokens[token]
-                self.update_profile(username, password, cookie, tokens, True)
+                self.update_profile(
+                        username, password, cookie, tokens, dump=True)
 
         def on_get_bduss(bduss, error=None):
             if error or not bduss:
