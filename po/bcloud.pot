@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-26 01:32+0800\n"
+"POT-Creation-Date: 2014-03-26 10:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../bcloud/App.py:73 ../bcloud/PreferencesDialog.py:17
+#: ../bcloud/App.py:74 ../bcloud/PreferencesDialog.py:17
 msgid "Preferences"
 msgstr ""
 
-#: ../bcloud/App.py:74
+#: ../bcloud/App.py:75
 msgid "Sign out"
 msgstr ""
 
-#: ../bcloud/App.py:75
+#: ../bcloud/App.py:76
 msgid "About"
 msgstr ""
 
-#: ../bcloud/App.py:76
+#: ../bcloud/App.py:77 ../bcloud/App.py:332
 msgid "Quit"
 msgstr ""
 
-#: ../bcloud/App.py:131
+#: ../bcloud/App.py:132
 msgid "Unknown"
+msgstr ""
+
+#: ../bcloud/App.py:325
+msgid "Show App"
 msgstr ""
 
 #: ../bcloud/BTBrowserDialog.py:43
@@ -163,7 +167,7 @@ msgstr ""
 msgid "Support http/https/ftp/thunder/qqdl/flashget/eMule/Magnet format"
 msgstr ""
 
-#: ../bcloud/Config.py:33
+#: ../bcloud/Config.py:34
 msgid "Baidu Pan client for GNU/Linux desktop users."
 msgstr ""
 

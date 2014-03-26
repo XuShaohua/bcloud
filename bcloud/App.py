@@ -322,14 +322,14 @@ class App:
     def on_status_icon_popup_menu(self, status_icon, event_button,
                                 event_time):
         menu = Gtk.Menu()
-        show_item = Gtk.MenuItem(label=_('Show App') )
+        show_item = Gtk.MenuItem.new_with_label(_('Show App'))
         show_item.connect('activate', self.on_status_icon_show_app_activate)
         menu.append(show_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
 
-        quit_item = Gtk.MenuItem(label=_('Quit'))
+        quit_item = Gtk.MenuItem.new_with_label(_('Quit'))
         quit_item.connect('activate', self.on_status_icon_quit_activate)
         menu.append(quit_item)
 
