@@ -78,7 +78,13 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
         try:
             pix = GdkPixbuf.Pixbuf.new_from_file_at_size(filepath, 96, 96)
             tree_path = liststore.get_path(tree_iter)
-            liststore[tree_path][col] = pix
+            print('gutil._update_image(), tree_path:', tree_path)
+            if tree_path is None:
+                return
+            row = liststore[tree_path]
+            if row is None:
+                return
+            row[col] = pix
         except GLib.GError as e:
             print('Error: Net.update_liststore_image:', e, 
                   'with filepath:', filepath, 'url:', url)

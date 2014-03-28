@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 # Copyright (C) 2013-2014 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
