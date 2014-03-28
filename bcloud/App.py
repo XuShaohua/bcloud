@@ -169,6 +169,7 @@ class App:
                 preferences = PreferencesDialog(self)
                 preferences.run()
                 preferences.destroy()
+                gutil.dump_profile(self.profile)
 
             self.home_page.load()
             return

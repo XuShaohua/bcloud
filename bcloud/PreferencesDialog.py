@@ -62,7 +62,9 @@ class PreferencesDialog(Gtk.Dialog):
         status_label.props.xalign = 1
         general_grid.attach(status_label, 0, 3, 1, 1)
         status_switch = Gtk.Switch()
-        status_switch.connect('activate', self.on_status_switch_activate)
+        status_switch.set_active(self.app.profile['use-status-icon'])
+        status_switch.connect(
+                'notify::active', self.on_status_switch_activate)
         status_switch.props.halign = Gtk.Align.START
         general_grid.attach(status_switch, 1, 3, 1, 1)
 
@@ -76,5 +78,5 @@ class PreferencesDialog(Gtk.Dialog):
     def on_concurr_value_changed(self, concurr_spin):
         self.app.profile['concurr-tasks'] = concurr_spin.get_value()
 
-    def on_status_switch_activate(self, switch):
+    def on_status_switch_activate(self, switch, event):
         self.app.profile['use-status-icon'] = switch.get_active()
