@@ -3,7 +3,6 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
-import copy
 import gzip
 import http
 import http.client
@@ -32,7 +31,7 @@ default_headers = {
 
 def urloption(url, headers={}, retries=RETRIES):
     '''发送OPTION 请求'''
-    headers_merged = copy.copy(default_headers)
+    headers_merged = default_headers.copy()
     for key in headers.keys():
         headers_merged[key] = headers[key]
     schema = urllib.parse.urlparse(url)
@@ -66,7 +65,7 @@ def urlopen(url, headers={}, data=None, retries=RETRIES):
     解压.
     req.data 里面放着的是最终的http数据内容, 通常都是UTF-8编码的文本.
     '''
-    headers_merged = copy.copy(default_headers)
+    headers_merged = default_headers.copy()
     for key in headers.keys():
         headers_merged[key] = headers[key]
     opener = urllib.request.build_opener(ForbiddenHandler)
@@ -92,7 +91,7 @@ def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
     使用这个函数可以返回URL重定向(Error 301/302)后的地址, 也可以重到URL中请
     求的文件的大小, 或者Header中的其它认证信息.
     '''
-    headers_merged = copy.copy(default_headers)
+    headers_merged = default_headers.copy()
     for key in headers.keys():
         headers_merged[key] = headers[key]
 
@@ -112,7 +111,7 @@ def post_multipart(url, headers, fields, files, retries=RETRIES):
     content_type, body = encode_multipart_formdata(fields, files)
     schema = urllib.parse.urlparse(url)
 
-    headers_merged = copy.copy(default_headers)
+    headers_merged = default_headers.copy()
     for key in headers.keys():
         headers_merged[key] = headers[key]
     headers_merged['Content-Type'] = content_type
