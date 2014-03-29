@@ -192,6 +192,8 @@ class App:
         dialog.destroy()
         if self.profile:
             gutil.dump_profile(self.profile)
+            if self.profile['use-status-icon']:
+                self.init_status_icon()
 
     def on_signout_action_activated(self, action, params):
         if self.profile:

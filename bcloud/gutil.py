@@ -3,7 +3,6 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
-import copy
 import json
 import os
 import subprocess
@@ -135,7 +134,7 @@ def dump_profile(profile):
     keyring这个模块, 如果存在, 就使用它来管理密码;
     如果不存存, 就会把密码明文存放(这个很不安全).
     '''
-    profile = copy.copy(profile)
+    profile = profile.copy()
     path = os.path.join(Config.CONF_DIR, profile['username'])
     if not profile['remember-password']:
         profile['password'] = ''
