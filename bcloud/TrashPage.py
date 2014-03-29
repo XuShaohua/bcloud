@@ -22,11 +22,11 @@ ICON_SIZE = 24
 
 class TrashPage(Gtk.Box):
 
-    icon_name = 'user-trash-symbolic'
+    icon_name = 'trash-symbolic'
     disname = _('Trash')
     tooltip = _('Files deleted.')
     first_run = True
-    page_num = 0
+    page_num = 1
     has_next = False
     filelist = []
 
