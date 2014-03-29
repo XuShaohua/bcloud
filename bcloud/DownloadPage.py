@@ -222,7 +222,7 @@ class DownloadPage(Gtk.Box):
             filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
             gfile = Gio.File.new_for_path(filepath)
             app_info.launch([gfile, ], None)
-            del self.app_infos[fs_id]
+            self.app_infos.pop(fs_id, None)
         else:
             print('fs id not in self.app_infos')
 
@@ -305,7 +305,7 @@ class DownloadPage(Gtk.Box):
                 total_size, _ = util.get_human_size(row[SIZE_COL])
                 row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
                 row[STATENAME_COL] = StateNames[State.FINISHED]
-                del self.workers[row[FSID_COL]]
+                self.workers.pop(row[FSID_COL], None)
                 self.launch_app(fs_id)
                 self.scan_tasks()
             GLib.idle_add(_on_worker_downloaded)
@@ -343,7 +343,7 @@ class DownloadPage(Gtk.Box):
             worker.stop()
         else:
             worker.pause()
-        del self.workers[fs_id]
+        self.workers.pop(fs_id, None)
 
     def start_task(self, row):
         '''启动下载任务.

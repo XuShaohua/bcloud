@@ -210,7 +210,7 @@ class UploadPage(Gtk.Box):
             row[PERCENT_COL] = 100
             row[STATE_COL] = State.FINISHED
             row[STATENAME_COL] = StateNames[State.FINISHED]
-            del self.workers[source_path]
+            self.workers.pop(source_path, None)
 
         def on_worker_network_error(worker, source_path):
             print('UploadPage.network error')
@@ -235,7 +235,7 @@ class UploadPage(Gtk.Box):
             worker.stop()
         else:
             worker.pause()
-        del self.workers[source_path]
+        self.workers.pop(source_path, None)
 
     def get_row_by_source_path(self, source_path):
         for row in self.liststore:
