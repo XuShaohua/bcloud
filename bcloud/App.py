@@ -145,7 +145,6 @@ class App:
         '''Dump profile content to disk'''
         if self.profile:
             gutil.dump_profile(self.profile)
-            self.download_page.emit('destroy')
 
     def run(self, argv):
         self.app.run(argv)

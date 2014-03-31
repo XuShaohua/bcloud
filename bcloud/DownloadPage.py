@@ -71,6 +71,7 @@ class DownloadPage(Gtk.Box):
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
+        GLib.idle_add(self.dump_tasks_in_background, 300000)
 
     def load(self):
         app = self.app
@@ -175,7 +176,7 @@ class DownloadPage(Gtk.Box):
 
     def do_destroy(self, *args):
         if not self.first_run:
-            for worker, _ in self.workers.values():
+            for worker, row in self.workers.values():
                 worker.pause()
             self.dump_tasks()
             self.conn.commit()
@@ -196,6 +197,11 @@ class DownloadPage(Gtk.Box):
                 row[STATE_COL] = State.PAUSED
                 row[STATENAME_COL] = StateNames[State.PAUSED]
             self.cursor.execute(sql, row[:])
+
+    def dump_tasks_in_background(self, *args):
+        if not self.first_run:
+            self.dump_tasks()
+        return True
 
     def get_task_by_fsid(self, fs_id):
         '''确认在Liststore中是否存在这条任务. 如果存在, 返回TreeModelRow,

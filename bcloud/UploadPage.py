@@ -48,7 +48,6 @@ class UploadPage(Gtk.Box):
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
-        self.connect('destroy', self.on_destroyed)
 
     def check_first(self):
         if self.first_run:
@@ -116,8 +115,8 @@ class UploadPage(Gtk.Box):
 
         self.show_all()
 
-    def on_destroyed(self, box):
-        print('on destroy')
+    def do_destroy(self, *args):
+        pass
 
     def on_start_button_clicked(self, button):
         print('暂不支持')
