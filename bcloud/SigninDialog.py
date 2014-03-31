@@ -227,6 +227,7 @@ class SigninDialog(Gtk.Dialog):
 
     def signin(self):
         def on_get_bdstoken(bdstokens, error=None):
+            print('on_get_bdstoken:', bdstokens, error)
             if error or not bdstokens:
                 self.signin_failed(
                     _('Error: Failed to get bdstokens!'))
@@ -238,6 +239,7 @@ class SigninDialog(Gtk.Dialog):
                         username, password, cookie, tokens, dump=True)
 
         def on_get_bduss(bduss, error=None):
+            print('on_get_bduss:', bduss, error)
             if error or not bduss:
                 self.signin_failed(
                     _('Please check username and password are correct!'))
@@ -248,6 +250,7 @@ class SigninDialog(Gtk.Dialog):
                     auth.get_bdstoken, cookie, callback=on_get_bdstoken)
 
         def on_check_login(status, error=None):
+            print('on_check_login:', status, error)
             if error or not status:
                 self.signin_failed(
                         _('Failed to get check login, please try again.'))
@@ -276,6 +279,7 @@ class SigninDialog(Gtk.Dialog):
                         password, callback=on_get_bduss)
 
         def on_get_UBI(ubi_cookie, error=None):
+            print('on_get_UBI:', ubi_cookie, error)
             if error or not ubi_cookie:
                 self.signin_failed(
                         _('Failed to get UBI cookie, please try again.'))
@@ -287,6 +291,7 @@ class SigninDialog(Gtk.Dialog):
                         callback=on_check_login)
 
         def on_get_token(token, error=None):
+            print('on_get_token:', token, error)
             if error or not token:
                 self.signin_failed(
                         _('Failed to get tokens, please try again.'))
@@ -298,6 +303,7 @@ class SigninDialog(Gtk.Dialog):
                         auth.get_UBI, cookie, token, callback=on_get_UBI)
 
         def on_get_BAIDUID(uid_cookie, error=None):
+            print('on_get_BAIDUID:', uid_cookie, error)
             if error or not uid_cookie:
                 self.signin_failed(
                         _('Failed to get BAIDUID cookie, please try agin.'))
@@ -310,10 +316,10 @@ class SigninDialog(Gtk.Dialog):
 
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
-        cookie, tokens = self.load_auth(username)
-        if cookie and tokens:
-            self.update_profile(username, password, cookie, tokens)
-            return
+#        cookie, tokens = self.load_auth(username)
+#        if cookie and tokens:
+#            self.update_profile(username, password, cookie, tokens)
+#            return
 
         cookie = RequestCookie()
         tokens = {}

@@ -187,13 +187,14 @@ class App:
             return False
 
     def on_preferences_action_activated(self, action, params):
-        dialog = PreferencesDialog(self)
-        dialog.run()
-        dialog.destroy()
         if self.profile:
-            gutil.dump_profile(self.profile)
-            if self.profile['use-status-icon']:
-                self.init_status_icon()
+            dialog = PreferencesDialog(self)
+            dialog.run()
+            dialog.destroy()
+            if self.profile:
+                gutil.dump_profile(self.profile)
+                if self.profile['use-status-icon']:
+                    self.init_status_icon()
 
     def on_signout_action_activated(self, action, params):
         if self.profile:
