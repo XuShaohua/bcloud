@@ -10,13 +10,10 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 * Debian sid
 * Debian testing
 * Debian stable
-* Ubuntu 13.10
 * Ubuntu 14.04
-* OpenSuse 13
-
-不支持的版本:
-
+* Ubuntu 13.10
 * Ubuntu 12.04
+* OpenSuse 13
 
 安装
 ====
