@@ -74,6 +74,8 @@ class MimeProvider:
 
     def get_app_img(self, app_info):
         themed_icon = app_info.get_icon()
+        if isinstance(themed_icon, Gio.FileIcon):
+            return None
         icon_names = themed_icon.get_names()
         if icon_names:
             img = Gtk.Image.new_from_icon_name(
