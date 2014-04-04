@@ -167,7 +167,12 @@ def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
         'Content-type': const.CONTENT_FORM,
         'Accept': const.ACCEPT_HTML,
         }, data=data.encode())
+    print('req:', req)
+    print('req status:', req.status)
+    print('req headers:\n', req.headers, 'req headers ends')
     if req:
+        print('signin page content:\n', req.data.decode())
+        print('signin page conent ends')
         return req.headers.get_all('Set-Cookie')
     else:
         return None
