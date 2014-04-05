@@ -61,12 +61,22 @@ class HomePage(Gtk.Box):
         nav_bar.props.toolbar_style = Gtk.ToolbarStyle.ICONS
         nav_bar.props.icon_size = Gtk.IconSize.BUTTON
         self.pack_start(nav_bar, False, False, 0)
+        nav_bar.props.valign = Gtk.Align.START
 
         path_item = Gtk.ToolItem()
         nav_bar.insert(path_item, 0)
         nav_bar.child_set_property(path_item, 'expand', True)
+        path_item.props.valign = Gtk.Align.START
+        path_win = Gtk.ScrolledWindow()
+        path_item.add(path_win)
+        path_win.props.valign = Gtk.Align.START
+        path_win.props.vscrollbar_policy = Gtk.PolicyType.NEVER
+        path_viewport = Gtk.Viewport()
+        path_viewport.props.valign = Gtk.Align.START
+        path_win.add(path_viewport)
         self.path_box = PathBox(self)
-        path_item.add(self.path_box)
+        self.path_box.props.valign = Gtk.Align.START
+        path_viewport.add(self.path_box)
 
         # search button
         search_button = Gtk.ToggleToolButton()
@@ -76,6 +86,7 @@ class HomePage(Gtk.Box):
                 _('Search documents and folders by name'))
         search_button.connect('toggled', self.on_search_button_toggled)
         nav_bar.insert(search_button, 1)
+        search_button.props.valign = Gtk.Align.START
 
         if Config.GTK_LE_36:
             self.search_entry = Gtk.Entry()
