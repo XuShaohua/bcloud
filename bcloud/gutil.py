@@ -146,3 +146,7 @@ def dump_profile(profile):
         print('警告: 密码被明文存储!')
     with open(path, 'w') as fh:
         json.dump(profile, fh)
+
+def reach_scrolled_bottom(adj):
+    '''在ScrolledWindow里面, 滚动到了底部, 就需要尝试载入下一页的内容'''
+    return (adj.get_upper() - adj.get_page_size() - adj.get_value()) < 80

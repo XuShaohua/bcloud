@@ -49,7 +49,7 @@ class HomePage(Gtk.Box):
     first_run = False
     page_num = 1
     path = '/'
-    has_next = False
+    has_next = True
 
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -94,25 +94,39 @@ class HomePage(Gtk.Box):
         self.pack_end(self.icon_window, True, True, 0)
 
     def load(self, path='/'):
+        def on_load(info, error=None):
+            if error or not info or info['errno'] != 0:
+                return
+            self.icon_window.load(info['list'])
+
         self.path = path
         self.page_num = 1
-        self.has_next = False
+        self.has_next = True
         self.path_box.set_path(path)
         gutil.async_call(
                 pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
-                callback=self.icon_window.load)
+                self.page_num, callback=on_load)
         gutil.async_call(
                 pcs.get_quota, self.app.cookie, self.app.tokens,
                 callback=self.app.update_quota)
 
     def load_next(self):
         '''载入下一页'''
+        def on_load_next(info, error=None):
+            if error or not info or info['errno'] != 0:
+                return
+            if info['list']:
+                self.icon_window.load_next(info['list'])
+            else:
+                self.has_next = False
+
+        if not self.has_next:
+            return
         self.page_num = self.page_num + 1
         self.path_box.set_path(self.path)
-        self.icon_window.load(self.path)
         gutil.async_call(
                 pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
-                callback=self.icon_window.load_next)
+                self.page_num, callback=on_load_next)
 
     def reload(self, *args, **kwds):
         '''重新载入本页面'''

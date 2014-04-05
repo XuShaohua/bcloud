@@ -51,38 +51,27 @@ class IconWindow(Gtk.ScrolledWindow):
         self.iconview.connect(
                 'button-press-event', self.on_iconview_button_pressed)
         self.add(self.iconview)
+        self.get_vadjustment().connect('value-changed', self.on_scrolled)
 
-    def load(self, filelist, error=None):
+    def load(self, pcs_files):
         '''载入一个目录并显示里面的内容.'''
         self.filelist = []
         self.pathlist = []
         self.liststore.clear()
-        if not error:
-            self.display_filelist(filelist)
+        self.display_files(pcs_files)
 
-    def load_next(self, filelist, error=None):
+    def load_next(self, pcs_files):
         '''当滚动条向下滚动到一定位置时, 调用这个方法载入下一页'''
-        if not error:
-            self.display_filelist(filelist)
+        self.display_files(pcs_files)
 
-    def display_filelist(self, filelist):
+    def display_files(self, pcs_files):
         '''重新格式化一下文件列表, 去除不需要的信息
 
         这一操作主要是为了便于接下来的查找工作.
         文件的path都被提取出来, 然后放到了一个list中.
         '''
-        if not filelist or filelist['errno'] != 0:
-            return
-        if 'list' in filelist:
-            key = 'list'
-        elif 'info' in filelist:
-            key = 'info'
-        else:
-            print('Error: current filelist format not supported!')
-            print(filelist)
-            return
         cache_path = Config.get_cache_path(self.app.profile['username'])
-        for pcs_file in filelist[key]:
+        for pcs_file in pcs_files:
             path = pcs_file['path']
             self.filelist.append(pcs_file)
             self.pathlist.append(path)
@@ -94,9 +83,11 @@ class IconWindow(Gtk.ScrolledWindow):
                 pixbuf, disname, path, tooltip, type_
                 ])
             gutil.update_liststore_image(
-                self.liststore, tree_iter, PIXBUF_COL, pcs_file,
-                cache_path,
-                )
+                self.liststore, tree_iter, PIXBUF_COL, pcs_file, cache_path)
+
+    def on_scrolled(self, adj):
+        if gutil.reach_scrolled_bottom(adj) and self.parent.has_next:
+            self.parent.load_next()
 
     def on_iconview_item_activated(self, iconview, tree_path):
         path = self.liststore[tree_path][PATH_COL]

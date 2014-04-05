@@ -20,16 +20,41 @@ __all__ = [
 class CategoryPage(IconWindow):
 
     page_num = 1
+    has_next = True
     first_run = True
 
     def __init__(self, app):
         super().__init__(self, app)
         self.app = app
+        self.icon_window = super()
 
     def load(self):
+        def on_load(info, error=None):
+            if error or not info or info['errno'] != 0:
+                return
+            self.icon_window.load(info['info'])
+
+        has_next = True
+        self.page_num = 1
         gutil.async_call(
                 pcs.get_category, self.app.cookie, self.app.tokens,
-                self.category, self.page_num, callback=super().load)
+                self.category, self.page_num, callback=on_load)
+
+    def load_next(self):
+        def on_load_next(info, error=None):
+            if error or not info or info['errno'] != 0:
+                return
+            if info['info']:
+                self.icon_window.load_next(info['info'])
+            else:
+                self.has_next = False
+
+        if not self.has_next:
+            return
+        self.page_num = self.page_num + 1
+        gutil.async_call(
+                pcs.get_category, self.app.cookie, self.app.tokens,
+                self.category, self.page_num, callback=on_load_next)
 
     def reload(self, *args):
         self.load()
