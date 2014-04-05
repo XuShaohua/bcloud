@@ -59,7 +59,7 @@ class SigninVcodeDialog(Gtk.Dialog):
         box.show_all()
 
     def get_vcode(self):
-        return (self.vcode_entry.get_text(), self.codeString)
+        return self.vcode_entry.get_text()
 
     def update_img(self, req_data, error=None):
         if error or not req_data:
@@ -238,16 +238,39 @@ class SigninDialog(Gtk.Dialog):
                 self.update_profile(
                         username, password, cookie, tokens, dump=True)
 
-        def on_get_bduss(bduss, error=None):
-            print('on_get_bduss:', bduss, error)
-            if error or not bduss:
+        def on_get_bduss(result, error=None):
+            print('on_get_bduss:', result, error)
+            status, info = result
+            if status == 4:
                 self.signin_failed(
                     _('Please check username and password are correct!'))
-            else:
-                cookie.load_list(bduss)
+            elif status == 0:
+                cookie.load_list(info)
                 self.signin_button.set_label(_('Get bdstoken...'))
                 gutil.async_call(
                     auth.get_bdstoken, cookie, callback=on_get_bdstoken)
+            elif status == 257:
+                print('input verification code')
+                vcodetype, codeString = info
+                dialog = SigninVcodeDialog(
+                    self, username, cookie, tokens['token'],
+                    codeString, vcodetype)
+                dialog.run()
+                vcode = dialog.get_vcode()
+                dialog.destroy()
+                if not vcode or len(vcode) != 4:
+                    self.signin_failed(
+                        _('Please input verification code!'))
+                    return
+                self.signin_button.set_label(_('Get bduss...'))
+                gutil.async_call(
+                        auth.get_bduss, cookie,
+                        tokens['token'], username, password, vcode,
+                        codeString, callback=on_get_bduss)
+            else:
+                self.signin_failed(
+                    _('Unknown err_no {0}, please try again!').format(
+                        status))
 
         def on_check_login(status, error=None):
             print('on_check_login:', status, error)
@@ -261,7 +284,7 @@ class SigninDialog(Gtk.Dialog):
                     self, username, cookie, tokens['token'],
                     codeString, vcodetype)
                 dialog.run()
-                vcode, codeString = dialog.get_vcode()
+                vcode = dialog.get_vcode()
                 dialog.destroy()
                 if not vcode or len(vcode) != 4:
                     self.signin_failed(

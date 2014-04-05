@@ -141,7 +141,11 @@ def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
     verifycode - 用户根据图片输入的四位验证码, 可以为空
     codeString - 获取验证码图片时用到的codeString, 可以为空
 
-    @return 最后会返回一个list, 里面包含了登录*.baidu.com需要的授权cookies.
+    @return (status, info). 其中, status表示返回的状态:
+      0 - 正常, 这里, info里面存放的是auth_cookie
+     -1 - 未知异常
+      4 - 密码错误
+    257 - 需要输入验证码, 此时info里面存放着(vcodetype, codeString))
     '''
     url = const.PASSPORT_URL + '?login'
     data = ''.join([
@@ -167,15 +171,27 @@ def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
         'Content-type': const.CONTENT_FORM,
         'Accept': const.ACCEPT_HTML,
         }, data=data.encode())
-    print('req:', req)
-    print('req status:', req.status)
-    print('req headers:\n', req.headers, 'req headers ends')
     if req:
-        print('signin page content:\n', req.data.decode())
-        print('signin page conent ends')
-        return req.headers.get_all('Set-Cookie')
+        print('req headers:', req.headers)
+        auth_cookie = req.headers.get_all('Set-Cookie')
+        if auth_cookie:
+            return (0, auth_cookie)
+        resp_content= req.data.decode()
+        print('response :', resp_content)
+        match = re.findall('"(err_no[^"]+)"', resp_content)
+        if len(match) != 1:
+            return (-1, None)
+        query = dict(urllib.parse.parse_qsl(match[0]))
+        err_no = int(query.get('err_no', '-1'))
+        if err_no != 257:
+            return (err_no, None)
+        vcodetype = query.get('vcodetype', '')
+        codeString = query.get('codeString', '')
+        if vcodetype and codeString:
+            return (257, (vcodetype, codeString))
+        return (-1, None)
     else:
-        return None
+        return (-1, None)
 
 def parse_bdstoken(content):
     '''从页面中解析出bdstoken等信息.
@@ -213,33 +229,3 @@ def get_bdstoken(cookie):
         return parse_bdstoken(req.data.decode())
     else:
         return None
-
-def get_auth_info(username, password):
-    '''获取授权信息.
-
-    username - 用户名
-    password - 明文密码
-    '''
-    cookie = RequestCookie()
-    cookie.load('cflag=65535%3A1; PANWEB=1;')
-    uid_cookie = get_BAIDUID()
-    if not uid_cookie:
-        print('Failed to get BAIDUID cookie, please try again.')
-        return (None, None)
-    cookie.load_list(uid_cookie)
-    token = get_token(cookie)
-    if not token:
-        print('Failed to get tokens, please try again.')
-        return (None, None)
-    cookie.load_list(get_UBI(cookie, token))
-    status = check_login(cookie, token, username)
-    if len(status['data']['codeString']):
-        print('Error: failed to check login!')
-        return (cookie, None)
-    cookie.load_list(get_bduss(cookie, token, username, password))
-    tokens = get_bdstoken(cookie)
-    tokens['token'] = token
-    auth_info = [str(cookie), tokens]
-    if 'bdstoken' not in tokens or not tokens['bdstoken']:
-        return (cookie, None)
-    return (cookie, tokens)

@@ -27,7 +27,8 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 DEPENDENCIES
 ===========
 
-* python3-gi  Gtk3 的python3 绑定
+* python3-gi  Gtk3 的python3 绑定. 这个包需要手动安装gir1.2-gtk-3.0, 但它并
+没有把这个依赖关系写清楚, 详细情况请看 [issue 5](https://github.com/LiuLang/bcloud/issues/5)
 * python3-urllib3 urllib的封装, 更易用, 在这里 https://pypi.python.org/pypi/urllib3.
 * gnome-icon-theme-symbolic Gnome3 提供的一套按纽.
 * python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到gnome-keyring
