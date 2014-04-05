@@ -24,7 +24,6 @@ class NewFolderDialog(Gtk.Dialog):
         self.set_default_size(550, 200)
 
         self.app = app
-        self.parent = parent
         self.path = path
 
         self.set_border_width(10)

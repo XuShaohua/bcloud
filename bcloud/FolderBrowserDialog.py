@@ -3,12 +3,14 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+from gi.repository import GLib
 from gi.repository import Gtk
 
 from bcloud import Config
 _ = Config._
 from bcloud import gutil
 from bcloud import pcs
+from bcloud.NewFolderDialog import NewFolderDialog
 
 NAME_COL, PATH_COL, EMPTY_COL, LOADED_COL = list(range(4))
 NUM = 100
@@ -29,12 +31,19 @@ class FolderBrowserDialog(Gtk.Dialog):
         self.set_border_width(10)
 
         box = self.get_content_area()
+
+        mkdir_button = Gtk.Button.new_with_label(_('Create Folder'))
+        box.pack_start(mkdir_button, False, False, 0)
+        mkdir_button.props.halign = Gtk.Align.END
+        mkdir_button.connect('clicked', self.on_mkdir_clicked)
+
         scrolled_win = Gtk.ScrolledWindow()
         box.pack_start(scrolled_win, True, True, 0)
 
         # disname, path, empty, loaded
         self.treestore = Gtk.TreeStore(str, str, bool, bool)
         self.treeview = Gtk.TreeView(model=self.treestore)
+        self.selection = self.treeview.get_selection()
         scrolled_win.add(self.treeview)
         icon_cell = Gtk.CellRendererPixbuf(icon_name='folder')
         name_cell = Gtk.CellRendererText()
@@ -51,7 +60,7 @@ class FolderBrowserDialog(Gtk.Dialog):
         box.show_all()
 
         root_iter = self.treestore.append(None, ['/', '/', False, False,])
-        self.list_dir(root_iter)
+        GLib.timeout_add(500, self.list_dir, root_iter)
 
     def list_dir(self, parent_iter):
         if self.treestore[parent_iter][LOADED_COL]:
@@ -94,17 +103,25 @@ class FolderBrowserDialog(Gtk.Dialog):
         self.treestore[parent_iter][LOADED_COL] = True
 
     def get_path(self):
-        selection = self.treeview.get_selection()
-        model, tree_iter = selection.get_selected()
+        model, tree_iter = self.selection.get_selected()
         if not tree_iter:
             return '/'
         else:
             return model[tree_iter][PATH_COL]
 
+    def on_mkdir_clicked(self, button):
+        path = self.get_path()
+        dialog = NewFolderDialog(self, self.app, path)
+        dialog.run()
+        dialog.destroy()
+        self.treestore.clear()
+        root_iter = self.treestore.append(None, ['/', '/', False, False,])
+        GLib.idle_add(self.list_dir, root_iter)
+
     def on_row_expanded(self, treeview, tree_iter, tree_path):
         if self.is_loading:
             return
-        self.ist_loading = True
+        self.is_loading = True
         self.list_dir(tree_iter)
-        self.ist_loading = False
+        self.is_loading = False
         self.treeview.expand_row(tree_path, False)
