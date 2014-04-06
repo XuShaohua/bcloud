@@ -1,3 +1,14 @@
+v2.2.5 - 2014.4.6
+* Fixed: save download status while destroying main window
+* Fixed: gettext is overrided to string
+* SharePage/InBoxPage removed
+* Wrapping path box with a ScrolledWindow
+* Add a Create Foldr button to Folder Browser Dialog
+* Automatically load next page when scrolling down to bottom of window
+* Support new type of signin verification code
+* AppChooserDilalog added
+* i18n updated
+
 v2.2.4 - 2014.4.4
 * Fixed: check tree path exists before updating liststore
 * Support opensuse 13

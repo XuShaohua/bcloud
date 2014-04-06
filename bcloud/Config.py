@@ -27,7 +27,7 @@ _ = gettext.gettext
 
 DBUS_APP_NAME = 'org.liulang.bcloud'
 APPNAME = 'BCloud'
-VERSION = '2.2.4'
+VERSION = '2.2.5'
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
 AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
