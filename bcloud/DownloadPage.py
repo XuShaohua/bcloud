@@ -71,7 +71,6 @@ class DownloadPage(Gtk.Box):
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
-        GLib.idle_add(self.dump_tasks_in_background, 300000)
 
     def load(self):
         app = self.app
@@ -178,6 +177,7 @@ class DownloadPage(Gtk.Box):
         if not self.first_run:
             for worker, row in self.workers.values():
                 worker.pause()
+                row[CURRSIZE_COL] = worker.row[CURRSIZE_COL]
             self.dump_tasks()
             self.conn.commit()
             self.conn.close()
@@ -229,8 +229,6 @@ class DownloadPage(Gtk.Box):
             gfile = Gio.File.new_for_path(filepath)
             app_info.launch([gfile, ], None)
             self.app_infos.pop(fs_id, None)
-        else:
-            print('fs id not in self.app_infos')
 
     # Open API
     def add_task(self, pcs_file, saveDir=None, saveName=None):
@@ -246,7 +244,7 @@ class DownloadPage(Gtk.Box):
                 self.launch_app(pcs_file['fs_id'])
             elif row[STATE_COL] not in RUNNING_STATES:
                 row[STATE_COL] = State.WAITING
-                self.scan_tasks()
+            self.scan_tasks()
             return
         if not saveDir:
             saveDir = os.path.split(
@@ -358,7 +356,7 @@ class DownloadPage(Gtk.Box):
         将任务状态设定为Downloading, 如果没有超过最大任务数的话;
         否则将它设定为Waiting.
         '''
-        if row[STATE_COL] == State.DOWNLOADING:
+        if row[STATE_COL] in RUNNING_STATES :
             return
         row[STATE_COL] = State.WAITING
         row[STATENAME_COL] = StateNames[State.WAITING]
@@ -370,9 +368,8 @@ class DownloadPage(Gtk.Box):
         elif row[STATE_COL] == State.DOWNLOADING:
             self.pause_worker(row)
             row[STATE_COL] = State.PAUSED
+            row[STATENAME_COL] = StateNames[State.PAUSED]
             self.scan_tasks()
-        row[STATE_COL] = State.PAUSED
-        row[STATENAME_COL] = StateNames[State.PAUSED]
 
     def remove_task(self, tree_iter):
         tree_path = self.liststore.get_path(tree_iter)

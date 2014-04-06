@@ -70,7 +70,6 @@ class Downloader(threading.Thread, GObject.GObject):
             # TODO: check MD5 to verify same file
             if (row[SIZE_COL] == stat.st_size and 
                     stat.st_size <= stat.st_blocks * 512):
-                print('File exists and has same size, quit!')
                 self.finished()
                 return
             if stat.st_size == row[CURRSIZE_COL]:
@@ -126,6 +125,7 @@ class Downloader(threading.Thread, GObject.GObject):
     def pause(self):
         '''暂停下载任务'''
         self.row[STATE_COL] = State.PAUSED
+        return
 
     def stop(self):
         '''停止下载, 并删除之前下载的片段'''
@@ -158,6 +158,8 @@ class Downloader(threading.Thread, GObject.GObject):
         self.emit('network-error', self.row[FSID_COL])
 
     def write_bytes(self, range_, block):
+        if self.row[STATE_COL] != State.DOWNLOADING:
+            return
         self.row[CURRSIZE_COL] = range_[1]
         self.emit('received', self.row[FSID_COL], self.row[CURRSIZE_COL])
         self.fh.write(block)

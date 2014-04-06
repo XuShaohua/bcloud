@@ -60,7 +60,8 @@ def xdg_open(uri):
     try:
         subprocess.call(['xdg-open', uri, ])
     except FileNotFoundError as e:
-        print(e)
+        pass
+        #print(e)
 
 def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
     '''下载文件缩略图, 并将它显示到liststore里.
@@ -72,7 +73,7 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
         if error:
             return
         if os.stat(filepath).st_size == 0:
-            print('target image file is empty:', filepath)
+            #print('target image file is empty:', filepath)
             return
         try:
             pix = GdkPixbuf.Pixbuf.new_from_file_at_size(filepath, 96, 96)
@@ -84,8 +85,9 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
                 return
             row[col] = pix
         except GLib.GError as e:
-            print('Error: Net.update_liststore_image:', e, 
-                  'with filepath:', filepath, 'url:', url)
+            pass
+            #print('Error: Net.update_liststore_image:', e, 
+            #      'with filepath:', filepath, 'url:', url)
 
     def _dump_image(req, error=None):
         if error or not req:
@@ -100,7 +102,7 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
     url = pcs_file['thumbs']['url1']
 
     if len(url) < 10:
-        print('url is too short')
+        #print('url is too short')
         return
     filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
     if os.path.exists(filepath) and os.stat(filepath).st_blocks:

@@ -133,15 +133,10 @@ def get_share_page(url):
         id_match = re.findall('FileUtils\.share_id="(\d+)"', content)
         uk_match = re.findall('/share/home\?uk=(\d+)" target=', content)
         sign_match = re.findall('FileUtils\.share_sign="([^"]+)"', content)
-        print('match:', match)
-        print('id_match:', id_match)
-        print('uk_match:', uk_match)
-        print('sign_match:', sign_match)
         if id_match and uk_match and sign_match:
             share_files['share_id'] = id_match[0]
             share_files['uk'] = uk_match[0]
             share_files['sign'] = sign_match[0]
-            print('share_files:', share_files, type(share_files))
             return share_files
     return None
 
@@ -186,11 +181,6 @@ def disable_share(cookie, tokens, shareid_list):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
-    print('pcs.disable_share()')
-    print(req.data)
-    print(req.status)
-    print(req.headers)
-    print('data:', data)
     if req:
         content = req.data
         return json.loads(content.decode())
