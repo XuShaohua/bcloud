@@ -31,8 +31,9 @@ DEPENDENCIES
 没有把这个依赖关系写清楚, 详细情况请看 [issue 5](https://github.com/LiuLang/bcloud/issues/5)
 * python3-urllib3 urllib的封装, 更易用, 在这里 https://pypi.python.org/pypi/urllib3.
 * gnome-icon-theme-symbolic Gnome3 提供的一套按纽.
-* python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到gnome-keyring
-或者kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
+* python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到
+gnome-keyring或kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
+* gir1.2-notify 这个是GtkNotification的接口, 显示桌面消息通知
 
 
 COPYRIGHT

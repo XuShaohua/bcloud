@@ -13,6 +13,10 @@ from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gtk
+try:
+    from gi.repository import Notify
+except ImportError:
+    print('Failed to import Notify module!')
 
 import Config
 Config.check_first()
@@ -26,7 +30,6 @@ from CategoryPage import *
 from CloudPage import CloudPage
 from DownloadPage import DownloadPage
 from HomePage import HomePage
-from InboxPage import InboxPage
 from PreferencesDialog import PreferencesDialog
 from SharePage import SharePage
 from SigninDialog import SigninDialog
@@ -162,6 +165,7 @@ class App:
             self.init_notebook()
             self.notebook.connect('switch-page', self.on_notebook_switched)
             self.init_status_icon()
+            self.init_notify()
 
             if self.profile['first-run']:
                 self.profile['first-run'] = False
@@ -258,8 +262,6 @@ class App:
         append_page(self.other_page)
         self.share_page = SharePage(self)
         append_page(self.share_page)
-        self.inbox_page = InboxPage(self)
-        append_page(self.inbox_page)
         self.trash_page = TrashPage(self)
         append_page(self.trash_page)
         self.cloud_page = CloudPage(self)
@@ -347,6 +349,7 @@ class App:
     def on_status_icon_quit_activate(self, menuitem):
         self.quit()
 
+    # Open API
     def blink_page(self, page):
         def blink():
             row[COLOR_COL] = random.choice(self.color_schema)
@@ -365,3 +368,31 @@ class App:
     def get_default_color(self):
         context = self.window.get_style_context()
         return context.get_color(Gtk.StateFlags.NORMAL)
+
+    # Open API
+    def update_clipboard(self, text):
+        '''将文本复制到系统剪贴板里面'''
+        print('update clipboard:', text)
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(text, -1)
+        self.toast(_('{0} copied to clipboard'.format(text)))
+
+    def init_notify(self):
+        self.notify = None
+        if globals().get('Notify') and self.profile['use-notify']:
+            status = Notify.init(Config.APPNAME)
+            if not status:
+                return
+            self.notify = Notify.Notification.new(
+                    Config.APPNAME, '', Config.NAME)
+
+    # Open API
+    def toast(self, text):
+        '''在用户界面显示一个消息通知.
+
+        可以使用系统提供的Notification工具, 也可以在窗口的最下方滚动弹出
+        这个消息
+        '''
+        if self.notify:
+            self.notify.update(Config.APPNAME, text, Config.NAME)
+            self.notify.show()

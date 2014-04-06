@@ -284,8 +284,7 @@ class IconWindow(Gtk.ScrolledWindow):
         # first, download this to load dir
         # then open it with app_info
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) != 1:
-            print('Please open one file at a time!')
+        if not tree_paths:
             return
         tree_path = tree_paths[0]
         file_type = self.liststore[tree_path][TYPE_COL]
@@ -318,23 +317,21 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_cloud_download_item_activated(self, menu_item):
         '''创建离线下载任务, 下载选中的BT种子.'''
         tree_paths = self.iconview.get_selected_items()
-        if tree_paths and len(tree_paths) == 1:
-            self.app.cloud_page.add_cloud_bt_task(
-                self.liststore[tree_paths[0]][PATH_COL])
-            self.app.blink_page(self.app.cloud_page)
+        if not tree_paths:
+            return
+        self.app.cloud_page.add_cloud_bt_task(
+            self.liststore[tree_paths[0]][PATH_COL])
+        self.app.blink_page(self.app.cloud_page)
 
     def on_copy_link_activated(self, menu_item):
         def copy_link_to_clipboard(res, error=None):
-            if error:
+            if error or not res:
                 return
             red_url, req_id = res
-            # TODO: add a notification here
-            print('will copy link to clipboard:', red_url)
-            clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-            clipboard.set_text(red_url, -1)
+            self.app.update_clipboard(red_url)
 
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) != 1:
+        if not tree_paths:
             return
         tree_path = tree_paths[0]
         index = tree_path.get_indices()[0]
@@ -354,11 +351,27 @@ class IconWindow(Gtk.ScrolledWindow):
             self.app.download_page.add_task(pcs_file)
 
     def on_share_activated(self, menu_item):
-        print('TODO: share activated')
+        def on_share(info, error=None):
+            if error or not info or info['errno'] != 0:
+                self.app.toast(_('Failed to share selected files'))
+                return
+            self.app.update_clipboard(info['shorturl'])
+
+        tree_paths = self.iconview.get_selected_items()
+        if not tree_paths:
+            return
+        fid_list = []
+        for tree_path in tree_paths:
+            index = tree_path.get_indices()[0]
+            pcs_file = self.filelist[index]
+            fid_list.append(pcs_file['fs_id'])
+            gutil.async_call(
+                    pcs.enable_share, self.app.cookie, self.app.tokens,
+                    fid_list, callback=on_share)
 
     def on_moveto_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) == 0:
+        if not tree_paths:
             return
 
         dialog = FolderBrowserDialog(self.parent, self.app, _('Move To...'))
@@ -384,7 +397,7 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def on_copyto_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
-        if len(tree_paths) == 0:
+        if not tree_paths:
             return
 
         dialog = FolderBrowserDialog(self.parent, self.app, _('Copy To...'))

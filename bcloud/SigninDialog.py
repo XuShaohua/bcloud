@@ -165,6 +165,7 @@ class SigninDialog(Gtk.Dialog):
             self.use_profile(self.conf['default'])
             # auto_signin here
             if self.signin_check.get_active() and self.auto_signin:
+                self.signin_button.set_sensitive(False)
                 self.signin()
         return False
 

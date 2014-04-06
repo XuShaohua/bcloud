@@ -9,6 +9,7 @@
 
 import json
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -39,22 +40,65 @@ def get_quota(cookie, tokens):
     else:
         return None
 
-def list_share(cookie, tokens, path='/', page=1, num=100):
-    '''获取用户已经共享的文件的信息
 
-    path - 哪个目录的信息, 默认为根目录.
+def get_user_uk(cookie, tokens):
+    '''获取用户的uk'''
+    url = 'http://yun.baidu.com'
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        content = req.data.decode()
+        match = re.findall('/share/home\?uk=(\d+)" target=', content)
+        if len(match) == 1:
+            return match[0]
+    return None
+
+def list_share(cookie, tokens, uk, page=1):
+    '''获取用户已经共享的所有文件的信息
+
+    uk   - user key
     page - 页数, 默认为第一页.
-    num - 一次性获取的共享文件的数量, 默认为100个.
+    num  - 一次性获取的共享文件的数量, 默认为100个.
+    '''
+    num = 100
+    start = 100 * (page - 1)
+    url = ''.join([
+        const.PAN_URL,
+        'pcloud/feed/getsharelist?',
+        '&t=', util.timestamp(),
+        '&categor=0&auth_type=1&request_location=share_home',
+        '&start=', str(start),
+        '&limit=', str(num),
+        '&query_uk=', str(uk),
+        '&channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        ])
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        'Referer': const.SHARE_REFERER,
+        })
+    if req:
+        content = req.data
+        return json.loads(content.decode())
+    else:
+        return None
+
+def list_share_path(cookie, tokens, uk, path, share_id, page):
+    '''列举出用户共享的某一个目录中的文件信息
+
+    uk       - user key
+    path     - 共享目录
+    share_id - 共享文件的ID值
     '''
     url = ''.join([
         const.PAN_URL,
-        'share/record?channel=chunlei&clienttype=0&web=1',
-        '&num=', str(num),
+        'share/list?channel=chunlei&clienttype=0&web=1&num=100',
         '&t=', util.timestamp(),
         '&page=', str(page),
         '&dir=', encoder.encode_uri_component(path),
-        '&t=', util.latency(), 
-        '&order=tme&desc=1',
+        '&t=', util.latency(),
+        '&shareid=', share_id,
+        '&order=time&desc=1',
+        '&uk=', uk,
         '&_=', util.timestamp(),
         '&bdstoken=', tokens['bdstoken'],
         ])
@@ -68,12 +112,47 @@ def list_share(cookie, tokens, path='/', page=1, num=100):
     else:
         return None
 
+def get_share_page(url):
+    '''获取共享页面的文件信息'''
+    req = net.urlopen(url)
+    if req:
+        content = req.data.decode()
+        match = re.findall('applicationConfig,(.+)\]\);', content)
+        share_files = {}
+        if not match:
+            match = re.findall('viewShareData=(.+");FileUtils.spublic', content)
+            if not match:
+                return None
+            list_ = json.loads(json.loads(match[0]))
+        else:
+            list_ = json.loads(json.loads(match[0]))
+        if isinstance(list_, dict):
+            share_files['list'] = [list_, ]
+        else:
+            share_files['list'] = list_
+        id_match = re.findall('FileUtils\.share_id="(\d+)"', content)
+        uk_match = re.findall('/share/home\?uk=(\d+)" target=', content)
+        sign_match = re.findall('FileUtils\.share_sign="([^"]+)"', content)
+        print('match:', match)
+        print('id_match:', id_match)
+        print('uk_match:', uk_match)
+        print('sign_match:', sign_match)
+        if id_match and uk_match and sign_match:
+            share_files['share_id'] = id_match[0]
+            share_files['uk'] = uk_match[0]
+            share_files['sign'] = sign_match[0]
+            print('share_files:', share_files, type(share_files))
+            return share_files
+    return None
+
 def enable_share(cookie, tokens, fid_list):
     '''建立新的分享.
 
     fid_list - 是一个list, 里面的每一条都是一个文件的fs_id
-
-    @return - 会返回每一项的分享链接和shareid.
+    一次可以分享同一个目录下的多个文件/目录, 它们会会打包为一个分享链接,
+    这个分享链接还有一个对应的shareid. 我们可以用uk与shareid来在百度网盘里
+    面定位到这个分享内容.
+    @return - 会返回分享链接和shareid.
     '''
     url = ''.join([
         const.PAN_URL,
@@ -107,6 +186,11 @@ def disable_share(cookie, tokens, shareid_list):
         'Cookie': cookie.header_output(),
         'Content-type': const.CONTENT_FORM_UTF8,
         }, data=data.encode())
+    print('pcs.disable_share()')
+    print(req.data)
+    print(req.status)
+    print(req.headers)
+    print('data:', data)
     if req:
         content = req.data
         return json.loads(content.decode())

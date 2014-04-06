@@ -312,6 +312,7 @@ class DownloadPage(Gtk.Box):
                 row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
                 row[STATENAME_COL] = StateNames[State.FINISHED]
                 self.workers.pop(row[FSID_COL], None)
+                self.app.toast(_('{0} downloaded'.format(row[NAME_COL])))
                 self.launch_app(fs_id)
                 self.scan_tasks()
             GLib.idle_add(_on_worker_downloaded)

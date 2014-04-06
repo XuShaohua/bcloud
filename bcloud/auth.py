@@ -172,12 +172,10 @@ def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
         'Accept': const.ACCEPT_HTML,
         }, data=data.encode())
     if req:
-        print('req headers:', req.headers)
         auth_cookie = req.headers.get_all('Set-Cookie')
         if auth_cookie:
             return (0, auth_cookie)
         resp_content= req.data.decode()
-        print('response :', resp_content)
         match = re.findall('"(err_no[^"]+)"', resp_content)
         if len(match) != 1:
             return (-1, None)
