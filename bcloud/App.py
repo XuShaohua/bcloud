@@ -31,7 +31,6 @@ from CloudPage import CloudPage
 from DownloadPage import DownloadPage
 from HomePage import HomePage
 from PreferencesDialog import PreferencesDialog
-from SharePage import SharePage
 from SigninDialog import SigninDialog
 from TrashPage import TrashPage
 from UploadPage import UploadPage
@@ -260,8 +259,6 @@ class App:
         append_page(self.music_page)
         self.other_page = OtherPage(self)
         append_page(self.other_page)
-        self.share_page = SharePage(self)
-        append_page(self.share_page)
         self.trash_page = TrashPage(self)
         append_page(self.trash_page)
         self.cloud_page = CloudPage(self)
