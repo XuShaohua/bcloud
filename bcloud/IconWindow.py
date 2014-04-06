@@ -307,7 +307,20 @@ class IconWindow(Gtk.ScrolledWindow):
         self.launch_app_with_app_info(app_info)
 
     def on_choose_app_activated(self, menu_item):
-        print('TODO:choose app')
+        tree_paths = self.iconview.get_selected_items()
+        if not tree_paths or len(tree_paths) != 1:
+            return
+        tree_path = tree_paths[0]
+        type_ = self.liststore[tree_path][TYPE_COL]
+        dialog = Gtk.AppChooserDialog.new_for_content_type(
+                self.app.window, Gtk.DialogFlags.MODAL,
+                type_)
+        response = dialog.run()
+        app_info = dialog.get_app_info()
+        dialog.destroy()
+        if response != Gtk.ResponseType.OK:
+            return
+        self.launch_app_with_app_info(app_info)
 
     def on_open_dir_item_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
