@@ -133,7 +133,7 @@ class UploadPage(Gtk.Box):
             return
         tree_path = tree_paths[0]
         path = model[tree_path][PATH_COL]
-        dir_name, _ = os.path.split(path)
+        dir_name = os.path.split(path)[0]
         self.app.home_page.load(dir_name)
         self.app.switch_page(self.app.home_page)
 
@@ -229,7 +229,7 @@ class UploadPage(Gtk.Box):
     def remove_worker(self, source_path, stop=True):
         if source_path not in self.workers:
             return
-        worker, _ = self.workers[source_path]
+        worker = self.workers[source_path][0]
         if stop:
             worker.stop()
         else:

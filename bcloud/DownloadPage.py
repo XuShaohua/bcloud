@@ -249,12 +249,12 @@ class DownloadPage(Gtk.Box):
                 self.scan_tasks()
             return
         if not saveDir:
-            saveDir, _ = os.path.split(
-                    self.app.profile['save-dir'] + pcs_file['path'])
+            saveDir = os.path.split(
+                    self.app.profile['save-dir'] + pcs_file['path'])[0]
         if not saveName:
             saveName = pcs_file['server_filename']
 
-        human_size, _ = util.get_human_size(pcs_file['size'])
+        human_size = util.get_human_size(pcs_file['size'])[0]
         task = (
             pcs_file['server_filename'],
             pcs_file['path'],
@@ -295,8 +295,8 @@ class DownloadPage(Gtk.Box):
                     print('on worker received, row is None:', row)
                     return
                 row[CURRSIZE_COL] = current_size
-                total_size, _ = util.get_human_size(row[SIZE_COL])
-                curr_size, _ = util.get_human_size(row[CURRSIZE_COL])
+                total_size = util.get_human_size(row[SIZE_COL])[0]
+                curr_size = util.get_human_size(row[CURRSIZE_COL])[0]
                 row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
                 row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
             GLib.idle_add(_on_worker_received)
@@ -304,11 +304,11 @@ class DownloadPage(Gtk.Box):
         def on_worker_downloaded(worker, fs_id):
             def _on_worker_downloaded():
                 row = self.get_task_by_fsid(fs_id)
-                _, row = self.workers[fs_id]
+                row = self.workers[fs_id][1]
                 row[CURRSIZE_COL] = row[SIZE_COL]
                 row[STATE_COL] = State.FINISHED
                 row[PERCENT_COL] = 100
-                total_size, _ = util.get_human_size(row[SIZE_COL])
+                total_size = util.get_human_size(row[SIZE_COL])[0]
                 row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
                 row[STATENAME_COL] = StateNames[State.FINISHED]
                 self.workers.pop(row[FSID_COL], None)
@@ -319,7 +319,7 @@ class DownloadPage(Gtk.Box):
 
         def on_worker_network_error(worker, fs_id):
             row = self.get_task_by_fsid(fs_id)
-            _, row = self.workers[fs_id]
+            row = self.workers[fs_id][1]
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
             self.remove_worker(row[FSID_COL])
@@ -345,7 +345,7 @@ class DownloadPage(Gtk.Box):
     def remove_worker(self, fs_id, stop=True):
         if fs_id not in self.workers:
             return
-        worker, _ = self.workers[fs_id]
+        worker = self.workers[fs_id][0]
         if stop:
             worker.stop()
         else:

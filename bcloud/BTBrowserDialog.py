@@ -88,7 +88,7 @@ class BTBrowserDialog(Gtk.Dialog):
                 return
             for task in tasks:
                 size = int(task['size'])
-                human_size, _ = util.get_human_size(size)
+                human_size = util.get_human_size(size)[0]
                 select = (size > MIN_SIZE_TO_CHECK or 
                         task['file_name'].endswith(CHECK_EXT))
                 self.liststore.append([

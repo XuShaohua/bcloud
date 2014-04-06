@@ -125,7 +125,7 @@ class TrashPage(Gtk.Box):
             if pcs_file['isdir']:
                 humansize = ''
             else:
-                humansize, _ = util.get_human_size(pcs_file['size'])
+                humansize = util.get_human_size(pcs_file['size'])[0]
             remaining_days = util.get_delta_days(
                     int(pcs_file['server_mtime']), time.time())
             remaining_days = str(MAX_DAYS - remaining_days) + ' days'

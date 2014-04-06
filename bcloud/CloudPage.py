@@ -169,8 +169,8 @@ class CloudPage(Gtk.Box):
                 row[STATUS_COL] = int(task['status'])
                 if row[SIZE_COL]:
                     row[PERCENT_COL] = int(row[FINISHED_COL] / row[SIZE_COL] * 100)
-                size, _ = util.get_human_size(row[SIZE_COL])
-                finished_size, _ = util.get_human_size(row[FINISHED_COL])
+                size = util.get_human_size(row[SIZE_COL])[0]
+                finished_size = util.get_human_size(row[FINISHED_COL])[0]
                 if row[SIZE_COL] == row[FINISHED_COL]:
                     row[HUMANSIZE_COL] = size
                 else:
@@ -300,7 +300,7 @@ class CloudPage(Gtk.Box):
             return
         tree_path = tree_paths[0]
         path = model[tree_path][PATH_COL]
-        dir_name, _ = os.path.split(path)
+        dir_name = os.path.split(path)[0]
         self.app.home_page.load(dir_name)
         self.app.switch_page(self.app.home_page)
 

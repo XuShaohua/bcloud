@@ -226,8 +226,8 @@ class App:
             return
         used = quota_info['used']
         total = quota_info['total']
-        used_size, _ = util.get_human_size(used)
-        total_size, _ = util.get_human_size(total)
+        used_size = util.get_human_size(used)[0]
+        total_size = util.get_human_size(total)[0]
         self.progressbar.set_text(used_size + ' / ' + total_size)
         self.progressbar.set_fraction(used / total)
 
