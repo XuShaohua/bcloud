@@ -105,6 +105,9 @@ class DownloadPage(Gtk.Box):
                 int, str, str, int, str, str, int)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_tooltip_column(PATH_COL)
+        self.treeview.set_headers_clickable(True)
+        self.treeview.set_reorderable(True)
+        self.treeview.set_search_column(0)
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
@@ -113,6 +116,7 @@ class DownloadPage(Gtk.Box):
                 ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
+        name_col.set_sort_column_id(NAME_COL)
         self.treeview.append_column(name_col)
 
         percent_cell = Gtk.CellRendererProgress()
@@ -120,18 +124,21 @@ class DownloadPage(Gtk.Box):
                 _('Progress'), percent_cell, value=PERCENT_COL)
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
+        percent_col.set_sort_column_id(PERCENT_COL)
 
         size_cell = Gtk.CellRendererText()
         size_col = Gtk.TreeViewColumn(
                 _('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
         size_col.props.min_width = 100
+        size_col.set_sort_column_id(SIZE_COL)
 
         state_cell = Gtk.CellRendererText()
         state_col = Gtk.TreeViewColumn(
                 _('State'), state_cell, text=STATENAME_COL)
         self.treeview.append_column(state_col)
         state_col.props.min_width = 100
+        state_col.set_sort_column_id(PERCENT_COL)
 
         self.init_db()
         self.load_tasks()
