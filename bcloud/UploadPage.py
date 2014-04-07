@@ -156,25 +156,30 @@ class UploadPage(Gtk.Box):
         self.add_file_task(source_path)
 
     ### Open API
-    def add_file_task(self, source_path):
+    def add_file_task(self, source_path, dir_name=None):
         '''创建新的上传任务
 
         source_path - 本地文件的绝对路径
+        dir_name    - 文件在服务器上的父目录, 如果为None的话, 会弹出一个
+                      对话框让用户来选择一个目录.
         '''
         self.check_first()
         row = self.get_row_by_source_path(source_path)
         if row:
             print('Task is already in uploading schedule, do nothing.')
             return
+        if source_path.startswith('file://'):
+            source_path = source_path[7:]
         source_dir, filename = os.path.split(source_path)
         
-        folder_dialog = FolderBrowserDialog(self, self.app)
-        response = folder_dialog.run()
-        if response != Gtk.ResponseType.OK:
+        if not dir_name:
+            folder_dialog = FolderBrowserDialog(self, self.app)
+            response = folder_dialog.run()
+            if response != Gtk.ResponseType.OK:
+                folder_dialog.destroy()
+                return
+            dir_name = folder_dialog.get_path()
             folder_dialog.destroy()
-            return
-        dir_name = folder_dialog.get_path()
-        folder_dialog.destroy()
         path = os.path.join(dir_name, filename)
         size = os.path.getsize(source_path)
         task = [

@@ -80,11 +80,9 @@ class App:
             ['*.*', Gtk.TargetFlags.OTHER_APP, 1]]
         target_list =[Gtk.TargetEntry.new(*t) for t in targets]
         self.window.drag_dest_set(
-                Gtk.DestDefaults.ALL,
-                target_list,
-                Gdk.DragAction.LINK)
+            Gtk.DestDefaults.ALL, target_list, Gdk.DragAction.COPY)
         self.window.connect(
-                'drag-data-received', self.on_main_window_drag_data_received)
+            'drag-data-received', self.on_main_window_drag_data_received)
 
         app_menu = Gio.Menu.new()
         app_menu.append(_('Preferences'), 'app.preferences')
@@ -95,7 +93,7 @@ class App:
 
         preferences_action = Gio.SimpleAction.new('preferences', None)
         preferences_action.connect(
-                'activate', self.on_preferences_action_activated)
+            'activate', self.on_preferences_action_activated)
         app.add_action(preferences_action)
         signout_action = Gio.SimpleAction.new('signout', None)
         signout_action.connect('activate', self.on_signout_action_activated)
@@ -206,7 +204,7 @@ class App:
                                           data, info, time):
         uri = data.get_text()
         if uri and uri.startswith('file://'):
-            source_path = uri[7:].strip()
+            source_path = uri[7:].rstrip()
             if self.profile:
                 self.upload_page.add_file_task(source_path)
 

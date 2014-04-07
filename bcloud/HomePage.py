@@ -3,6 +3,7 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+from gi.repository import Gdk
 from gi.repository import Gtk
 
 from bcloud import Config
@@ -55,6 +56,14 @@ class HomePage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
 
+        # set drop action
+        targets = [
+            ['text/plain', Gtk.TargetFlags.OTHER_APP, 0],
+            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]]
+        target_list =[Gtk.TargetEntry.new(*t) for t in targets]
+        self.drag_dest_set(
+            Gtk.DestDefaults.ALL, target_list, Gdk.DragAction.COPY)
+
         nav_bar = Gtk.Toolbar()
         nav_bar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR)
         nav_bar.props.show_arrow = False
@@ -104,6 +113,14 @@ class HomePage(Gtk.Box):
         self.icon_window = IconWindow(self, app)
         self.pack_end(self.icon_window, True, True, 0)
 
+    def do_drag_data_received(self, drag_context, x, y, data, info, time):
+        uri = data.get_text()
+        if uri and uri.startswith('file://'):
+            source_path = uri[7:].rstrip()
+            if self.app.profile:
+                self.app.upload_page.add_file_task(source_path, self.path)
+
+    # Open API
     def load(self, path='/'):
         def on_load(info, error=None):
             if error or not info or info['errno'] != 0:
