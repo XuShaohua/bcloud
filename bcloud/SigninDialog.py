@@ -340,10 +340,11 @@ class SigninDialog(Gtk.Dialog):
 
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
-#        cookie, tokens = self.load_auth(username)
-#        if cookie and tokens:
-#            self.update_profile(username, password, cookie, tokens)
-#            return
+        # 使用本地的缓存token, 有效期是七天
+        cookie, tokens = self.load_auth(username)
+        if cookie and tokens:
+            self.update_profile(username, password, cookie, tokens)
+            return
 
         cookie = RequestCookie()
         tokens = {}
