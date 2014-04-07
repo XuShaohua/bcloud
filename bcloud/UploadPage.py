@@ -140,9 +140,7 @@ class UploadPage(Gtk.Box):
     def on_upload_button_clicked(self, button):
         self.add_task()
 
-    # Open API
     def add_task(self):
-        self.check_first()
         file_dialog = Gtk.FileChooserDialog(
             _('Choose a file..'), self.app.window,
             Gtk.FileChooserAction.OPEN,
@@ -155,6 +153,15 @@ class UploadPage(Gtk.Box):
             return
         source_path = file_dialog.get_filename()
         file_dialog.destroy()
+        self.add_file_task(source_path)
+
+    ### Open API
+    def add_file_task(self, source_path):
+        '''创建新的上传任务
+
+        source_path - 本地文件的绝对路径
+        '''
+        self.check_first()
         row = self.get_row_by_source_path(source_path)
         if row:
             print('Task is already in uploading schedule, do nothing.')
@@ -182,6 +189,7 @@ class UploadPage(Gtk.Box):
             0,
             ]
         self.liststore.append(task)
+        self.app.blink_page(self)
         self.scan_tasks()
 
     def pause_task(self):
@@ -191,7 +199,6 @@ class UploadPage(Gtk.Box):
         pass
 
     def scan_tasks(self):
-        print('scan task')
         for row in self.liststore:
             if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
                 print('max concurrent tasks reached')

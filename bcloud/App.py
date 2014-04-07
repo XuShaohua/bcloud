@@ -41,6 +41,8 @@ if Gtk.MAJOR_VERSION <= 3 and Gtk.MINOR_VERSION < 10:
 BLINK_DELTA = 250    # 字体闪烁间隔, 250 miliseconds 
 BLINK_SUSTAINED = 3  # 字体闪烁持续时间, 5 seconds
 
+
+
 class App:
 
     profile = None
@@ -71,6 +73,18 @@ class App:
         self.window.connect('check-resize', self.on_main_window_resized)
         self.window.connect('delete-event', self.on_main_window_deleted)
         app.add_window(self.window)
+
+        # set drop action
+        targets = [
+            ['text/plain', Gtk.TargetFlags.OTHER_APP, 0],
+            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]]
+        target_list =[Gtk.TargetEntry.new(*t) for t in targets]
+        self.window.drag_dest_set(
+                Gtk.DestDefaults.ALL,
+                target_list,
+                Gdk.DragAction.LINK)
+        self.window.connect(
+                'drag-data-received', self.on_main_window_drag_data_received)
 
         app_menu = Gio.Menu.new()
         app_menu.append(_('Preferences'), 'app.preferences')
@@ -187,6 +201,14 @@ class App:
             return True
         else:
             return False
+
+    def on_main_window_drag_data_received(self, window, drag_context, x, y,
+                                          data, info, time):
+        uri = data.get_text()
+        if uri and uri.startswith('file://'):
+            source_path = uri[7:].strip()
+            if self.profile:
+                self.upload_page.add_file_task(source_path)
 
     def on_preferences_action_activated(self, action, params):
         if self.profile:
