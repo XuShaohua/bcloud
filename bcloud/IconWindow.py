@@ -16,6 +16,7 @@ _ = Config._
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.NewFolderDialog import NewFolderDialog
 from bcloud.PropertiesDialog import PropertiesDialog
+from bcloud.PropertiesDialog import FolderPropertyDialog
 from bcloud.RenameDialog import RenameDialog
 from bcloud import gutil
 from bcloud import pcs
@@ -461,10 +462,13 @@ class IconWindow(Gtk.ScrolledWindow):
         '''显示选中的文件或者当前目录的属性'''
         tree_paths = self.iconview.get_selected_items()
         if not tree_paths:
-            return
-        for tree_path in tree_paths:
-            index = tree_path.get_indices()[0]
-            pcs_file = self.filelist[index]
-            dialog = PropertiesDialog(self.parent, self.app, pcs_file)
+            dialog = FolderPropertyDialog(self, self.app, self.parent.path)
             dialog.run()
             dialog.destroy()
+        else:
+            for tree_path in tree_paths:
+                index = tree_path.get_indices()[0]
+                pcs_file = self.filelist[index]
+                dialog = PropertiesDialog(self.parent, self.app, pcs_file)
+                dialog.run()
+                dialog.destroy()
