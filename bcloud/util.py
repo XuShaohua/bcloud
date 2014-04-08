@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import os
 import random
+import urllib.parse
 import time
 
 SIZE_K = 2 ** 10
@@ -71,3 +72,8 @@ def list_remove_by_index(l, index):
         l = l[0:index] + l[index+1:]
 
     return l
+
+def uri_to_path(uri):
+    if not uri or len(uri) < 7:
+        return ''
+    return urllib.parse.unquote(uri)[7:].replace('\n', '')

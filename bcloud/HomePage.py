@@ -115,10 +115,9 @@ class HomePage(Gtk.Box):
 
     def do_drag_data_received(self, drag_context, x, y, data, info, time):
         uri = data.get_text()
-        if uri and uri.startswith('file://'):
-            source_path = uri[7:].rstrip()
-            if self.app.profile:
-                self.app.upload_page.add_file_task(source_path, self.path)
+        source_path = util.uri_to_path(uri)
+        if source_path and self.app.profile:
+            self.app.upload_page.add_file_task(source_path, self.path)
 
     # Open API
     def load(self, path='/'):

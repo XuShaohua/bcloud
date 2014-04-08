@@ -199,10 +199,9 @@ class App:
     def on_main_window_drag_data_received(self, window, drag_context, x, y,
                                           data, info, time):
         uri = data.get_text()
-        if uri and uri.startswith('file://'):
-            source_path = uri[7:].rstrip()
-            if self.profile:
-                self.upload_page.add_file_task(source_path)
+        source_path = util.uri_to_path(uri)
+        if source_path and self.profile:
+            self.upload_page.add_file_task(source_path)
 
     def on_preferences_action_activated(self, action, params):
         if self.profile:
@@ -385,7 +384,6 @@ class App:
     # Open API
     def update_clipboard(self, text):
         '''将文本复制到系统剪贴板里面'''
-        print('update clipboard:', text)
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         clipboard.set_text(text, -1)
         self.toast(_('{0} copied to clipboard'.format(text)))
