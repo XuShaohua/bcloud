@@ -106,14 +106,16 @@ class App:
         app.add_action(quit_action)
 
         paned = Gtk.Paned()
+        #paned.props.position = 15
         self.window.add(paned)
 
         left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         paned.add1(left_box)
+        paned.child_set_property(left_box, 'shrink', False)
+        paned.child_set_property(left_box, 'resize', False)
 
         nav_window = Gtk.ScrolledWindow()
         nav_window.props.hscrollbar_policy = Gtk.PolicyType.NEVER
-        #nav_window.props.border_width = 5
         left_box.pack_start(nav_window, True, True, 0)
 
         # icon_name, disname, tooltip, color
@@ -123,20 +125,14 @@ class App:
         nav_treeview.props.headers_visible = False
         nav_treeview.set_tooltip_column(TOOLTIP_COL)
         icon_cell = Gtk.CellRendererPixbuf()
+        icon_cell.props.xalign = 1
+        icon_col = Gtk.TreeViewColumn('Icon', icon_cell, icon_name=ICON_COL)
+        icon_col.props.fixed_width = 40
+        nav_treeview.append_column(icon_col)
         name_cell = Gtk.CellRendererText()
-        nav_col = Gtk.TreeViewColumn.new()
-        nav_col.set_title('Places')
-        nav_col.pack_start(icon_cell, False)
-        nav_col.pack_start(name_cell, True)
-        if Config.GTK_LE_36:
-            nav_col.add_attribute(icon_cell, 'icon_name', ICON_COL)
-            nav_col.add_attribute(name_cell, 'text', NAME_COL)
-            nav_col.add_attribute(name_cell, 'foreground_rgba', COLOR_COL)
-        else:
-            nav_col.set_attributes(icon_cell, icon_name=ICON_COL)
-            nav_col.set_attributes(
-                name_cell, text=NAME_COL, foreground_rgba=COLOR_COL)
-        nav_treeview.append_column(nav_col)
+        name_col = Gtk.TreeViewColumn(
+                'Places', name_cell, text=NAME_COL, foreground_rgba=COLOR_COL)
+        nav_treeview.append_column(name_col)
         nav_selection = nav_treeview.get_selection()
         nav_selection.connect('changed', self.on_nav_selection_changed)
         nav_window.add(nav_treeview)
