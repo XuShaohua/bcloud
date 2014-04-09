@@ -296,9 +296,22 @@ def clear_trash(cookie, tokens):
     else:
         return None
 
+def list_dir_all(cookie, tokens, path):
+    '''得到一个目录中所有文件的信息, 并返回它的文件列表'''
+    pcs_files = []
+    page = 1
+    while True:
+        content = list_dir(cookie, tokens, path, page)
+        if not content:
+            return (path, None)
+        if not content['list']:
+            print(pcs_files)
+            return (path, pcs_files)
+        pcs_files.extend(content['list'])
+        page = page + 1
 
 def list_dir(cookie, tokens, path, page=1, num=100):
-    '''得到一个目录中的所有文件的信息.'''
+    '''得到一个目录中的所有文件的信息(最多100条记录).'''
     timestamp = util.timestamp()
     url = ''.join([
         const.PAN_API_URL,

@@ -76,6 +76,7 @@ class Downloader(threading.Thread, GObject.GObject):
                 self.fh = open(self.filepath, 'ab')
                 self.fh.seek(row[CURRSIZE_COL])
             else:
+                # TODO: popup a dialog to ask user to confirm overriding
                 self.fh = open(self.filepath, 'wb')
                 self.row[CURRSIZE_COL] = 0
 

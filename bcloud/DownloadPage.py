@@ -219,14 +219,13 @@ class DownloadPage(Gtk.Box):
         return None
 
     # Open API
-    def add_launch_task(self, pcs_file, app_info, saveDir=None,
-                        saveName=None):
+    def add_launch_task(self, pcs_file, app_info):
         self.check_first()
         fs_id = str(pcs_file['fs_id'])
         if fs_id in self.app_infos:
             return
         self.app_infos[fs_id] = app_info
-        self.add_task(pcs_file, saveDir, saveName)
+        self.add_task(pcs_file)
 
     def launch_app(self, fs_id):
         if fs_id in self.app_infos:
@@ -238,10 +237,33 @@ class DownloadPage(Gtk.Box):
             self.app_infos.pop(fs_id, None)
 
     # Open API
-    def add_task(self, pcs_file, saveDir=None, saveName=None):
-        '''加入新的下载任务'''
+    def add_tasks(self, pcs_files):
+        '''建立批量下载任务, 包括目录'''
+        def on_list_dir(info, error=None):
+            path, pcs_files = info
+            if error or not pcs_files:
+                dialog = Gtk.MessageDialog(
+                        self.app.window, Gtk.DialogFlags.MODAL,
+                        Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE,
+                        _('Failed to scan folder to download'))
+                dialog.format_secondary_text(
+                        _('Please download {0} again').format(path))
+                dialog.run()
+                dialog.destroy()
+                return
+            self.add_tasks(pcs_files)
+
         self.check_first()
-        # 目前还不支持下载目录.
+        for pcs_file in pcs_files:
+            if pcs_file['isdir']:
+                gutil.async_call(
+                        pcs.list_dir_all, self.app.cookie, self.app.tokens,
+                        pcs_file['path'], callback=on_list_dir)
+            else:
+                self.add_task(pcs_file)
+
+    def add_task(self, pcs_file):
+        '''加入新的下载任务'''
         if pcs_file['isdir']:
             return
         # 如果已经存在于下载列表中, 就忽略.
@@ -253,11 +275,9 @@ class DownloadPage(Gtk.Box):
                 row[STATE_COL] = State.WAITING
             self.scan_tasks()
             return
-        if not saveDir:
-            saveDir = os.path.split(
-                    self.app.profile['save-dir'] + pcs_file['path'])[0]
-        if not saveName:
-            saveName = pcs_file['server_filename']
+        saveDir = os.path.split(
+                self.app.profile['save-dir'] + pcs_file['path'])[0]
+        saveName = pcs_file['server_filename']
 
         human_size = util.get_human_size(pcs_file['size'])[0]
         task = (
@@ -280,12 +300,13 @@ class DownloadPage(Gtk.Box):
 
     def scan_tasks(self):
         '''扫描所有下载任务, 并在需要时启动新的下载'''
+        if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
+            return
         for row in self.liststore:
             if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
                 break
             if row[STATE_COL] == State.WAITING:
                 self.start_worker(row)
-        return True
 
     def start_worker(self, row):
         '''为task新建一个后台下载线程, 并开始下载.'''

@@ -359,10 +359,9 @@ class IconWindow(Gtk.ScrolledWindow):
         tree_paths = self.iconview.get_selected_items()
         if not tree_paths:
             return
-        for tree_path in tree_paths:
-            pcs_file = self.filelist[tree_path.get_indices()[0]]
-            self.app.blink_page(self.app.download_page)
-            self.app.download_page.add_task(pcs_file)
+        pcs_files = [self.filelist[p.get_indices()[0]] for p in tree_paths]
+        self.app.blink_page(self.app.download_page)
+        self.app.download_page.add_tasks(pcs_files)
 
     def on_share_activated(self, menu_item):
         def on_share(info, error=None):
