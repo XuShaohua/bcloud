@@ -1,3 +1,20 @@
+v3.1.1 - 2014.4.10
+* Fixed: switch to home page when a new account signed in
+* Fixed: IndexError: could not find tree path
+* Fixed: KeyError: 'upload-threshold'
+* Fixed: Unable to convert from gint to glong; reported by @bcsflilong
+* Set `notify` and `keyring` modules as essential
+* Support slice uploading
+* Support downloading/uploading folders
+* Fixed: unescape uri; reported by @eexpress
+* Add 15px to left margin of nav window
+* Support folder properties
+* Support sorting and DnD in DownloadPage/UploadPage
+* Drop file to application window to upload
+* Enable local authorization cache
+* Support pause/remove uploading tasks
+* Dump downloading task first
+
 v2.2.5 - 2014.4.6
 * Fixed: save download status while destroying main window
 * Fixed: gettext is overrided to string
