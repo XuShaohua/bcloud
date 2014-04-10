@@ -183,12 +183,12 @@ class DownloadPage(Gtk.Box):
 
     def do_destroy(self, *args):
         if not self.first_run:
-            for worker, row in self.workers.values():
-                worker.pause()
-                row[CURRSIZE_COL] = worker.row[CURRSIZE_COL]
             self.dump_tasks()
             self.conn.commit()
             self.conn.close()
+            for worker, row in self.workers.values():
+                worker.pause()
+                row[CURRSIZE_COL] = worker.row[CURRSIZE_COL]
     
     def load_tasks(self):
         req = self.cursor.execute('SELECT * FROM download')

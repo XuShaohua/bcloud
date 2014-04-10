@@ -116,9 +116,7 @@ class Downloader(threading.Thread, GObject.GObject):
                 if range_:
                     self.request_bytes(range_)
             else:
-                self.fh.flush()
-                self.fh.close()
-                self.fh = None
+                self.close_file()
                 if self.row[STATE_COL] == State.CANCELED:
                     os.remove(self.filepath)
                 break
@@ -126,11 +124,18 @@ class Downloader(threading.Thread, GObject.GObject):
     def pause(self):
         '''暂停下载任务'''
         self.row[STATE_COL] = State.PAUSED
-        return
+        self.close_file()
 
     def stop(self):
         '''停止下载, 并删除之前下载的片段'''
         self.row[STATE_COL] = State.CANCELED
+        self.close_file()
+
+    def close_file(self):
+        if self.fh and not self.fh.closed:
+            self.fh.flush()
+            self.fh.close()
+            self.fh = None
 
     def finished(self):
         self.row[STATE_COL] = State.FINISHED
@@ -159,7 +164,7 @@ class Downloader(threading.Thread, GObject.GObject):
         self.emit('network-error', self.row[FSID_COL])
 
     def write_bytes(self, range_, block):
-        if self.row[STATE_COL] != State.DOWNLOADING:
+        if not self.fh or self.row[STATE_COL] != State.DOWNLOADING:
             return
         self.row[CURRSIZE_COL] = range_[1]
         self.emit('received', self.row[FSID_COL], self.row[CURRSIZE_COL])
