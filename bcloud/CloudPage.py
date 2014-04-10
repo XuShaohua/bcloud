@@ -76,8 +76,8 @@ class CloudPage(Gtk.Box):
         # task_id, name, path, source_url, size, finished_size,
         # status, percent, human_size
         self.liststore = Gtk.ListStore(
-                str, str, str, str, GObject.TYPE_LONG, 
-                GObject.TYPE_LONG, int, int, str)
+                str, str, str, str, GObject.TYPE_INT64,
+                GObject.TYPE_INT64, int, int, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.selection = self.treeview.get_selection()
         name_cell = Gtk.CellRendererText(

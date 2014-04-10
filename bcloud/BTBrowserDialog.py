@@ -50,7 +50,7 @@ class BTBrowserDialog(Gtk.Dialog):
         box.pack_start(scrolled_win, True, True, 0)
 
         # check, name, size, humansize
-        self.liststore = Gtk.ListStore(bool, str, GObject.TYPE_LONG, str)
+        self.liststore = Gtk.ListStore(bool, str, GObject.TYPE_INT64, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_tooltip_column(NAME_COL)
         scrolled_win.add(self.treeview)

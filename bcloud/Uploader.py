@@ -31,7 +31,7 @@ class Uploader(threading.Thread, GObject.GObject):
             # 一个新的文件分片完成上传
             'slice-sent': (GObject.SIGNAL_RUN_LAST,
                 # fid, slice_end, md5 
-                GObject.TYPE_NONE, (GObject.TYPE_INT, GObject.TYPE_LONG, str)),
+                GObject.TYPE_NONE, (GObject.TYPE_INT, GObject.TYPE_INT64, str)),
             # 请求UploadPage来合并文件分片
             'merge-files': (GObject.SIGNAL_RUN_LAST,
                 # fid

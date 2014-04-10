@@ -94,8 +94,8 @@ class UploadPage(Gtk.Box):
         # fid, source_name, source_path, path, size,
         # currsize, state, statename, humansize, percent
         self.liststore = Gtk.ListStore(
-            GObject.TYPE_INT, str, str, str, GObject.TYPE_LONG,
-            GObject.TYPE_LONG, int, str, str, GObject.TYPE_INT)
+            GObject.TYPE_INT, str, str, str, GObject.TYPE_INT64,
+            GObject.TYPE_INT64, int, str, str, GObject.TYPE_INT)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)

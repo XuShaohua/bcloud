@@ -34,7 +34,7 @@ class Downloader(threading.Thread, GObject.GObject):
     __gsignals__ = {
             'received': (GObject.SIGNAL_RUN_LAST,
                 # fs-id, current-size
-                GObject.TYPE_NONE, (str, GObject.TYPE_LONG)),
+                GObject.TYPE_NONE, (str, GObject.TYPE_INT64)),
             'downloaded': (GObject.SIGNAL_RUN_LAST, 
                 # fs_id
                 GObject.TYPE_NONE, (str, )),

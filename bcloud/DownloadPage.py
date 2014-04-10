@@ -101,7 +101,7 @@ class DownloadPage(Gtk.Box):
         # isdir, saveDir, saveName, state, statename,
         # humansize, percent
         self.liststore = Gtk.ListStore(
-                str, str, str, GObject.TYPE_LONG, GObject.TYPE_LONG, str,
+                str, str, str, GObject.TYPE_INT64, GObject.TYPE_INT64, str,
                 GObject.TYPE_INT, str, str, GObject.TYPE_INT, str,
                 str, GObject.TYPE_INT)
         self.treeview = Gtk.TreeView(model=self.liststore)
