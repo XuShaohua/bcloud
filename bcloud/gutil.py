@@ -22,7 +22,7 @@ DEFAULT_PROFILE = {
     'use-notify': False,
     'first-run': True,
     'save-dir': Config.HOME_DIR,
-    'update-threshold': 1,  # 上传时的阈值, 1~20.
+    'upload-threshold': 1,  # 上传时的阈值, 1~5.
     'concurr-tasks': 2,     # 下载/上传同时进行的任务数, 1~5
     'username': '',
     'password': '',
@@ -56,8 +56,7 @@ def xdg_open(uri):
     try:
         subprocess.call(['xdg-open', uri, ])
     except FileNotFoundError as e:
-        pass
-        #print(e)
+        print(e)
 
 def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
     '''下载文件缩略图, 并将它显示到liststore里.
@@ -69,7 +68,6 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
         if error:
             return
         if os.stat(filepath).st_size == 0:
-            #print('target image file is empty:', filepath)
             return
         try:
             pix = GdkPixbuf.Pixbuf.new_from_file_at_size(filepath, 96, 96)
@@ -82,8 +80,6 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
             row[col] = pix
         except GLib.GError as e:
             pass
-            #print('Error: Net.update_liststore_image:', e, 
-            #      'with filepath:', filepath, 'url:', url)
 
     def _dump_image(req, error=None):
         if error or not req:
@@ -98,7 +94,6 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
     url = pcs_file['thumbs']['url1']
 
     if len(url) < 10:
-        #print('url is too short')
         return
     filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
     if os.path.exists(filepath) and os.stat(filepath).st_blocks:
@@ -114,13 +109,20 @@ def ellipse_text(text, length=10):
 
 def load_profile(profile_name):
     '''读取特定帐户的配置信息'''
+    def mig_5_6():
+        if 'upload-threshold' not in profile:
+            profile['upload-threshold'] = 1
+
     path = os.path.join(Config.CONF_DIR, profile_name)
     if not os.path.exists(path):
         return DEFAULT_PROFILE
     with open(path) as fh:
         profile = json.load(fh)
-    profile['password'] = keyring.get_password(
+    mig_5_6()
+    password = keyring.get_password(
             Config.DBUS_APP_NAME, profile['username'])
+    if password:
+        profile['password'] = password
     return profile
 
 def dump_profile(profile):

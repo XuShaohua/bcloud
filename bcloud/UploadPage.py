@@ -449,8 +449,6 @@ class UploadPage(Gtk.Box):
             return
         row[STATE_COL] = State.UPLOADING
         row[STATENAME_COL] = StateNames[State.UPLOADING]
-        if 'upload-threshold' not in self.app.profile:
-            self.app.profile['upload-threshold'] = 1
         threshold = self.app.profile['upload-threshold'] * (2 ** 20)
         worker = Uploader(self, row, threshold, self.app.cookie, self.app.tokens)
         self.workers[row[FID_COL]] = (worker, row)

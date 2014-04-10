@@ -54,7 +54,7 @@ class PreferencesDialog(Gtk.Dialog):
         upload_label = Gtk.Label.new(_('Upload threshold:'))
         upload_label.props.xalign = 1
         general_grid.attach(upload_label, 0, 2, 1, 1)
-        upload_spin = Gtk.SpinButton.new_with_range(1, 20, 1)
+        upload_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
         upload_spin.set_tooltip_text(
                 _('Specify size of each slice data to upload. Sliced data will be merge on server. Default value, 1, means 1Mb.'))
         upload_spin.set_value(self.app.profile['upload-threshold'])
