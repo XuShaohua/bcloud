@@ -179,6 +179,7 @@ class App:
                 gutil.dump_profile(self.profile)
 
             self.home_page.load()
+            self.switch_page(self.home_page)
             return
         self.quit()
 
