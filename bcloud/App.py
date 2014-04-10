@@ -13,10 +13,7 @@ from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
 from gi.repository import Gtk
-try:
-    from gi.repository import Notify
-except ImportError:
-    print('Failed to import Notify module!')
+from gi.repository import Notify
 
 import Config
 Config.check_first()
@@ -392,7 +389,7 @@ class App:
 
     def init_notify(self):
         self.notify = None
-        if globals().get('Notify') and self.profile['use-notify']:
+        if self.profile['use-notify']:
             status = Notify.init(Config.APPNAME)
             if not status:
                 return

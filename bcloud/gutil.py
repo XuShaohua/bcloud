@@ -10,16 +10,11 @@ import threading
 
 from gi.repository import GdkPixbuf
 from gi.repository import GLib
-try:
-    import keyring
-    keyring_imported = True
-except ImportError:
-    keyring_imported = False
+import keyring
 
 from bcloud import Config
 from bcloud import net
 
-PASSWORD_MAGIC_CHAR = 'x'
 DEFAULT_PROFILE = {
     'version': Config.VERSION,
     'window-size': (960, 680),
@@ -124,9 +119,8 @@ def load_profile(profile_name):
         return DEFAULT_PROFILE
     with open(path) as fh:
         profile = json.load(fh)
-    if profile['password'] == PASSWORD_MAGIC_CHAR and keyring_imported:
-        profile['password'] = keyring.get_password(
-                Config.DBUS_APP_NAME, profile['username'])
+    profile['password'] = keyring.get_password(
+            Config.DBUS_APP_NAME, profile['username'])
     return profile
 
 def dump_profile(profile):
@@ -138,15 +132,9 @@ def dump_profile(profile):
     '''
     profile = profile.copy()
     path = os.path.join(Config.CONF_DIR, profile['username'])
-    if not profile['remember-password']:
-        profile['password'] = ''
-    elif keyring_imported:
-        keyring.set_password(
-                Config.DBUS_APP_NAME, profile['username'],
-                profile['password'])
-        profile['password'] = PASSWORD_MAGIC_CHAR
-    else:
-        print('警告: 密码被明文存储!')
+    keyring.set_password(
+            Config.DBUS_APP_NAME, profile['username'], profile['password'])
+    profile['password'] = ''
     with open(path, 'w') as fh:
         json.dump(profile, fh)
 
