@@ -491,26 +491,23 @@ class UploadPage(Gtk.Box):
 
         operator  - 处理函数
         '''
-        print('operate selected rows:', operator)
         model, tree_paths = self.selection.get_selected_rows()
         if not tree_paths:
             return
-        print('tree paths:', tree_paths)
+        fids = []
         for tree_path in tree_paths:
-            index = tree_path.get_indices()[0]
-            row = self.liststore[index]
-            operator(row)
+            fids.append(model[tree_path][FID_COL])
+        for fid in fids:
+            row = self.get_row_by_fid(fid)
+            operator(fid)
 
     def on_start_button_clicked(self, button):
-        print('on start button clicked')
         self.operate_selected_rows(self.start_task)
 
     def on_pause_button_clicked(self, button):
-        print('on pause button clicked')
         self.operate_selected_rows(self.pause_task)
 
     def on_remove_button_clicked(self, button):
-        print('on remove button clicked')
         self.operate_selected_rows(self.remove_task)
 
     def on_open_folder_button_clicked(self, button):

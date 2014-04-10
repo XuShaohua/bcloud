@@ -211,7 +211,7 @@ class DownloadPage(Gtk.Box):
             self.dump_tasks()
         return True
 
-    def get_task_by_fsid(self, fs_id):
+    def get_row_by_fsid(self, fs_id):
         '''确认在Liststore中是否存在这条任务. 如果存在, 返回TreeModelRow,
         否则就返回None'''
         for row in self.liststore:
@@ -230,7 +230,7 @@ class DownloadPage(Gtk.Box):
 
     def launch_app(self, fs_id):
         if fs_id in self.app_infos:
-            row = self.get_task_by_fsid(fs_id)
+            row = self.get_row_by_fsid(fs_id)
             app_info = self.app_infos[fs_id]
             filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
             gfile = Gio.File.new_for_path(filepath)
@@ -268,7 +268,7 @@ class DownloadPage(Gtk.Box):
         if pcs_file['isdir']:
             return
         # 如果已经存在于下载列表中, 就忽略.
-        row = self.get_task_by_fsid(pcs_file['fs_id'])
+        row = self.get_row_by_fsid(pcs_file['fs_id'])
         if row:
             if row[STATE_COL] == State.FINISHED:
                 self.launch_app(pcs_file['fs_id'])
@@ -317,7 +317,7 @@ class DownloadPage(Gtk.Box):
                 if fs_id in self.workers:
                     _, row = self.workers[fs_id]
                 else:
-                    row = self.get_task_by_fsid(fs_id)
+                    row = self.get_row_by_fsid(fs_id)
                 if not row:
                     print('on worker received, row is None:', row)
                     return
@@ -330,7 +330,7 @@ class DownloadPage(Gtk.Box):
 
         def on_worker_downloaded(worker, fs_id):
             def _on_worker_downloaded():
-                row = self.get_task_by_fsid(fs_id)
+                row = self.get_row_by_fsid(fs_id)
                 row = self.workers[fs_id][1]
                 row[CURRSIZE_COL] = row[SIZE_COL]
                 row[STATE_COL] = State.FINISHED
@@ -345,7 +345,7 @@ class DownloadPage(Gtk.Box):
             GLib.idle_add(_on_worker_downloaded)
 
         def on_worker_network_error(worker, fs_id):
-            row = self.get_task_by_fsid(fs_id)
+            row = self.get_row_by_fsid(fs_id)
             row = self.workers[fs_id][1]
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
@@ -412,34 +412,29 @@ class DownloadPage(Gtk.Box):
         if tree_iter:
             self.liststore.remove(tree_iter)
 
-    def on_start_button_clicked(self, button):
+    def operate_selected_rows(self, operator):
+        '''对选中的条目进行操作.
+
+        operator  - 处理函数
+        '''
         model, tree_paths = self.selection.get_selected_rows()
         if not tree_paths:
             return
+        fs_ids = []
         for tree_path in tree_paths:
-            index = tree_path.get_indices()[0]
-            row = self.liststore[index]
-            self.start_task(row)
+            fs_ids.append(model[tree_path][FSID_COL])
+        for fs_id in fs_ids:
+            row = self.get_row_by_fsid(fs_id)
+            operator(row)
+
+    def on_start_button_clicked(self, button):
+        self.operate_selected_rows(self.start_task)
 
     def on_pause_button_clicked(self, button):
-        model, tree_paths = self.selection.get_selected_rows()
-        if not tree_paths:
-            return
-        for tree_path in tree_paths:
-            index = tree_path.get_indices()[0]
-            row = self.liststore[index]
-            if row[STATE_COL] == State.FINISHED:
-                continue
-            self.pause_task(row)
+        self.operate_selected_rows(self.pause_task)
 
     def on_remove_button_clicked(self, button):
-        model, tree_paths = self.selection.get_selected_rows()
-        if not tree_paths:
-            return
-        for tree_path in tree_paths:
-            index = tree_path.get_indices()[0]
-            row = self.liststore[index]
-            self.remove_task(row)
+        self.operate_selected_rows(self.remove_task)
 
     def on_open_folder_button_clicked(self, button):
         model, tree_paths = self.selection.get_selected_rows()
