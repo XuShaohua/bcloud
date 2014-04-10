@@ -108,7 +108,7 @@ class DownloadPage(Gtk.Box):
         self.treeview.set_tooltip_column(PATH_COL)
         self.treeview.set_headers_clickable(True)
         self.treeview.set_reorderable(True)
-        self.treeview.set_search_column(0)
+        self.treeview.set_search_column(NAME_COL)
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
@@ -117,8 +117,8 @@ class DownloadPage(Gtk.Box):
                 ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
-        name_col.set_sort_column_id(NAME_COL)
         self.treeview.append_column(name_col)
+        name_col.set_sort_column_id(NAME_COL)
 
         percent_cell = Gtk.CellRendererProgress()
         percent_col = Gtk.TreeViewColumn(

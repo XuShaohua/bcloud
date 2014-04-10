@@ -97,6 +97,10 @@ class UploadPage(Gtk.Box):
             GObject.TYPE_INT, str, str, str, GObject.TYPE_INT64,
             GObject.TYPE_INT64, int, str, str, GObject.TYPE_INT)
         self.treeview = Gtk.TreeView(model=self.liststore)
+        self.treeview.set_headers_clickable(True)
+        self.treeview.set_reorderable(True)
+        self.treeview.set_search_column(NAME_COL)
+        self.treeview.set_tooltip_column(PATH_COL)
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
@@ -106,22 +110,28 @@ class UploadPage(Gtk.Box):
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
+        name_col.set_sort_column_id(NAME_COL)
+
         percent_cell = Gtk.CellRendererProgress()
         percent_col = Gtk.TreeViewColumn(
                 _('Progress'), percent_cell, value=PERCENT_COL)
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
+        percent_col.set_sort_column_id(PERCENT_COL)
+
         size_cell = Gtk.CellRendererText()
         size_col = Gtk.TreeViewColumn(
                 _('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
         size_col.props.min_width = 100
+        size_col.set_sort_column_id(SIZE_COL)
+
         state_cell = Gtk.CellRendererText()
         state_col = Gtk.TreeViewColumn(
                 _('State'), state_cell, text=STATENAME_COL)
         self.treeview.append_column(state_col)
         state_col.props.min_width = 100
-        self.treeview.set_tooltip_column(PATH_COL)
+        state_col.set_sort_column_id(PERCENT_COL)
 
         self.show_all()
         self.init_db()
@@ -243,6 +253,7 @@ class UploadPage(Gtk.Box):
 
     def do_destroy(self, *args):
         if not self.first_run:
+            self.conn.commit()
             for row in self.liststore:
                 self.pause_task(row, scan=False)
             self.conn.commit()
