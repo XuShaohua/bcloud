@@ -102,7 +102,8 @@ class DownloadPage(Gtk.Box):
         # humansize, percent
         self.liststore = Gtk.ListStore(
                 str, str, str, GObject.TYPE_LONG, GObject.TYPE_LONG, str,
-                int, str, str, int, str, str, int)
+                GObject.TYPE_INT, str, str, GObject.TYPE_INT, str,
+                str, GObject.TYPE_INT)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_tooltip_column(PATH_COL)
         self.treeview.set_headers_clickable(True)
@@ -366,7 +367,7 @@ class DownloadPage(Gtk.Box):
 
     def stop_worker(self, row):
         '''停止这个task的后台下载线程'''
-        self.remove_worker(row[FSID_COL])
+        self.remove_worker(row[FSID_COL], stop=True)
 
     def remove_worker(self, fs_id, stop=True):
         if fs_id not in self.workers:
@@ -391,28 +392,22 @@ class DownloadPage(Gtk.Box):
         self.scan_tasks()
 
     def pause_task(self, row):
-        if row[STATE_COL] == State.PAUSED:
-            return
-        elif row[STATE_COL] == State.DOWNLOADING:
+        if row[STATE_COL] == State.DOWNLOADING:
             self.pause_worker(row)
             row[STATE_COL] = State.PAUSED
             row[STATENAME_COL] = StateNames[State.PAUSED]
             self.scan_tasks()
+        elif row[STATE_COL] == State.WAITING:
+            row[STATE_COL] = State.PAUSED
+            row[STATENAME_COL] = StateNames[State.PAUSED]
+            self.scan_tasks()
 
-    def remove_task(self, tree_iter):
-        tree_path = self.liststore.get_path(tree_iter)
-        index = tree_path.get_indices()[0]
-        row = self.liststore[index]
+    def remove_task(self, row):
         # 当删除正在下载的任务时, 直接调用stop_worker(), 它会自动删除本地的
         # 文件片段
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)
-        elif row[CURRSIZE_COL] < row[SIZE_COL]:
-        # 当文件没有下载完, 就被暂停, 之后又被删除时, 务必删除本地的文件片段
-            filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
-            if os.path.exists(filepath):
-                os.remove(filepath)
-        self.launch_app(row[FSID_COL])
+        self.app_infos.pop(row[FSID_COL], None)
         tree_iter = row.iter
         if tree_iter:
             self.liststore.remove(tree_iter)
@@ -424,8 +419,7 @@ class DownloadPage(Gtk.Box):
         for tree_path in tree_paths:
             index = tree_path.get_indices()[0]
             row = self.liststore[index]
-            if row[STATE_COL] not in RUNNING_STATES:
-                self.start_task(row)
+            self.start_task(row)
 
     def on_pause_button_clicked(self, button):
         model, tree_paths = self.selection.get_selected_rows()
@@ -442,11 +436,10 @@ class DownloadPage(Gtk.Box):
         model, tree_paths = self.selection.get_selected_rows()
         if not tree_paths:
             return
-        tree_iters = []
         for tree_path in tree_paths:
-            tree_iters.append(model.get_iter(tree_path))
-        for tree_iter in tree_iters:
-            self.remove_task(tree_iter)
+            index = tree_path.get_indices()[0]
+            row = self.liststore[index]
+            self.remove_task(row)
 
     def on_open_folder_button_clicked(self, button):
         model, tree_paths = self.selection.get_selected_rows()

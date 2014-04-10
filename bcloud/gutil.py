@@ -27,7 +27,8 @@ DEFAULT_PROFILE = {
     'use-notify': False,
     'first-run': True,
     'save-dir': Config.HOME_DIR,
-    'concurr-tasks': 2,
+    'update-threshold': 1,  # 上传时的阈值, 1~20.
+    'concurr-tasks': 2,     # 下载/上传同时进行的任务数, 1~5
     'username': '',
     'password': '',
     'remember-password': False,

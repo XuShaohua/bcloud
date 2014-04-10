@@ -76,4 +76,13 @@ def list_remove_by_index(l, index):
 def uri_to_path(uri):
     if not uri or len(uri) < 7:
         return ''
-    return urllib.parse.unquote(uri)[7:].replace('\n', '')
+    return urllib.parse.unquote(uri).replace('file://', '')
+
+def uris_to_paths(uris):
+    '''将一串URI地址转为绝对路径, 用于处理桌面程序中的文件拖放'''
+    source_paths = []
+    for uri in uris.split('\n'):
+        source_path = uri_to_path(uri)
+        if source_path:
+            source_paths.append(source_path)
+    return source_paths

@@ -51,25 +51,36 @@ class PreferencesDialog(Gtk.Dialog):
         concurr_spin.connect('value-changed', self.on_concurr_value_changed)
         general_grid.attach(concurr_spin, 1, 1, 1, 1)
 
+        upload_label = Gtk.Label.new(_('Upload threshold:'))
+        upload_label.props.xalign = 1
+        general_grid.attach(upload_label, 0, 2, 1, 1)
+        upload_spin = Gtk.SpinButton.new_with_range(1, 20, 1)
+        upload_spin.set_tooltip_text(
+                _('Specify size of each slice data to upload. Sliced data will be merge on server. Default value, 1, means 1Mb.'))
+        upload_spin.set_value(self.app.profile['upload-threshold'])
+        upload_spin.props.halign = Gtk.Align.START
+        upload_spin.connect('value-changed', self.on_upload_value_changed)
+        general_grid.attach(upload_spin, 1, 2, 1, 1)
+
         notify_label = Gtk.Label.new(_('Use Notification:'))
         notify_label.props.xalign = 1
-        general_grid.attach(notify_label, 0, 2, 1, 1)
+        general_grid.attach(notify_label, 0, 3, 1, 1)
         notify_switch = Gtk.Switch()
         notify_switch.props.halign = Gtk.Align.START
         notify_switch.set_active(self.app.profile['use-notify'])
         notify_switch.connect(
                 'notify::active', self.on_notify_switch_activate)
-        general_grid.attach(notify_switch, 1, 2, 1, 1)
+        general_grid.attach(notify_switch, 1, 3, 1, 1)
 
         status_label = Gtk.Label.new(_('Minimize To System Tray:'))
         status_label.props.xalign = 1
-        general_grid.attach(status_label, 0, 3, 1, 1)
+        general_grid.attach(status_label, 0, 4, 1, 1)
         status_switch = Gtk.Switch()
         status_switch.set_active(self.app.profile['use-status-icon'])
         status_switch.connect(
                 'notify::active', self.on_status_switch_activate)
         status_switch.props.halign = Gtk.Align.START
-        general_grid.attach(status_switch, 1, 3, 1, 1)
+        general_grid.attach(status_switch, 1, 4, 1, 1)
 
         box.show_all()
 
@@ -80,6 +91,9 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_concurr_value_changed(self, concurr_spin):
         self.app.profile['concurr-tasks'] = concurr_spin.get_value()
+
+    def on_upload_value_changed(self, upload_spin):
+        self.app.profile['upload-threshold'] = upload_spin.get_value()
 
     def on_notify_switch_activate(self, switch, event):
         self.app.profile['use-notify'] = switch.get_active()

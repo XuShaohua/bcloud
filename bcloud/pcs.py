@@ -550,16 +550,19 @@ def upload_option(cookie, path):
     else:
         return None
 
-def upload(cookie, source_path, path):
+def upload(cookie, source_path, path, ondup='overwrite'):
     '''上传一个文件.
 
     这个是使用的网页中的上传接口.
+    ondup - 如果文件已在服务器上存在, 该如何操作. 有两个选项:
+            overwrite, 直接将其重写.
+            newcopy, 保留原先的文件, 并在新上传的文件名尾部加上当前时间戳.
     '''
     dir_name, file_name = os.path.split(path)
     url = ''.join([
         const.PCS_URL_C,
         'file?method=upload&app_id=250528',
-        '&ondup=newcopy',
+        '&ondup=', ondup,
         '&dir=', encoder.encode_uri_component(dir_name),
         '&filename=', encoder.encode_uri_component(file_name),
         '&', cookie.sub_output('BDUSS'),
@@ -581,6 +584,8 @@ def upload(cookie, source_path, path):
         return None
 
 def rapid_upload(cookie, tokens, source_path, path):
+    '''快速上传'''
+    print('rapid_upload:', source_path)
     content_length = os.path.getsize(source_path)
     assert content_length > RAPIDUPLOAD_THRESHOLD, 'file size is not satisfied!'
     dir_name, file_name = os.path.split(path)
@@ -607,9 +612,59 @@ def rapid_upload(cookie, tokens, source_path, path):
     else:
         return None
 
+def slice_upload(cookie, data):
+    '''分片上传一个大文件
+    
+    分片上传完成后, 会返回这个分片的MD5, 用于最终的文件合并.
+    如果上传失败, 需要重新上传.
+    不需要指定上传路径, 上传后的数据会被存储在服务器的临时目录里.
+    data - 这个文件分片的数据.
+    '''
+    url = ''.join([
+        const.PCS_URL_C,
+        'file?method=upload&type=tmpfile&app_id=250528',
+        '&', cookie.sub_output('BDUSS'),
+        ])
+    fields = []
+    files = [
+        ('file', ' ', data),
+        ]
+    headers = {
+        'Accept': const.ACCEPT_HTML,
+        'Origin': const.PAN_URL,
+        }
+    req = net.post_multipart(url, headers, fields, files)
+    if req:
+        return json.loads(req.data.decode())
+    else:
+        return None
+
+def create_superfile(cookie, path, block_list):
+    '''合并slice_upload()中产生的临时文件
+
+    path       - 文件在服务器上的绝对路径
+    block_list - 这些文件分片的MD5列表
+    返回完整的文件pcs信息.
+    '''
+    url = ''.join([
+        const.PCS_URL_C,
+        'file?method=createsuperfile&app_id=250528',
+        '&path=', encoder.encode_uri_component(path),
+        '&', cookie.sub_output('BDUSS'),
+        ])
+    param = {'block_list': block_list}
+    data = 'param=' + json.dumps(param)
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        }, data=data.encode())
+    if req:
+        return json.loads(req.data.decode())
+    else:
+        return None
+
 
 def get_metas(cookie, tokens, filelist):
-    '''获取文件的metadata.
+    '''获取多个文件的metadata.
 
     filelist - 一个list, 里面是每个文件的绝对路径.
                也可以是一个字符串, 只包含一个文件的绝对路径.
