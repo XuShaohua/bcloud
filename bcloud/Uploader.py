@@ -87,14 +87,14 @@ class Uploader(threading.Thread, GObject.GObject):
     # Open API
     def pause(self):
         print('Uploader.pause()')
-        sef.row[STATE_COL] = State.PAUSED
+        self.row[STATE_COL] = State.PAUSED
         if self.is_slice_upload:
             print('will dump slice upload')
 
     # Open API
     def stop(self):
         print('Uploader.stop() ')
-        sef.row[STATE_COL] = State.CANCELED
+        self.row[STATE_COL] = State.CANCELED
 
     def check_exists(self):
         meta = pcs.get_metas(self.row[PATH_COL])
@@ -132,28 +132,25 @@ class Uploader(threading.Thread, GObject.GObject):
         file_size = os.path.getsize(self.row[SOURCEPATH_COL])
         fh = open(self.row[SOURCEPATH_COL], 'rb')
         fid = self.row[FID_COL]
-        while True:
-            if self.row[STATE_COL] == State.UPLOADING:
-                if slice_end >= file_size:
-                    print('will emit merge-files signal:', fid)
-                    self.emit('merge-files', self.row[FID_COL])
-                    break
-                slice_start, slice_end = slice_end, min(
-                        slice_start + self.threshold, file_size)
-                data = fh.read(slice_end - slice_start)
-                slice_end = len(data) + slice_start
-                info = pcs.slice_upload(self.cookie, data)
-                if info and 'md5' in info:
-                    print('will emit slice-sent signal')
-                    self.emit('slice-sent', fid, slice_end, info['md5'])
-                else:
-                    # TODO: use a better way to info user
-                    print('Failed to upload this slice:', slice_start, slice_end)
-                    break
-            else:
-                print('slice upload returned')
+        while self.row[STATE_COL] == State.UPLOADING:
+            if slice_end >= file_size:
+                print('will emit merge-files signal:', fid)
+                self.emit('merge-files', self.row[FID_COL])
                 break
-        fh.close()
+            slice_start = slice_end
+            slice_end = min(slice_start + self.threshold, file_size)
+            data = fh.read(slice_end - slice_start)
+            slice_end = slice_start + len(data)
+            info = pcs.slice_upload(self.cookie, data)
+            if info and 'md5' in info:
+                print('will emit slice-sent signal:', fid, slice_end, info['md5'])
+                self.emit('slice-sent', fid, slice_end, info['md5'])
+            else:
+                # TODO: use a better way to info user
+                print('Failed to upload this slice:', slice_start, slice_end)
+                break
+        if not fh.closed:
+            fh.close()
         return
 
 GObject.type_register(Uploader)

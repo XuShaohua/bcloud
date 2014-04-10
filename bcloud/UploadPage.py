@@ -244,7 +244,7 @@ class UploadPage(Gtk.Box):
     def do_destroy(self, *args):
         if not self.first_run:
             for row in self.liststore:
-                self.pause_task(row)
+                self.pause_task(row, scan=False)
             self.conn.commit()
             self.conn.close()
 
@@ -323,7 +323,7 @@ class UploadPage(Gtk.Box):
         task.insert(0, row_id)
         self.liststore.append(task)
 
-    def start_task(self, row):
+    def start_task(self, row, scan=True):
         '''启动上传任务.
 
         将任务状态设定为Uploading, 如果没有超过最大任务数的话;
@@ -336,32 +336,32 @@ class UploadPage(Gtk.Box):
         row[STATE_COL] = State.WAITING
         row[STATENAME_COL] = StateNames[State.WAITING]
         self.update_task_db(row)
-        self.scan_tasks()
+        if scan:
+            self.scan_tasks()
 
-    def pause_task(self, row):
+    def pause_task(self, row, scan=True):
         '''暂停下载任务'''
         print('pause task:', row[:])
         if row[STATE_COL] == State.UPLOADING:
-            self.pause_worker(row)
+            self.remove_worker(row[FID_COL], stop=False)
+        if row[STATE_COL] in (State.UPLOADING, State.WAITING):
             row[STATE_COL] = State.PAUSED
             row[STATENAME_COL] = StateNames[State.PAUSED]
             self.update_task_db(row)
-            self.scan_tasks()
-        elif row[STATE_COL] == State.WAITING:
-            row[STATE_COL] = State.PAUSED
-            row[STATENAME_COL] = StateNames[State.PAUSED]
-            self.update_task_db(row)
-            self.scan_tasks()
+            if scan:
+                self.scan_tasks()
 
-    def remove_task(self, row):
+    def remove_task(self, row, scan=True):
         '''删除下载任务'''
         print('remove task:', row[:])
         if row[STATE_COL] == State.UPLOADING:
-            self.remove_worker(row)
+            self.remove_worker(row[FID_COL], stop=True)
         self.remove_task_db(row[FID_COL])
         tree_iter = row.iter
         if tree_iter:
             self.liststore.remove(tree_iter)
+        if scan:
+            self.scan_tasks()
 
     def scan_tasks(self):
         print('scan tasks()')
@@ -382,8 +382,11 @@ class UploadPage(Gtk.Box):
             GLib.idle_add(do_worker_slice_sent, fid, slice_end, md5)
 
         def do_worker_slice_sent(fid, slice_end, md5):
+            if fid not in self.workers:
+                return
             self.add_slice_db(fid, slice_end, md5)
             row = self.get_row_by_fid(fid)
+            row[CURRSIZE_COL] = slice_end
             total_size = util.get_human_size(row[SIZE_COL])[0]
             curr_size = util.get_human_size(slice_end)[0]
             row[PERCENT_COL] = int(slice_end / row[SIZE_COL] * 100)
@@ -438,11 +441,10 @@ class UploadPage(Gtk.Box):
         def do_worker_error(fid):
             print('do worker error:', fid)
             row = self.get_row_by_fid(fid)
-            row[PERCENT_COL] = 0
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
             self.update_task_db(row)
-            self.remove_worker(fid)
+            self.remove_worker(fid, stop=False)
             self.scan_tasks()
 
         if row[FID_COL] in self.workers:
@@ -459,9 +461,6 @@ class UploadPage(Gtk.Box):
         worker.connect('uploaded', on_worker_uploaded)
         worker.connect('network-error', on_worker_network_error)
         worker.start()
-
-    def pause_worker(self, fid):
-        print('UploadPage.pause_worker():', fid)
 
     def remove_worker(self, fid, stop=True):
         print('remove worker:', fid)
@@ -499,7 +498,7 @@ class UploadPage(Gtk.Box):
             fids.append(model[tree_path][FID_COL])
         for fid in fids:
             row = self.get_row_by_fid(fid)
-            operator(fid)
+            operator(row)
 
     def on_start_button_clicked(self, button):
         self.operate_selected_rows(self.start_task)

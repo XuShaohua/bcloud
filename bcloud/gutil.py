@@ -134,8 +134,10 @@ def dump_profile(profile):
     '''
     profile = profile.copy()
     path = os.path.join(Config.CONF_DIR, profile['username'])
-    keyring.set_password(
-            Config.DBUS_APP_NAME, profile['username'], profile['password'])
+    if profile['remember-password']:
+        keyring.set_password(
+                Config.DBUS_APP_NAME, profile['username'],
+                profile['password'])
     profile['password'] = ''
     with open(path, 'w') as fh:
         json.dump(profile, fh)

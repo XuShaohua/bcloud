@@ -23,7 +23,7 @@ class SigninVcodeDialog(Gtk.Dialog):
         super().__init__(
             _('Verification..'), parent, Gtk.DialogFlags.MODAL)
 
-        self.set_default_size(280, 160)
+        self.set_default_size(280, 120)
         self.set_border_width(10)
         self.username = username
         self.cookie = cookie

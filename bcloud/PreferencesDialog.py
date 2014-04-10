@@ -30,6 +30,7 @@ class PreferencesDialog(Gtk.Dialog):
         general_grid = Gtk.Grid()
         general_grid.props.halign = Gtk.Align.CENTER
         general_grid.props.column_spacing = 12
+        general_grid.props.row_spacing = 5
         general_grid.props.margin_top = 5
         notebook.append_page(general_grid, Gtk.Label.new(_('General')))
 
@@ -51,12 +52,12 @@ class PreferencesDialog(Gtk.Dialog):
         concurr_spin.connect('value-changed', self.on_concurr_value_changed)
         general_grid.attach(concurr_spin, 1, 1, 1, 1)
 
-        upload_label = Gtk.Label.new(_('Upload threshold:'))
+        upload_label = Gtk.Label.new(_('Uploading slice size:'))
         upload_label.props.xalign = 1
         general_grid.attach(upload_label, 0, 2, 1, 1)
         upload_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
         upload_spin.set_tooltip_text(
-                _('Specify size of each slice data to upload. Sliced data will be merge on server. Default value, 1, means 1Mb.'))
+                _('Specify size, in Megabyte, of each slice data to upload.\nSliced data will be merge on server. Default is 1'))
         upload_spin.set_value(self.app.profile['upload-threshold'])
         upload_spin.props.halign = Gtk.Align.START
         upload_spin.connect('value-changed', self.on_upload_value_changed)
