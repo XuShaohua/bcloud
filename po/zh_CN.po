@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-10 23:35+0800\n"
+"POT-Creation-Date: 2014-04-11 09:12+0800\n"
 "PO-Revision-Date: 2014-03-20 11:25+0800\n"
 "Last-Translator: LiuLang <gsushzhsosgsu@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -28,7 +28,7 @@ msgstr "注销"
 msgid "About"
 msgstr "关于"
 
-#: ../bcloud/App.py:88 ../bcloud/App.py:349
+#: ../bcloud/App.py:88 ../bcloud/App.py:364
 msgid "Quit"
 msgstr "退出"
 
@@ -40,7 +40,15 @@ msgstr "未知"
 msgid "Show App"
 msgstr "显示程序"
 
-#: ../bcloud/App.py:389
+#: ../bcloud/App.py:350
+msgid "Pause Uploading Tasks"
+msgstr "暂停所有上传任务"
+
+#: ../bcloud/App.py:356
+msgid "Pause Downloading Tasks"
+msgstr "暂停所有下载任务"
+
+#: ../bcloud/App.py:404
 #, python-brace-format
 msgid "{0} copied to clipboard"
 msgstr "{0} 已被复制到剪贴板"
@@ -331,7 +339,10 @@ msgstr "上传时的分片大小:"
 msgid ""
 "Specify size, in Megabyte, of each slice data to upload.\n"
 "Sliced data will be merge on server. Default is 1"
-msgstr "以MB为单位, 设定文件上传时的分片大小.\n大文件以此为单位被分隔成若干片段, 被单独上传, 然后在服务器上合并, 这样就可以实现断点续传. 默认的分片是1MB."
+msgstr ""
+"以MB为单位, 设定文件上传时的分片大小.\n"
+"大文件以此为单位被分隔成若干片段, 被单独上传, 然后在服务器上合并, 这样就可以"
+"实现断点续传. 默认的分片是1MB."
 
 #: ../bcloud/PreferencesDialog.py:66
 msgid "Use Notification:"
@@ -536,7 +547,7 @@ msgstr "上传文件"
 msgid "Choose a file.."
 msgstr "选择文件.."
 
-#: ../bcloud/UploadPage.py:445
+#: ../bcloud/UploadPage.py:455
 #, python-brace-format
 msgid "{0} uploaded"
 msgstr "{0} 已上传"
