@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-11 09:12+0800\n"
+"POT-Creation-Date: 2014-04-12 02:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -300,11 +300,11 @@ msgstr ""
 msgid "Share..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:235 ../bcloud/IconWindow.py:390
+#: ../bcloud/IconWindow.py:235 ../bcloud/IconWindow.py:418
 msgid "Move To..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:238 ../bcloud/IconWindow.py:416
+#: ../bcloud/IconWindow.py:238 ../bcloud/IconWindow.py:444
 msgid "Copy To..."
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 msgid "Move to Trash"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:369
+#: ../bcloud/IconWindow.py:397
 msgid "Failed to share selected files"
 msgstr ""
 
@@ -348,6 +348,16 @@ msgstr ""
 
 #: ../bcloud/PreferencesDialog.py:76
 msgid "Minimize To System Tray:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:86
+msgid "Use streaming mode:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:94
+msgid ""
+"When opening a video file, try to download a m3u8 playlist, instread of "
+"getting its file source link"
 msgstr ""
 
 #: ../bcloud/PropertiesDialog.py:24 ../bcloud/PropertiesDialog.py:94

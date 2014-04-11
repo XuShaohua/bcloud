@@ -91,7 +91,7 @@ class PreferencesDialog(Gtk.Dialog):
         stream_switch.connect(
                 'notify::active', self.on_stream_switch_activate)
         stream_switch.props.halign = Gtk.Align.START
-        stream_switch.set_tooltip_text(_('When open a video file, try to download a m3u8 playlist, instread of getting its file source link'))
+        stream_switch.set_tooltip_text(_('When opening a video file, try to download a m3u8 playlist, instread of getting its file source link'))
         general_grid.attach(stream_switch, 1, 5, 1, 1)
 
         box.show_all()

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-11 09:12+0800\n"
+"POT-Creation-Date: 2014-04-12 02:58+0800\n"
 "PO-Revision-Date: 2014-03-20 11:25+0800\n"
 "Last-Translator: LiuLang <gsushzhsosgsu@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -299,11 +299,11 @@ msgstr "下载..."
 msgid "Share..."
 msgstr "分享..."
 
-#: ../bcloud/IconWindow.py:235 ../bcloud/IconWindow.py:390
+#: ../bcloud/IconWindow.py:235 ../bcloud/IconWindow.py:418
 msgid "Move To..."
 msgstr "移动到..."
 
-#: ../bcloud/IconWindow.py:238 ../bcloud/IconWindow.py:416
+#: ../bcloud/IconWindow.py:238 ../bcloud/IconWindow.py:444
 msgid "Copy To..."
 msgstr "复制到..."
 
@@ -315,7 +315,7 @@ msgstr "重命名..."
 msgid "Move to Trash"
 msgstr "丢弃到回收站"
 
-#: ../bcloud/IconWindow.py:369
+#: ../bcloud/IconWindow.py:397
 msgid "Failed to share selected files"
 msgstr "无法分享选中的文件"
 
@@ -351,6 +351,16 @@ msgstr "使用消息通知:"
 #: ../bcloud/PreferencesDialog.py:76
 msgid "Minimize To System Tray:"
 msgstr "使用系统托盘:"
+
+#: ../bcloud/PreferencesDialog.py:86
+msgid "Use streaming mode:"
+msgstr "流媒体模式:"
+
+#: ../bcloud/PreferencesDialog.py:94
+msgid ""
+"When opening a video file, try to download a m3u8 playlist, instread of "
+"getting its file source link"
+msgstr "当打开视频文件时, 试着下载一个m3u8播放列表文件, 而不是这个视频文件的链接地址"
 
 #: ../bcloud/PropertiesDialog.py:24 ../bcloud/PropertiesDialog.py:94
 msgid " Properties"
