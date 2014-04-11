@@ -346,6 +346,21 @@ class App:
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
 
+        pause_upload_item = Gtk.MenuItem.new_with_label(
+                _('Pause Uploading Tasks'))
+        pause_upload_item.connect(
+                'activate', lambda *args: self.upload_page.pause_tasks())
+        menu.append(pause_upload_item)
+
+        pause_download_item = Gtk.MenuItem.new_with_label(
+                _('Pause Downloading Tasks'))
+        pause_download_item.connect(
+                'activate', lambda *args: self.download_page.pause_tasks())
+        menu.append(pause_download_item)
+
+        sep_item = Gtk.SeparatorMenuItem()
+        menu.append(sep_item)
+
         quit_item = Gtk.MenuItem.new_with_label(_('Quit'))
         quit_item.connect('activate', self.on_status_icon_quit_activate)
         menu.append(quit_item)

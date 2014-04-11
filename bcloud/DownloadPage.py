@@ -379,7 +379,7 @@ class DownloadPage(Gtk.Box):
             worker.pause()
         self.workers.pop(fs_id, None)
 
-    def start_task(self, row):
+    def start_task(self, row, scan=True):
         '''启动下载任务.
 
         将任务状态设定为Downloading, 如果没有超过最大任务数的话;
@@ -389,28 +389,41 @@ class DownloadPage(Gtk.Box):
             return
         row[STATE_COL] = State.WAITING
         row[STATENAME_COL] = StateNames[State.WAITING]
-        self.scan_tasks()
+        if scan:
+            self.scan_tasks()
 
-    def pause_task(self, row):
+    # Open API
+    def pause_tasks(self):
+        '''暂停所有下载任务'''
+        if self.first_run:
+            return
+        for row in self.liststore:
+            self.pause_task(row, scan=False)
+
+    def pause_task(self, row, scan=True):
         if row[STATE_COL] == State.DOWNLOADING:
             self.pause_worker(row)
+        if row[STATE_COL] in (State.DOWNLOADING, State.WAITING):
             row[STATE_COL] = State.PAUSED
             row[STATENAME_COL] = StateNames[State.PAUSED]
-            self.scan_tasks()
-        elif row[STATE_COL] == State.WAITING:
-            row[STATE_COL] = State.PAUSED
-            row[STATENAME_COL] = StateNames[State.PAUSED]
-            self.scan_tasks()
+            if scan:
+                self.scan_tasks()
 
-    def remove_task(self, row):
+    def remove_task(self, row, scan=True):
         # 当删除正在下载的任务时, 直接调用stop_worker(), 它会自动删除本地的
         # 文件片段
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)
+        elif row[CURRSIZE_COL] < row[SIZE_COL]:
+            filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
+            if os.path.exists(filepath):
+                os.remove(filepath)
         self.app_infos.pop(row[FSID_COL], None)
         tree_iter = row.iter
         if tree_iter:
             self.liststore.remove(tree_iter)
+        if scan:
+            self.scan_tasks()
 
     def operate_selected_rows(self, operator):
         '''对选中的条目进行操作.
