@@ -89,6 +89,7 @@ class Uploader(threading.Thread, GObject.GObject):
         print('Uploader.pause()')
         self.row[STATE_COL] = State.PAUSED
         if self.is_slice_upload:
+            # TODO:
             print('will dump slice upload')
 
     # Open API
@@ -127,11 +128,18 @@ class Uploader(threading.Thread, GObject.GObject):
 
     def slice_upload(self):
         print('Uploader.slice_upload()')
+        fid = self.row[FID_COL]
         slice_start = self.row[CURRSIZE_COL]
         slice_end = self.row[CURRSIZE_COL]
         file_size = os.path.getsize(self.row[SOURCEPATH_COL])
+        if file_size < slice_start:
+            self.emit('disk-error', fid)
+            return
+        elif file_size == slice_start and slice_start == self.row[SIZE_COL]:
+            self.emit('uploaded', fid)
+            return
         fh = open(self.row[SOURCEPATH_COL], 'rb')
-        fid = self.row[FID_COL]
+        fh.seek(slice_start)
         while self.row[STATE_COL] == State.UPLOADING:
             if slice_end >= file_size:
                 print('will emit merge-files signal:', fid)
@@ -146,8 +154,8 @@ class Uploader(threading.Thread, GObject.GObject):
                 print('will emit slice-sent signal:', fid, slice_end, info['md5'])
                 self.emit('slice-sent', fid, slice_end, info['md5'])
             else:
-                # TODO: use a better way to info user
                 print('Failed to upload this slice:', slice_start, slice_end)
+                self.emit('network-error', fid)
                 break
         if not fh.closed:
             fh.close()

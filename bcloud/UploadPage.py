@@ -188,7 +188,7 @@ class UploadPage(Gtk.Box):
         human_size, percent)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'''
         req = self.cursor.execute(sql, task)
-        self.check_commit()
+        self.conn.commit()
         return req.lastrowid
 
     def add_slice_db(self, fid, slice_end, md5):
@@ -196,7 +196,7 @@ class UploadPage(Gtk.Box):
         print('add slice db:', fid, slice_end, md5)
         sql = 'INSERT INTO slice VALUES(?, ?, ?)'
         self.cursor.execute(sql, (fid, slice_end, md5))
-        self.check_commit()
+        self.conn.commit()
 
     def get_task_db(self, source_path):
         '''从数据库中查询source_path的信息.
@@ -236,7 +236,7 @@ class UploadPage(Gtk.Box):
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
             row[HUMANSIZE_COL], row[PERCENT_COL], row[FID_COL]
             ])
-        self.check_commit()
+        self.conn.commit()
 
     def remove_task_db(self, fid):
         '''将任务从数据库中删除'''
@@ -244,7 +244,7 @@ class UploadPage(Gtk.Box):
         self.remove_slice_db(fid)
         sql = 'DELETE FROM tasks WHERE fid=?'
         self.cursor.execute(sql, [fid, ])
-        self.check_commit()
+        self.conn.commit()
 
     def remove_slice_db(self, fid):
         '''将上传任务的分片从数据库中删除'''
@@ -350,6 +350,14 @@ class UploadPage(Gtk.Box):
         if scan:
             self.scan_tasks()
 
+    # Open API
+    def pause_tasks(self):
+        '''暂停所有上传任务'''
+        if self.first_run:
+            return
+        for row in self.liststore:
+            self.pause_task(row, scan=False)
+
     def pause_task(self, row, scan=True):
         '''暂停下载任务'''
         print('pause task:', row[:])
@@ -389,13 +397,12 @@ class UploadPage(Gtk.Box):
     def start_worker(self, row):
         print('start worker:', row[:])
         def on_worker_slice_sent(worker, fid, slice_end, md5):
-            print('on worker slice sent:', fid, slice_end, md5)
             GLib.idle_add(do_worker_slice_sent, fid, slice_end, md5)
 
         def do_worker_slice_sent(fid, slice_end, md5):
             if fid not in self.workers:
                 return
-            self.add_slice_db(fid, slice_end, md5)
+            print('will add slice to db:', fid, slice_end, md5)
             row = self.get_row_by_fid(fid)
             row[CURRSIZE_COL] = slice_end
             total_size = util.get_human_size(row[SIZE_COL])[0]
@@ -403,6 +410,7 @@ class UploadPage(Gtk.Box):
             row[PERCENT_COL] = int(slice_end / row[SIZE_COL] * 100)
             row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
             self.update_task_db(row)
+            self.add_slice_db(fid, slice_end, md5)
 
         def on_worker_merge_files(worker, fid):
             print('merge_files:', worker, fid)
@@ -434,6 +442,8 @@ class UploadPage(Gtk.Box):
 
         def do_worker_uploaded(fid):
             print('do worker uploaded:', fid)
+            if fid not in self.workers:
+                return
             row = self.get_row_by_fid(fid)
             row[PERCENT_COL] = 100
             total_size = util.get_human_size(row[SIZE_COL])[0]
@@ -444,6 +454,10 @@ class UploadPage(Gtk.Box):
             self.workers.pop(fid, None)
             self.app.toast(_('{0} uploaded').format(row[NAME_COL]))
             self.scan_tasks()
+
+        def on_worker_disk_error(worker, fid):
+            print('UploadPage.disk_error')
+            GLib.idle_add(do_worker_error, fid)
 
         def on_worker_network_error(worker, fid):
             print('UploadPage.network error')
@@ -470,6 +484,7 @@ class UploadPage(Gtk.Box):
         worker.connect('merge-files', on_worker_merge_files)
         # For upload_small_files/rapid_upload
         worker.connect('uploaded', on_worker_uploaded)
+        worker.connect('disk-error', on_worker_disk_error)
         worker.connect('network-error', on_worker_network_error)
         worker.start()
 
