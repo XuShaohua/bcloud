@@ -19,7 +19,7 @@ DEFAULT_PROFILE = {
     'version': Config.VERSION,
     'window-size': (960, 680),
     'use-status-icon': True,
-    'use-notify': False,
+    'use-notify': True,
     'first-run': True,
     'save-dir': Config.HOME_DIR,
     'upload-threshold': 1,  # 上传时的阈值, 1~5.
