@@ -512,24 +512,52 @@ def get_download_link(cookie, dlink):
     req_id = req.getheader('x-pcs-request-id', '')
     return (red_url, req_id)
 
-#def download(cookie, url, targ_path, range_=None):
-#    '''以普通方式下载文件.
-#
-#    如果指定range的话, 可以下载指定的数据段.
-#    pcs_file - 文件的详细信息.
-#    targ_path - 保存文件的目标路径
-#    range_ - 要下载的数据范围, 利用这个可以实现断点续传; 如果不指定它,
-#             就会一次性下载文件的全部内容(在pcs_file中有文件的大小信息).
-#
-#    @return 
-#    '''
-#    headers = {'Cookie': cookie.header_output()}
-#    if range_:
-#        headers['Range'] = range_
-#    req = net.urlopen(url, headers=headers)
-#    content = req.data
-#    with open(targ_path, 'wb') as fh:
-#        fh.write(content)
+def download(cookie, url, targ_path, range_=None):
+    '''以普通方式下载文件.
+
+    @deprecated
+    在Downloader中, 已经实现了这个接口, 还包括断点续传功能.
+    如果指定range的话, 可以下载指定的数据段.
+    pcs_file - 文件的详细信息.
+    targ_path - 保存文件的目标路径
+    range_ - 要下载的数据范围, 利用这个可以实现断点续传; 如果不指定它,
+             就会一次性下载文件的全部内容(在pcs_file中有文件的大小信息).
+
+    @return
+    '''
+    headers = {'Cookie': cookie.header_output()}
+    if range_:
+        headers['Range'] = range_
+    req = net.urlopen(url, headers=headers)
+    content = req.data
+    with open(targ_path, 'wb') as fh:
+        fh.write(content)
+
+def stream_download():
+    '''下载流媒体文件.
+    '''
+    pass
+
+def get_streaming_playlist(cookie, path, video_type='M3U8_AUTO_480'):
+    '''获取流媒体(通常是视频)的播放列表.
+
+    默认得到的是m3u8格式的播放列表, 因为它最通用.
+    path       - 视频的绝对路径
+    video_type - 视频格式, 可以根据网速及片源, 选择不同的格式.
+    '''
+    url = ''.join([
+        const.PCS_URL,
+        'file?method=streaming',
+        '&path=', encoder.encode_uri_component(path),
+        '&type=', video_type,
+        '&app_id=250528',
+        ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        return req.data
+    else:
+        return None
+
 
 def upload_option(cookie, path):
     '''上传之前的检查.

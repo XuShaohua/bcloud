@@ -23,6 +23,7 @@ DEFAULT_PROFILE = {
     'first-run': True,
     'save-dir': Config.HOME_DIR,
     'upload-threshold': 1,  # 上传时的阈值, 1~5.
+    'use-streaming': True,  # 使用流媒体方式播放视频
     'concurr-tasks': 2,     # 下载/上传同时进行的任务数, 1~5
     'username': '',
     'password': '',
@@ -110,8 +111,12 @@ def ellipse_text(text, length=10):
 def load_profile(profile_name):
     '''读取特定帐户的配置信息'''
     def mig_5_6():
+        # 2.2.5 - > 2.2.6
         if 'upload-threshold' not in profile:
             profile['upload-threshold'] = 1
+        # 3.1.2 -> 3.1.3
+        if 'use-streaming' not in profile:
+            profile['use-streaming'] = DEFAULT_PROFILE['use-streaming']
 
     path = os.path.join(Config.CONF_DIR, profile_name)
     if not os.path.exists(path):

@@ -277,10 +277,32 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def launch_app_with_app_info(self, app_info):
         def open_video_link(resp, error=None):
+            '''得到视频最后地址后, 调用播放器直接播放'''
             if error or not resp:
+                print('Failed to get video dlink!')
                 return
             red_url, req_id = resp
             gutil.async_call(app_info.launch_uris, [red_url, ], None)
+
+        def save_playlist(pls, error=None):
+            '''先保存播放列表到临时目录, 再调用播放器直接打开这个播放列表
+
+            如果pls为None的话, 说明没能得到播放列表, 这时就需要使用之前的方
+            法, 先得琶视频地址, 再用播放器去打开它.
+            '''
+            if error or not pls:
+                print('save_playlist:', pls, error)
+                print('Failed to get playlist, now try to get video dlink')
+                gutil.async_call(
+                        pcs.get_download_link, self.app.cookie,
+                        pcs_file['dlink'], callback=open_video_link)
+            else:
+                pls_filepath = os.path.join(
+                        '/tmp', pcs_file['server_filename'] + '.m3u8')
+                with open(pls_filepath, 'wb') as fh:
+                    fh.write(pls)
+                pls_file_uri = 'file://' + pls_filepath
+                app_info.launch_uris([pls_file_uri, ], None)
 
         # first, download this to load dir
         # then open it with app_info
@@ -295,10 +317,16 @@ class IconWindow(Gtk.ScrolledWindow):
         index = tree_path.get_indices()[0]
         pcs_file = self.filelist[index]
         # 'media' 对应于rmvb格式.
+        # 如果是视频等多媒体格式的话, 默认是直接调用播放器进行网络播放的
         if 'video' in file_type or 'media' in file_type:
-            gutil.async_call(
-                    pcs.get_download_link, self.app.cookie,
-                    pcs_file['dlink'], callback=open_video_link)
+            if self.app.profile['use-streaming']:
+                gutil.async_call(
+                        pcs.get_streaming_playlist, self.app.cookie,
+                        pcs_file['path'], callback=save_playlist)
+            else:
+                gutil.async_call(
+                        pcs.get_download_link, self.app.cookie,
+                        pcs_file['dlink'], callback=open_video_link)
         else:
             self.app.blink_page(self.app.download_page)
             self.app.download_page.add_launch_task(pcs_file, app_info)

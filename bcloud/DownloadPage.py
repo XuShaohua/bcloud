@@ -48,7 +48,7 @@ class DownloadPage(Gtk.Box):
     * 它会自动管理磁盘文件结构, 在必要时会创建必要的目录.
     * 它会自动获取文件的最新的下载链接(这个链接有效时间是8小时).
 
-    每个task包含这些信息:
+    每个task(pcs_file)包含这些信息:
     fs_id - 服务器上的文件UID
     md5 - 文件MD5校验值
     size - 文件大小

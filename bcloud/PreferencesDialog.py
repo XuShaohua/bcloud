@@ -83,6 +83,17 @@ class PreferencesDialog(Gtk.Dialog):
         status_switch.props.halign = Gtk.Align.START
         general_grid.attach(status_switch, 1, 4, 1, 1)
 
+        stream_label = Gtk.Label.new(_('Use streaming mode:'))
+        stream_label.props.xalign = 1
+        general_grid.attach(stream_label, 0, 5, 1, 1)
+        stream_switch = Gtk.Switch()
+        stream_switch.set_active(self.app.profile['use-streaming'])
+        stream_switch.connect(
+                'notify::active', self.on_stream_switch_activate)
+        stream_switch.props.halign = Gtk.Align.START
+        stream_switch.set_tooltip_text(_('When open a video file, try to download a m3u8 playlist, instread of getting its file source link'))
+        general_grid.attach(stream_switch, 1, 5, 1, 1)
+
         box.show_all()
 
     def on_dir_update(self, file_button):
@@ -101,3 +112,6 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_status_switch_activate(self, switch, event):
         self.app.profile['use-status-icon'] = switch.get_active()
+
+    def on_stream_switch_activate(self, switch, event):
+        self.app.profile['use-streaming'] = switch.get_active()
