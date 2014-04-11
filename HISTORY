@@ -1,3 +1,8 @@
+v3.1.2 - 2014.4.11
+* Fixed: seek file to last position before resuming uploading
+* Add `Pause Downloading/Uploading Tasks` menu item
+* Support Traditional Chinese(zh_TW)
+
 v3.1.1 - 2014.4.10
 * Fixed: switch to home page when a new account signed in
 * Fixed: IndexError: could not find tree path
