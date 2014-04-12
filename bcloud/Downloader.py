@@ -13,13 +13,14 @@ import urllib3
 from bcloud.const import State
 from bcloud import pcs
 
-CHUNK = 2 ** 18  # 256k 
-RETRIES = 3
-THRESHOLD_TO_FLUSH = 10
+CHUNK = 2 ** 18         # 256k 
+RETRIES = 5             # 下载数据出错时重试的次数
+THRESHOLD_TO_FLUSH = 5  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
 
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
     ISDIR_COL, SAVENAME_COL, SAVEDIR_COL, STATE_COL, STATENAME_COL,
     HUMANSIZE_COL, PERCENT_COL) = list(range(13))
+
 
 class Downloader(threading.Thread, GObject.GObject):
     '''后台下载的线程, 每个任务应该对应一个Downloader对象.
@@ -30,6 +31,7 @@ class Downloader(threading.Thread, GObject.GObject):
 
     fh = None
     red_url = ''
+    flush_count = 0
 
     __gsignals__ = {
             'received': (GObject.SIGNAL_RUN_LAST,
@@ -66,13 +68,12 @@ class Downloader(threading.Thread, GObject.GObject):
             os.makedirs(row[SAVEDIR_COL], exist_ok=True)
         self.filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL]) 
         if os.path.exists(self.filepath):
-            stat = os.stat(self.filepath)
             # TODO: check MD5 to verify same file
-            if (row[SIZE_COL] == stat.st_size and 
-                    stat.st_size <= stat.st_blocks * 512):
+            curr_size = os.path.getsize(self.filepath)
+            if row[SIZE_COL] == curr_size and row[CURRSIZE_COL] < curr_size:
                 self.finished()
                 return
-            if stat.st_size == row[CURRSIZE_COL]:
+            if curr_size == row[CURRSIZE_COL]:
                 self.fh = open(self.filepath, 'ab')
                 self.fh.seek(row[CURRSIZE_COL])
             else:
@@ -110,16 +111,11 @@ class Downloader(threading.Thread, GObject.GObject):
                 self.download()
 
     def download(self):
-        while True:
-            if self.row[STATE_COL] == State.DOWNLOADING:
-                range_ = self.get_range()
-                if range_:
-                    self.request_bytes(range_)
-            else:
-                self.close_file()
-                if self.row[STATE_COL] == State.CANCELED:
-                    os.remove(self.filepath)
-                break
+        while self.row[STATE_COL] == State.DOWNLOADING:
+            range_ = self.get_range()
+            if range_:
+                self.request_bytes(range_)
+        self.close_file()
 
     def pause(self):
         '''暂停下载任务'''
@@ -130,6 +126,7 @@ class Downloader(threading.Thread, GObject.GObject):
         '''停止下载, 并删除之前下载的片段'''
         self.row[STATE_COL] = State.CANCELED
         self.close_file()
+        os.remove(self.filepath)
 
     def close_file(self):
         if self.fh and not self.fh.closed:
@@ -140,6 +137,7 @@ class Downloader(threading.Thread, GObject.GObject):
     def finished(self):
         self.row[STATE_COL] = State.FINISHED
         self.emit('downloaded', self.row[FSID_COL])
+        self.close_file()
 
     def get_range(self):
         if self.row[CURRSIZE_COL] >= self.row[SIZE_COL]:
@@ -169,4 +167,8 @@ class Downloader(threading.Thread, GObject.GObject):
         self.row[CURRSIZE_COL] = range_[1]
         self.emit('received', self.row[FSID_COL], self.row[CURRSIZE_COL])
         self.fh.write(block)
+        if self.flush_count >= THRESHOLD_TO_FLUSH:
+            self.fh.flush()
+            self.flush_count = 0
+
 GObject.type_register(Downloader)
