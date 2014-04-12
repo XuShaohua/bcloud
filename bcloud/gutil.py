@@ -30,6 +30,7 @@ DEFAULT_PROFILE = {
     'remember-password': False,
     'auto-signin': False,
     }
+RETRIES = 5   # 调用keyring模块与libgnome-keyring交互的尝试次数
 
 # calls f on another thread
 def async_call(func, *args, callback=None):
@@ -109,7 +110,12 @@ def ellipse_text(text, length=10):
         return text[:8] + '..'
 
 def load_profile(profile_name):
-    '''读取特定帐户的配置信息'''
+    '''读取特定帐户的配置信息
+
+    有时, dbus会出现连接错误, 这里会进行重试. 但如果超过最大尝试次数, 就
+    会失效, 此时, profile['password'] 是一个空字符串, 所以在下一步, 应该去
+    检查一下password是否有效, 如果无效, 应该提醒用户.
+    '''
     def mig_5_6():
         # 2.2.5 - > 2.2.6
         if 'upload-threshold' not in profile:
@@ -124,8 +130,13 @@ def load_profile(profile_name):
     with open(path) as fh:
         profile = json.load(fh)
     mig_5_6()
-    password = keyring.get_password(
-            Config.DBUS_APP_NAME, profile['username'])
+    for i in range(RETRIES):
+        try:
+            password = keyring.get_password(
+                    Config.DBUS_APP_NAME, profile['username'])
+            break
+        except dbus.exceptions.DBusException as e:
+            print(e)
     if password:
         profile['password'] = password
     return profile
@@ -133,16 +144,21 @@ def load_profile(profile_name):
 def dump_profile(profile):
     '''保存帐户的配置信息.
 
-    这里会检查用户是否愿意保存密码, 如果需要保存密码的话, 就会检查是否存在
-    keyring这个模块, 如果存在, 就使用它来管理密码;
-    如果不存存, 就会把密码明文存放(这个很不安全).
+    这里会检查用户是否愿意保存密码, 如果需要保存密码的话, 就调用keyring来存
+    放密码.
+    但如果密码为空, 就不再存放它了.
     '''
     profile = profile.copy()
     path = os.path.join(Config.CONF_DIR, profile['username'])
-    if profile['remember-password']:
-        keyring.set_password(
-                Config.DBUS_APP_NAME, profile['username'],
-                profile['password'])
+    if profile['remember-password'] and profile['password']:
+        for i in range(RETRIES):
+            try:
+                keyring.set_password(
+                        Config.DBUS_APP_NAME, profile['username'],
+                        profile['password'])
+                break
+            except dbus.exceptions.DBusException as e:
+                print(e)
     profile['password'] = ''
     with open(path, 'w') as fh:
         json.dump(profile, fh)
