@@ -15,8 +15,8 @@ from bcloud import gutil
 from bcloud import pcs
 from bcloud import util
 
-(ICON_COL, DISNAME_COL, PATH_COL, FSID_COL, TOOLTIP_COL,
-    HUMANSIZE_COL, DELETING_COL, REMAINING_COL) = list(range(8))
+(ICON_COL, NAME_COL, PATH_COL, FSID_COL, TOOLTIP_COL, SIZE_COL,
+    HUMANSIZE_COL, DELETING_COL, REMAINING_COL) = list(range(9))
 MAX_DAYS = 10  # 10天后会自动从回收站中删除
 ICON_SIZE = 24
 
@@ -60,13 +60,18 @@ class TrashPage(Gtk.Box):
         self.pack_start(scrolled_win, True, True, 0)
 
         # icon name, disname, path, fs_id, tooltip,
-        # size, deleting time, remaining days
+        # size, humansize, deleting time, remaining days
         self.liststore = Gtk.ListStore(
-                str, str, str, str, str, str, str, str)
+                str, str, str, str, str,
+                GObject.TYPE_INT64, str, str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         selection = self.treeview.get_selection()
         selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         self.treeview.set_rubber_banding(True)
+        self.treeview.set_tooltip_column(PATH_COL)
+        self.treeview.set_headers_clickable(True)
+        self.treeview.set_reorderable(True)
+        self.treeview.set_search_column(NAME_COL)
         scrolled_win.add(self.treeview)
 
         icon_cell = Gtk.CellRendererPixbuf()
@@ -77,25 +82,32 @@ class TrashPage(Gtk.Box):
         name_col.pack_start(name_cell, True)
         if Config.GTK_LE_36:
             name_col.add_attribute(icon_cell, 'icon_name', ICON_COL)
-            name_col.add_attribute(name_cell, 'text', DISNAME_COL)
+            name_col.add_attribute(name_cell, 'text', NAME_COL)
         else:
             name_col.set_attributes(icon_cell, icon_name=ICON_COL)
-            name_col.set_attributes(name_cell, text=DISNAME_COL)
+            name_col.set_attributes(name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
+        name_col.set_sort_column_id(NAME_COL)
+
         size_cell = Gtk.CellRendererText()
         size_col = Gtk.TreeViewColumn(
                 _('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
+        size_col.set_sort_column_id(SIZE_COL)
+
         time_cell = Gtk.CellRendererText()
         time_col = Gtk.TreeViewColumn(
                 _('Time'), time_cell, text=DELETING_COL)
         self.treeview.append_column(time_col)
+        time_col.set_sort_column_id(DELETING_COL)
+
         remaining_cell = Gtk.CellRendererText()
         remaining_col = Gtk.TreeViewColumn(
                 _('Remaining'), remaining_cell, text=REMAINING_COL)
         self.treeview.append_column(remaining_col)
-        self.treeview.set_tooltip_column(TOOLTIP_COL)
+        remaining_col.set_sort_column_id(REMAINING_COL)
+
 
     def load(self):
         self.page_num = 1
@@ -122,10 +134,12 @@ class TrashPage(Gtk.Box):
 
             icon_name = self.app.mime.get_icon_name(path, pcs_file['isdir'])
             tooltip = path
-            if pcs_file['isdir']:
+            if pcs_file['isdir'] or 'size' not in pcs_file:
+                size = 0
                 humansize = ''
             else:
-                humansize = util.get_human_size(pcs_file['size'])[0]
+                size = pcs_file['size']
+                humansize = util.get_human_size(size)[0]
             remaining_days = util.get_delta_days(
                     int(pcs_file['server_mtime']), time.time())
             remaining_days = str(MAX_DAYS - remaining_days) + ' days'
@@ -135,6 +149,7 @@ class TrashPage(Gtk.Box):
                 path,
                 str(pcs_file['fs_id']),
                 tooltip,
+                size,
                 humansize,
                 time.ctime(pcs_file['server_mtime']),
                 remaining_days,
