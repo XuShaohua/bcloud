@@ -190,10 +190,10 @@ class CloudPage(Gtk.Box):
         source_url - BT 种子在服务器上的绝对路径, 或者是磁链的地址.
         '''
         def check_vcode(info, error=None):
-            if error or not info:
+            if error or not info or 'error_code' not in info:
                 print('Error in check_vcode:', info)
                 return
-            if 'error_code' not in info or info['error_code'] == 0:
+            if info['error_code'] == 0:
                 self.reload()
                 return
             if info['error_code'] == -19:
@@ -210,6 +210,7 @@ class CloudPage(Gtk.Box):
                     callback=check_vcode)
             else:
                 print('Unknown error info:', info)
+                self.app.toast(_('Error: {0}').format(info['error_msg']))
 
         self.check_first()
         folder_browser = FolderBrowserDialog(
@@ -235,6 +236,17 @@ class CloudPage(Gtk.Box):
 
     # Open API
     def add_link_task(self):
+        '''新建普通的链接任务'''
+        def on_link_task_added(info, error=None):
+            if error or not info or 'error_code' not in info:
+                print(info)
+                return
+            if info['error_code'] == 0:
+                self.reload()
+            else:
+                print('Unknown error info:', info)
+                self.app.toast(_('Error: {0}').format(info['error_msg']))
+
         self.check_first()
         dialog = Gtk.Dialog(
                 _('Add new link task'), self.app.window,
@@ -283,7 +295,7 @@ class CloudPage(Gtk.Box):
         folder_browser.destroy()
         gutil.async_call(
             pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
-            source_url, save_path, callback=self.reload)
+            source_url, save_path, callback=on_link_task_added)
 
     def on_bt_button_clicked(self, button):
         self.add_local_bt_task()
