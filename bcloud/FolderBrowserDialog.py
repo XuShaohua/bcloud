@@ -20,15 +20,15 @@ class FolderBrowserDialog(Gtk.Dialog):
     is_loading = False
 
     def __init__(self, parent, app, title=_('Save to..')):
+        self.parent = parent
+        self.app = app
         super().__init__(
                 title, app.window, Gtk.DialogFlags.MODAL,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                  Gtk.STOCK_OK, Gtk.ResponseType.OK))
-
-        self.parent = parent
-        self.app = app
         self.set_default_size(440, 480)
         self.set_border_width(10)
+        self.set_default_response(Gtk.ResponseType.OK)
 
         box = self.get_content_area()
 

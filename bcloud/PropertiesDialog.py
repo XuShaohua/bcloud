@@ -24,6 +24,8 @@ class PropertiesDialog(Gtk.Dialog):
                 file_name + _(' Properties'),
                 app.window, Gtk.DialogFlags.MODAL,
                 (Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
+        self.set_default_response(Gtk.ResponseType.CLOSE)
+
         self.set_border_width(15)
         #self.set_default_size(640, 480)
 
