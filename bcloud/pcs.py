@@ -739,7 +739,8 @@ def search(cookie, tokens, key, path='/'):
     else:
         return None
 
-def cloud_add_link_task(cookie, tokens, source_url, save_path):
+def cloud_add_link_task(cookie, tokens, source_url, save_path,
+                        vcode='', vcode_input=''):
     '''新建离线下载任务.
     
     source_url - 可以是http/https/ftp等一般的链接
@@ -756,12 +757,18 @@ def cloud_add_link_task(cookie, tokens, source_url, save_path):
         type_ = '&type=3'
     if not save_path.endswith('/'):
         save_path = save_path + '/'
-    data = ''.join([
+    data = [
         'method=add_task&app_id=250528',
         '&source_url=', encoder.encode_uri_component(source_url),
         '&save_path=', encoder.encode_uri_component(save_path),
         '&type=', type_,
-        ])
+        ]
+    if vcode:
+        data.append('&input=')
+        data.append(vcode_input)
+        data.append('&vcode=')
+        data.append(vcode)
+    data = ''.join(data)
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         }, data=data.encode())
@@ -771,8 +778,8 @@ def cloud_add_link_task(cookie, tokens, source_url, save_path):
     else:
         return None
 
-def cloud_add_bt_task(cookie, tokens, source_url, save_path,
-                    selected_idx, file_sha1='', vcode='', vcode_input=''):
+def cloud_add_bt_task(cookie, tokens, source_url, save_path, selected_idx,
+                      file_sha1='', vcode='', vcode_input=''):
     '''新建一个BT类的离线下载任务, 包括magent磁链.
 
     source_path  - BT种子所在的绝对路径
