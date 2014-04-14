@@ -8,6 +8,7 @@ import time
 from gi.repository import GdkPixbuf
 from gi.repository import GObject
 from gi.repository import Gtk
+from gi.repository import Pango
 
 from bcloud import Config
 _ = Config._
@@ -75,7 +76,8 @@ class TrashPage(Gtk.Box):
         scrolled_win.add(self.treeview)
 
         icon_cell = Gtk.CellRendererPixbuf()
-        name_cell = Gtk.CellRendererText()
+        name_cell = Gtk.CellRendererText(
+                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
         name_col = Gtk.TreeViewColumn()
         name_col.set_title(_('Name'))
         name_col.pack_start(icon_cell, False)
@@ -89,6 +91,7 @@ class TrashPage(Gtk.Box):
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
         name_col.set_sort_column_id(NAME_COL)
+        self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         size_cell = Gtk.CellRendererText()
         size_col = Gtk.TreeViewColumn(
@@ -133,7 +136,7 @@ class TrashPage(Gtk.Box):
             path = pcs_file['path']
 
             icon_name = self.app.mime.get_icon_name(path, pcs_file['isdir'])
-            tooltip = path
+            tooltip = gutil.escape(path)
             if pcs_file['isdir'] or 'size' not in pcs_file:
                 size = 0
                 humansize = ''

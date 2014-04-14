@@ -5,11 +5,14 @@
 
 import mimetypes
 import os
+import time
 
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
 from gi.repository import Gio
+from gi.repository import GObject
 from gi.repository import Gtk
+from gi.repository import Pango
 
 from bcloud import Config
 _ = Config._
@@ -20,8 +23,10 @@ from bcloud.PropertiesDialog import FolderPropertyDialog
 from bcloud.RenameDialog import RenameDialog
 from bcloud import gutil
 from bcloud import pcs
+from bcloud import util
 
-PIXBUF_COL, DISNAME_COL, PATH_COL, TOOLTIP_COL, TYPE_COL = list(range(5))
+(PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
+    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL) = list(range(10))
 TYPE_TORRENT = 'application/x-bittorrent'
 
 class IconWindow(Gtk.ScrolledWindow):
@@ -31,19 +36,25 @@ class IconWindow(Gtk.ScrolledWindow):
     其中的网络操作部分多半是异步进行的.
     '''
 
-    filelist = []
-    pathlist = []
+    filelist = []  # to store pcs_files
+    ICON_SIZE = 64
 
     def __init__(self, parent, app):
         super().__init__()
         self.parent = parent
         self.app = app
 
-        # pixbuf, disname, path, tooltip, type 
-        self.liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str, str)
+        # pixbuf, name, path, tooltip, size, humansize,
+        # isdir, mtime, human mtime, type 
+        self.liststore = Gtk.ListStore(
+            GdkPixbuf.Pixbuf, str, str, str, GObject.TYPE_INT64, str,
+            GObject.TYPE_INT, GObject.TYPE_INT64, str, str)
+        self.init_ui()
+
+    def init_ui(self):
         self.iconview = Gtk.IconView(model=self.liststore)
         self.iconview.set_pixbuf_column(PIXBUF_COL)
-        self.iconview.set_text_column(DISNAME_COL)
+        self.iconview.set_text_column(NAME_COL)
         self.iconview.set_tooltip_column(TOOLTIP_COL)
         self.iconview.set_item_width(84)
         self.iconview.set_selection_mode(Gtk.SelectionMode.MULTIPLE)
@@ -53,11 +64,11 @@ class IconWindow(Gtk.ScrolledWindow):
                 'button-press-event', self.on_iconview_button_pressed)
         self.add(self.iconview)
         self.get_vadjustment().connect('value-changed', self.on_scrolled)
+        self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
     def load(self, pcs_files):
         '''载入一个目录并显示里面的内容.'''
         self.filelist = []
-        self.pathlist = []
         self.liststore.clear()
         self.display_files(pcs_files)
 
@@ -75,16 +86,20 @@ class IconWindow(Gtk.ScrolledWindow):
         for pcs_file in pcs_files:
             path = pcs_file['path']
             self.filelist.append(pcs_file)
-            self.pathlist.append(path)
-            pixbuf, type_ = self.app.mime.get(path, pcs_file['isdir'])
-            disname = os.path.split(path)[DISNAME_COL]
-            #tooltip = gutil.escape(disname)
-            tooltip = disname
+            pixbuf, type_ = self.app.mime.get(
+                    path, pcs_file['isdir'], icon_size=self.ICON_SIZE)
+            name = os.path.split(path)[NAME_COL]
+            tooltip = gutil.escape(name)
+            size = pcs_file.get('size', 0)
+            human_size = util.get_human_size(pcs_file['size'])[0]
+            mtime = pcs_file.get('server_mtime', 0)
+            human_mtime = time.ctime(mtime)
             tree_iter = self.liststore.append([
-                pixbuf, disname, path, tooltip, type_
-                ])
+                pixbuf, name, path, tooltip, size, human_size,
+                pcs_file['isdir'], mtime, human_mtime, type_])
             gutil.update_liststore_image(
-                self.liststore, tree_iter, PIXBUF_COL, pcs_file, cache_path)
+                self.liststore, tree_iter, PIXBUF_COL, pcs_file,
+                cache_path, icon_size=self.ICON_SIZE)
 
     def on_scrolled(self, adj):
         if gutil.reach_scrolled_bottom(adj) and self.parent.has_next:
@@ -429,7 +444,7 @@ class IconWindow(Gtk.ScrolledWindow):
             filelist.append({
                 'path': self.liststore[tree_path][PATH_COL],
                 'dest': targ_path,
-                'newname': self.liststore[tree_path][DISNAME_COL],
+                'newname': self.liststore[tree_path][NAME_COL],
                 })
         gutil.async_call(
                 pcs.move,
@@ -455,7 +470,7 @@ class IconWindow(Gtk.ScrolledWindow):
             filelist.append({
                 'path': self.liststore[tree_path][PATH_COL],
                 'dest': targ_path,
-                'newname': self.liststore[tree_path][DISNAME_COL],
+                'newname': self.liststore[tree_path][NAME_COL],
                 })
         gutil.async_call(
                 pcs.copy,
@@ -499,3 +514,78 @@ class IconWindow(Gtk.ScrolledWindow):
                 dialog = PropertiesDialog(self.parent, self.app, pcs_file)
                 dialog.run()
                 dialog.destroy()
+
+
+class TreeWindow(IconWindow):
+
+    ICON_SIZE = 24
+
+    def __init__(self, parent, app):
+        super().__init__(parent, app)
+
+    # Override
+    def init_ui(self):
+        self.iconview = Gtk.TreeView(model=self.liststore)
+        self.iconview.set_tooltip_column(TOOLTIP_COL)
+        self.iconview.connect(
+                'row-activated',
+                lambda view, path, column:
+                    self.on_iconview_item_activated(view, path))
+        self.iconview.connect(
+                'button-press-event', self.on_iconview_button_pressed)
+        self.get_vadjustment().connect('value-changed', self.on_scrolled)
+        self.iconview.set_headers_clickable(True)
+        self.iconview.set_reorderable(True)
+        self.iconview.set_search_column(NAME_COL)
+        self.selection = self.iconview.get_selection()
+        self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
+        self.add(self.iconview)
+
+        icon_cell = Gtk.CellRendererPixbuf()
+        name_cell = Gtk.CellRendererText(
+                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
+        name_col = Gtk.TreeViewColumn()
+        name_col.set_title(_('Name'))
+        name_col.pack_start(icon_cell, False)
+        name_col.pack_start(name_cell, True)
+        if Config.GTK_LE_36:
+            name_col.add_attribute(icon_cell, 'pixbuf', PIXBUF_COL)
+            name_col.add_attribute(name_cell, 'text', NAME_COL)
+        else:
+            name_col.set_attributes(icon_cell, pixbuf=PIXBUF_COL)
+            name_col.set_attributes(name_cell, text=NAME_COL)
+        name_col.set_expand(True)
+        name_col.set_resizable(True)
+        self.iconview.append_column(name_col)
+        name_col.set_sort_column_id(NAME_COL)
+        self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
+
+        size_cell = Gtk.CellRendererText()
+        size_col = Gtk.TreeViewColumn(
+                _('Size'), size_cell, text=HUMAN_SIZE_COL)
+        self.iconview.append_column(size_col)
+        size_col.props.min_width = 100
+        size_col.set_resizable(True)
+        size_col.set_sort_column_id(SIZE_COL)
+
+        mtime_cell = Gtk.CellRendererText()
+        mtime_col = Gtk.TreeViewColumn(
+                _('Modified'), mtime_cell, text=HUMAN_MTIME_COL)
+        self.iconview.append_column(mtime_col)
+        mtime_col.props.min_width = 100
+        mtime_col.set_resizable(True)
+        mtime_col.set_sort_column_id(MTIME_COL)
+
+        # Override selection methods
+        self.iconview.unselect_all = self.selection.unselect_all
+        self.iconview.select_path = self.selection.select_path
+        # Gtk.TreeSelection.get_selected_rows() returns (model, tree_paths)
+        self.iconview.get_selected_items = lambda: self.selection.get_selected_rows()[1]
+        # Gtk.TreeView.get_path_at_pos() returns (path, column)
+        def get_path_at_pos(x, y):
+            selected = Gtk.TreeView.get_path_at_pos(self.iconview, x, y)
+            if selected:
+                return selected[0]
+            else:
+                return None
+        self.iconview.get_path_at_pos = get_path_at_pos
