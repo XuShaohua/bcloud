@@ -8,6 +8,7 @@ from gi.repository import Gtk
 from bcloud import Config
 _ = Config._
 from bcloud.IconWindow import IconWindow
+from bcloud.IconWindow import TreeWindow
 from bcloud import gutil
 from bcloud import pcs
 
@@ -17,16 +18,42 @@ __all__ = [
     ]
 
 
-class CategoryPage(IconWindow):
+class CategoryPage(Gtk.Box):
 
     page_num = 1
     has_next = True
     first_run = True
 
     def __init__(self, app):
-        super().__init__(self, app)
+        super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
-        self.icon_window = super()
+
+        nav_bar = Gtk.Toolbar()
+        nav_bar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR)
+        nav_bar.props.show_arrow = False
+        nav_bar.props.toolbar_style = Gtk.ToolbarStyle.ICONS
+        nav_bar.props.icon_size = Gtk.IconSize.LARGE_TOOLBAR
+        self.pack_start(nav_bar, False, False, 0)
+
+        # toggle view mode
+        list_view_button = Gtk.ToolButton()
+        list_view_button.set_label(_('ListView'))
+        list_view_button.set_icon_name('list-view-symbolic')
+        list_view_button.connect(
+                'clicked', self.on_list_view_button_clicked)
+        nav_bar.insert(list_view_button, 0)
+        nav_bar.child_set_property(list_view_button, 'expand', True)
+        nav_bar.props.halign = Gtk.Align.END
+
+        grid_view_button = Gtk.ToolButton()
+        grid_view_button.set_label(_('ListView'))
+        grid_view_button.set_icon_name('grid-view-symbolic')
+        grid_view_button.connect(
+                'clicked', self.on_grid_view_button_clicked)
+        nav_bar.insert(grid_view_button, 1)
+
+        self.icon_window = IconWindow(self, app)
+        self.pack_end(self.icon_window, True, True, 0)
 
     def load(self):
         def on_load(info, error=None):
@@ -58,6 +85,23 @@ class CategoryPage(IconWindow):
 
     def reload(self, *args):
         self.load()
+
+    def on_list_view_button_clicked(self, button):
+        if not isinstance(self.icon_window, TreeWindow):
+            self.remove(self.icon_window)
+            self.icon_window = TreeWindow(self, self.app)
+            self.pack_end(self.icon_window, True, True, 0)
+            self.icon_window.show_all()
+            self.reload()
+
+    def on_grid_view_button_clicked(self, button):
+        if isinstance(self.icon_window, TreeWindow):
+            self.remove(self.icon_window)
+            self.icon_window = IconWindow(self, self.app)
+            self.pack_end(self.icon_window, True, True, 0)
+            self.icon_window.show_all()
+            self.reload()
+
 
 class VideoPage(CategoryPage):
 

@@ -9,6 +9,7 @@ from gi.repository import Gtk
 from bcloud import Config
 _ = Config._
 from bcloud.IconWindow import IconWindow
+from bcloud.IconWindow import TreeWindow
 from bcloud import gutil
 from bcloud import pcs
 from bcloud import util
@@ -68,7 +69,7 @@ class HomePage(Gtk.Box):
         nav_bar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR)
         nav_bar.props.show_arrow = False
         nav_bar.props.toolbar_style = Gtk.ToolbarStyle.ICONS
-        nav_bar.props.icon_size = Gtk.IconSize.BUTTON
+        nav_bar.props.icon_size = Gtk.IconSize.LARGE_TOOLBAR
         self.pack_start(nav_bar, False, False, 0)
         nav_bar.props.valign = Gtk.Align.START
 
@@ -96,7 +97,26 @@ class HomePage(Gtk.Box):
         search_button.connect('toggled', self.on_search_button_toggled)
         nav_bar.insert(search_button, 1)
         search_button.props.valign = Gtk.Align.START
+        search_button.props.margin_right = 10
 
+        # toggle view mode
+        list_view_button = Gtk.ToolButton()
+        list_view_button.set_label(_('ListView'))
+        list_view_button.set_icon_name('list-view-symbolic')
+        list_view_button.connect(
+                'clicked', self.on_list_view_button_clicked)
+        nav_bar.insert(list_view_button, 2)
+        list_view_button.props.valign = Gtk.Align.START
+
+        grid_view_button = Gtk.ToolButton()
+        grid_view_button.set_label(_('ListView'))
+        grid_view_button.set_icon_name('grid-view-symbolic')
+        grid_view_button.connect(
+                'clicked', self.on_grid_view_button_clicked)
+        nav_bar.insert(grid_view_button, 3)
+        grid_view_button.props.valign = Gtk.Align.START
+
+        # serch entry
         if Config.GTK_LE_36:
             self.search_entry = Gtk.Entry()
             self.search_entry.set_icon_from_icon_name(
@@ -165,6 +185,22 @@ class HomePage(Gtk.Box):
         if status:
             self.search_entry.grab_focus()
         else:
+            self.reload()
+
+    def on_list_view_button_clicked(self, button):
+        if not isinstance(self.icon_window, TreeWindow):
+            self.remove(self.icon_window)
+            self.icon_window = TreeWindow(self, self.app)
+            self.pack_end(self.icon_window, True, True, 0)
+            self.icon_window.show_all()
+            self.reload()
+
+    def on_grid_view_button_clicked(self, button):
+        if isinstance(self.icon_window, TreeWindow):
+            self.remove(self.icon_window)
+            self.icon_window = IconWindow(self, self.app)
+            self.pack_end(self.icon_window, True, True, 0)
+            self.icon_window.show_all()
             self.reload()
 
     def on_search_entry_activated(self, search_entry):
