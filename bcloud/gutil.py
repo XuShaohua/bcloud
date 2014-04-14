@@ -9,11 +9,13 @@ import subprocess
 import threading
 
 from gi.repository import GdkPixbuf
+from gi.repository import Gtk
 from gi.repository import GLib
 import keyring
 
 from bcloud import Config
 from bcloud import net
+from bcloud import util
 
 DEFAULT_PROFILE = {
     'version': Config.VERSION,
@@ -60,11 +62,13 @@ def xdg_open(uri):
     except FileNotFoundError as e:
         print(e)
 
-def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
+def update_liststore_image(liststore, tree_iter, col, pcs_file,
+                           dir_name, icon_size=96):
     '''下载文件缩略图, 并将它显示到liststore里.
     
     pcs_file - 里面包含了几个必要的字段.
     dir_name - 缓存目录, 下载到的图片会保存这个目录里.
+    size     - 指定图片的缩放大小, 默认是96px.
     '''
     def _update_image(error=None):
         if error:
@@ -72,7 +76,8 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file, dir_name):
         if os.stat(filepath).st_size == 0:
             return
         try:
-            pix = GdkPixbuf.Pixbuf.new_from_file_at_size(filepath, 96, 96)
+            pix = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                    filepath, icon_size, icon_size)
             tree_path = liststore.get_path(tree_iter)
             if tree_path is None:
                 return
@@ -166,3 +171,20 @@ def dump_profile(profile):
 def reach_scrolled_bottom(adj):
     '''在ScrolledWindow里面, 滚动到了底部, 就需要尝试载入下一页的内容'''
     return (adj.get_upper() - adj.get_page_size() - adj.get_value()) < 80
+
+def tree_model_natsort(model, row1, row2, user_data=None):
+    '''用natural sorting算法对TreeModel的一个column进行排序'''
+    sort_column, sort_type = model.get_sort_column_id()
+    value1 = model.get_value(row1, sort_column)
+    value2 = model.get_value(row2, sort_column)
+    sort_list1 = util.natsort(value1)
+    sort_list2 = util.natsort(value2)
+    status = sort_list1 < sort_list2
+    if sort_list1 < sort_list2:
+        return -1
+    else:
+        return 1
+
+def escape(tooltip):
+    '''Escape special characters in tooltip text'''
+    return GLib.markup_escape_text(tooltip)
