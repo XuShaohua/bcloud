@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import os
 import random
+import re
 import urllib.parse
 import time
 
@@ -86,3 +87,13 @@ def uris_to_paths(uris):
         if source_path:
             source_paths.append(source_path)
     return source_paths
+
+def natsort(string):
+    '''按照语言里的意义对字符串进行排序.
+
+    这个方法用于替换按照字符编码顺序对字符串进行排序.
+    相关链接:
+    http://stackoverflow.com/questions/2545532/python-analog-of-natsort-function-sort-a-list-using-a-natural-order-algorithm
+    http://www.codinghorror.com/blog/2007/12/sorting-for-humans-natural-sort-order.html
+    '''
+    return [int(s) if s.isdigit() else s for s in re.split('(\d+)', string)]

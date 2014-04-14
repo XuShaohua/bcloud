@@ -18,7 +18,7 @@ UNKNOWN = 'unknown'
 class MimeProvider:
     '''用于提供IconView中显示时需要的缩略图'''
 
-    _data = {}
+    _data = {}  # 用于存放pixbuf的容器, 以(file_type, icon_size)为key
 
     def __init__(self, app):
         self.app = app
@@ -45,10 +45,10 @@ class MimeProvider:
 
         @return 会返回一个Pixbuf以象, 和这个文件的类型(MIME)
         '''
-        # FIXME: using icon_size 
         file_type = self.get_mime(path, isdir)
-        if file_type in self._data:
-            return (self._data[file_type], file_type)
+        key = (file_type, icon_size)
+        if key in self._data:
+            return (self._data.get(key), file_type)
 
         themed_icon = Gio.content_type_get_icon(file_type)
         icon_names = themed_icon.to_string().split(' ')[2:]
@@ -56,10 +56,11 @@ class MimeProvider:
                 icon_names, icon_size, Gtk.IconLookupFlags.GENERIC_FALLBACK)
         if icon_info:
             pixbuf = icon_info.load_icon()
-            self._data[file_type] = pixbuf
+            self._data[key] = pixbuf
             return (pixbuf, file_type)
         else:
-            pixbuf = self._data[UNKNOWN]
+            key = (UNKNOWN, icon_size)
+            pixbuf = self._data.get(key)
             return (pixbuf, file_type)
 
     def get_icon_name(self, path, isdir):
