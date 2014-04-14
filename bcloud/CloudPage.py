@@ -20,8 +20,8 @@ from bcloud import pcs
 from bcloud import util
 
 
-(TASKID_COL, NAME_COL, PATH_COL, SOURCEURL_COL, SIZE_COL,
-    FINISHED_COL, STATUS_COL, PERCENT_COL, HUMANSIZE_COL) = list(range(9))
+(TASKID_COL, NAME_COL, PATH_COL, SOURCEURL_COL, SIZE_COL, FINISHED_COL,
+    STATUS_COL, PERCENT_COL, HUMANSIZE_COL, TOOLTIP_COL) = list(range(10))
 
 Status = (0, 1, )
 StatusNames = (_('FINISHED'), _('DOWNLOADING'), )
@@ -74,10 +74,10 @@ class CloudPage(Gtk.Box):
         self.pack_start(scrolled_win, True, True, 0)
 
         # task_id, name, path, source_url, size, finished_size,
-        # status, percent, human_size
+        # status, percent, human_size, tooltip
         self.liststore = Gtk.ListStore(
                 str, str, str, str, GObject.TYPE_INT64,
-                GObject.TYPE_INT64, int, int, str)
+                GObject.TYPE_INT64, int, int, str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.selection = self.treeview.get_selection()
         name_cell = Gtk.CellRendererText(
@@ -96,7 +96,7 @@ class CloudPage(Gtk.Box):
                 _('Progress'), percent_cell, value=PERCENT_COL)
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
-        self.treeview.set_tooltip_column(PATH_COL)
+        self.treeview.set_tooltip_column(TOOLTIP_COL)
         scrolled_win.add(self.treeview)
 
     def check_first(self):
@@ -127,6 +127,7 @@ class CloudPage(Gtk.Box):
                     int(task['status']),
                     0,
                     '0',
+                    gutil.escape(task['save_path']),
                     ])
             self.scan_tasks()
 
@@ -190,13 +191,12 @@ class CloudPage(Gtk.Box):
         source_url - BT 种子在服务器上的绝对路径, 或者是磁链的地址.
         '''
         def check_vcode(info, error=None):
-            if error or not info or 'error_code' not in info:
-                print('Error in check_vcode:', info)
+            if error or not info:
+                print('Error in check_vcode:', info, Error)
                 return
-            if info['error_code'] == 0:
+            if 'task_id' in info or info['error_code'] == 0:
                 self.reload()
-                return
-            if info['error_code'] == -19:
+            elif info['error_code'] == -19:
                 vcode_dialog = VCodeDialog(self, self.app, info)
                 response = vcode_dialog.run()
                 vcode_input = vcode_dialog.get_vcode()
@@ -238,11 +238,23 @@ class CloudPage(Gtk.Box):
     def add_link_task(self):
         '''新建普通的链接任务'''
         def on_link_task_added(info, error=None):
-            if error or not info or 'error_code' not in info:
+            if error or not info:
                 print(info)
                 return
-            if info['error_code'] == 0:
+            if 'task_id' in info or info['error_code'] == 0:
                 self.reload()
+            elif info['error_code'] == -19:
+                vcode = info['vcode']
+                vcode_dialog = VCodeDialog(self, self.app, info)
+                response = vcode_dialog.run()
+                vcode_input = vcode_dialog.get_vcode()
+                vcode_dialog.destroy()
+                if response != Gtk.ResponseType.OK:
+                    return
+                gutil.async_call(
+                    pcs.cloud_add_link_task, self.app.cookie,
+                    self.app.tokens, source_url, save_path, vcode,
+                    vcode_input, callback=on_link_task_added)
             else:
                 print('Unknown error info:', info)
                 self.app.toast(_('Error: {0}').format(info['error_msg']))
