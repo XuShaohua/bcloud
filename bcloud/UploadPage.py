@@ -20,8 +20,9 @@ from bcloud import gutil
 from bcloud import pcs
 from bcloud import util
 
-(FID_COL, NAME_COL, SOURCEPATH_COL, PATH_COL, SIZE_COL, CURRSIZE_COL, 
-    STATE_COL, STATENAME_COL, HUMANSIZE_COL, PERCENT_COL) = list(range(10))
+(FID_COL, NAME_COL, SOURCEPATH_COL, PATH_COL, SIZE_COL,
+    CURRSIZE_COL, STATE_COL, STATENAME_COL, HUMANSIZE_COL,
+    PERCENT_COL, TOOLTIP_COL) = list(range(11))
 TASK_FILE = 'upload.sqlite'
 
 class State:
@@ -92,15 +93,15 @@ class UploadPage(Gtk.Box):
         self.pack_start(scrolled_win, True, True, 0)
         
         # fid, source_name, source_path, path, size,
-        # currsize, state, statename, humansize, percent
+        # currsize, state, statename, humansize, percent, tooltip
         self.liststore = Gtk.ListStore(
             GObject.TYPE_INT, str, str, str, GObject.TYPE_INT64,
-            GObject.TYPE_INT64, int, str, str, GObject.TYPE_INT)
+            GObject.TYPE_INT64, int, str, str, GObject.TYPE_INT, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_headers_clickable(True)
         self.treeview.set_reorderable(True)
         self.treeview.set_search_column(NAME_COL)
-        self.treeview.set_tooltip_column(PATH_COL)
+        self.treeview.set_tooltip_column(TOOLTIP_COL)
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
@@ -111,6 +112,7 @@ class UploadPage(Gtk.Box):
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
         name_col.set_sort_column_id(NAME_COL)
+        self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         percent_cell = Gtk.CellRendererProgress()
         percent_col = Gtk.TreeViewColumn(
@@ -171,7 +173,7 @@ class UploadPage(Gtk.Box):
         sql = 'SELECT * FROM tasks'
         req = self.cursor.execute(sql)
         for task in req:
-            self.liststore.append(task)
+            self.liststore.append(task + (gutil.escape(task[PATH_COL]), ))
 
     def check_commit(self):
         '''当修改数据库超过5次后, 就自动commit数据.'''
@@ -187,7 +189,7 @@ class UploadPage(Gtk.Box):
         name, source_path, path, size, curr_size, state, state_name,
         human_size, percent)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'''
-        req = self.cursor.execute(sql, task)
+        req = self.cursor.execute(sql, task[:-1])
         self.conn.commit()
         return req.lastrowid
 
@@ -329,6 +331,7 @@ class UploadPage(Gtk.Box):
             StateNames[State.WAITING],
             '0 / {0}'.format(total_size),
             0,
+            gutil.escape(path)
             ]
         row_id = self.add_task_db(task)
         task.insert(0, row_id)

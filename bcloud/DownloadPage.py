@@ -27,7 +27,7 @@ TASK_FILE = 'tasks.sqlite'
 RUNNING_STATES = (State.FINISHED, State.DOWNLOADING, State.WAITING)
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
     ISDIR_COL, SAVENAME_COL, SAVEDIR_COL, STATE_COL, STATENAME_COL,
-    HUMANSIZE_COL, PERCENT_COL) = list(range(13))
+    HUMANSIZE_COL, PERCENT_COL, TOOLTIP_COL) = list(range(14))
 
 StateNames = (
         _('DOWNLOADING'),
@@ -99,13 +99,13 @@ class DownloadPage(Gtk.Box):
 
         # name, path, fs_id, size, currsize, link,
         # isdir, saveDir, saveName, state, statename,
-        # humansize, percent
+        # humansize, percent, tooltip
         self.liststore = Gtk.ListStore(
                 str, str, str, GObject.TYPE_INT64, GObject.TYPE_INT64, str,
                 GObject.TYPE_INT, str, str, GObject.TYPE_INT, str,
-                str, GObject.TYPE_INT)
+                str, GObject.TYPE_INT, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
-        self.treeview.set_tooltip_column(PATH_COL)
+        self.treeview.set_tooltip_column(TOOLTIP_COL)
         self.treeview.set_headers_clickable(True)
         self.treeview.set_reorderable(True)
         self.treeview.set_search_column(NAME_COL)
@@ -119,6 +119,7 @@ class DownloadPage(Gtk.Box):
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
         name_col.set_sort_column_id(NAME_COL)
+        self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         percent_cell = Gtk.CellRendererProgress()
         percent_col = Gtk.TreeViewColumn(
@@ -193,7 +194,7 @@ class DownloadPage(Gtk.Box):
     def load_tasks(self):
         req = self.cursor.execute('SELECT * FROM download')
         for task in req:
-            self.liststore.append(task)
+            self.liststore.append(task + (gutil.escape(task[PATH_COL]), ))
 
     def dump_tasks(self):
         sql = 'DELETE FROM download'
@@ -204,7 +205,7 @@ class DownloadPage(Gtk.Box):
                     row[STATE_COL] == State.WAITING):
                 row[STATE_COL] = State.PAUSED
                 row[STATENAME_COL] = StateNames[State.PAUSED]
-            self.cursor.execute(sql, row[:])
+            self.cursor.execute(sql, row[:-1])
 
     def dump_tasks_in_background(self, *args):
         if not self.first_run:
@@ -295,6 +296,7 @@ class DownloadPage(Gtk.Box):
             StateNames[State.WAITING],
             human_size,
             0,
+            gutil.escape(pcs_file['path']),
             )
         self.liststore.append(task)
         self.scan_tasks()

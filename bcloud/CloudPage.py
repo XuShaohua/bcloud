@@ -79,25 +79,34 @@ class CloudPage(Gtk.Box):
                 str, str, str, str, GObject.TYPE_INT64,
                 GObject.TYPE_INT64, int, int, str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
+        self.treeview.set_headers_clickable(True)
+        self.treeview.set_reorderable(True)
+        self.treeview.set_search_column(NAME_COL)
+        self.treeview.set_tooltip_column(TOOLTIP_COL)
         self.selection = self.treeview.get_selection()
+        scrolled_win.add(self.treeview)
+
         name_cell = Gtk.CellRendererText(
                 ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
+        name_col.set_sort_column_id(NAME_COL)
+        self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
+
         size_cell = Gtk.CellRendererText()
         size_col = Gtk.TreeViewColumn(
                 _('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
-        #size_col.props.sizing = Gtk.TreeViewColumnSizing.AUTOSIZE
         size_col.props.min_width = 145
+        size_col.set_sort_column_id(SIZE_COL)
+
         percent_cell = Gtk.CellRendererProgress()
         percent_col = Gtk.TreeViewColumn(
                 _('Progress'), percent_cell, value=PERCENT_COL)
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
-        self.treeview.set_tooltip_column(TOOLTIP_COL)
-        scrolled_win.add(self.treeview)
+        percent_col.set_sort_column_id(PERCENT_COL)
 
     def check_first(self):
         if self.first_run:
@@ -127,7 +136,8 @@ class CloudPage(Gtk.Box):
                     int(task['status']),
                     0,
                     '0',
-                    gutil.escape(task['save_path']),
+                    gutil.escape(
+                        os.path.join(task['save_path'], task['task_name'])),
                     ])
             self.scan_tasks()
 
