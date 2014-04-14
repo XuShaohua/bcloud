@@ -68,22 +68,30 @@ class Downloader(threading.Thread, GObject.GObject):
             os.makedirs(row[SAVEDIR_COL], exist_ok=True)
         self.filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL]) 
         if os.path.exists(self.filepath):
-            # TODO: check MD5 to verify same file
             curr_size = os.path.getsize(self.filepath)
-            if row[SIZE_COL] == curr_size and row[CURRSIZE_COL] < curr_size:
+            if curr_size == row[SIZE_COL]:
                 self.finished()
                 return
-            if curr_size == row[CURRSIZE_COL]:
-                self.fh = open(self.filepath, 'ab')
-                self.fh.seek(row[CURRSIZE_COL])
+            elif curr_size < row[SIZE_COL]:
+                if curr_size == row[CURRSIZE_COL]:
+                    self.fh = open(self.filepath, 'ab')
+                elif curr_size < row[CURRSIZE_COL]:
+                    self.fh = open(self.filepath, 'ab')
+                    row[CURRSIZE_COL] = curr_size
+                else:
+                    if 0 < row[CURRSIZE_COL]:
+                        self.fh = open(self.filepath, 'ab')
+                        self.fh.seek(row[CURRSIZE_COL])
+                    else:
+                        self.fh = open(self.filepath, 'wb')
+                        self.row[CURRSIZE_COL] = 0
             else:
-                # TODO: popup a dialog to ask user to confirm overriding
                 self.fh = open(self.filepath, 'wb')
                 self.row[CURRSIZE_COL] = 0
-
         else:
             self.fh = open(self.filepath, 'wb')
             self.row[CURRSIZE_COL] = 0
+
 
     def destroy(self):
         '''自毁'''

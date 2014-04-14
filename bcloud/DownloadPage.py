@@ -67,6 +67,7 @@ class DownloadPage(Gtk.Box):
     first_run = True
     workers = {} # { `fs_id': (worker,row) }
     app_infos = {} # { `fs_id': app }
+    commit_count = 0
 
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -143,7 +144,7 @@ class DownloadPage(Gtk.Box):
         state_col.set_sort_column_id(PERCENT_COL)
 
         self.init_db()
-        self.load_tasks()
+        self.load_tasks_from_db()
         self.show_all()
 
     def init_db(self):
@@ -184,33 +185,61 @@ class DownloadPage(Gtk.Box):
 
     def do_destroy(self, *args):
         if not self.first_run:
-            self.dump_tasks()
+            self.pause_tasks()
             self.conn.commit()
             self.conn.close()
             for worker, row in self.workers.values():
                 worker.pause()
                 row[CURRSIZE_COL] = worker.row[CURRSIZE_COL]
     
-    def load_tasks(self):
+    def load_tasks_from_db(self):
         req = self.cursor.execute('SELECT * FROM download')
         for task in req:
             self.liststore.append(task + (gutil.escape(task[PATH_COL]), ))
 
-    def dump_tasks(self):
-        sql = 'DELETE FROM download'
-        self.cursor.execute(sql)
+    def add_task_db(self, task):
+        '''向数据库中写入一个新的任务记录'''
         sql = 'INSERT INTO download VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
-        for row in self.liststore:
-            if (row[STATE_COL] == State.DOWNLOADING or 
-                    row[STATE_COL] == State.WAITING):
-                row[STATE_COL] = State.PAUSED
-                row[STATENAME_COL] = StateNames[State.PAUSED]
-            self.cursor.execute(sql, row[:-1])
+        req = self.cursor.execute(sql, task[:-1])
+        self.check_commit()
 
-    def dump_tasks_in_background(self, *args):
-        if not self.first_run:
-            self.dump_tasks()
-        return True
+    def get_task_db(self, fs_id):
+        '''从数据库中查询fsid的信息.
+        
+        如果存在的话, 就返回这条记录;
+        如果没有的话, 就返回None
+        '''
+        sql = 'SELECT * FROM download WHERE fsid=? LIMIT 1'
+        req = self.cursor.execute(sql, [fs_id, ])
+        if req:
+            return req.fetchone()
+        else:
+            None
+
+    def check_commit(self):
+        '''当修改数据库超过5次后, 就自动commit数据.'''
+        self.commit_count = self.commit_count + 1
+        if self.commit_count >= 5:
+            self.commit_count = 0
+            self.conn.commit()
+
+    def update_task_db(self, row):
+        '''更新数据库中的任务信息'''
+        sql = '''UPDATE download SET 
+        currsize=?, state=?, statename=?, humansize=?, percent=?
+        WHERE fsid=? LIMIT 1;
+        '''
+        self.cursor.execute(sql, [
+            row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
+            row[HUMANSIZE_COL], row[PERCENT_COL], row[FSID_COL]
+            ])
+        self.check_commit()
+
+    def remove_task_db(self, fs_id):
+        '''将任务从数据库中删除'''
+        sql = 'DELETE FROM download WHERE fsid=?'
+        self.cursor.execute(sql, [fs_id, ])
+        self.check_commit()
 
     def get_row_by_fsid(self, fs_id):
         '''确认在Liststore中是否存在这条任务. 如果存在, 返回TreeModelRow,
@@ -269,10 +298,11 @@ class DownloadPage(Gtk.Box):
         if pcs_file['isdir']:
             return
         # 如果已经存在于下载列表中, 就忽略.
-        row = self.get_row_by_fsid(pcs_file['fs_id'])
+        fs_id = str(pcs_file['fs_id'])
+        row = self.get_row_by_fsid(fs_id)
         if row:
             if row[STATE_COL] == State.FINISHED:
-                self.launch_app(pcs_file['fs_id'])
+                self.launch_app(fs_id)
             elif row[STATE_COL] not in RUNNING_STATES:
                 row[STATE_COL] = State.WAITING
             self.scan_tasks()
@@ -285,7 +315,7 @@ class DownloadPage(Gtk.Box):
         task = (
             pcs_file['server_filename'],
             pcs_file['path'],
-            str(pcs_file['fs_id']),
+            fs_id,
             pcs_file['size'],
             0,
             pcs_file['dlink'],
@@ -299,6 +329,7 @@ class DownloadPage(Gtk.Box):
             gutil.escape(pcs_file['path']),
             )
         self.liststore.append(task)
+        self.add_task_db(task)
         self.scan_tasks()
 
     def scan_tasks(self):
@@ -314,43 +345,51 @@ class DownloadPage(Gtk.Box):
     def start_worker(self, row):
         '''为task新建一个后台下载线程, 并开始下载.'''
         def on_worker_received(worker, fs_id, current_size):
-            def _on_worker_received():
-                row = None
-                if fs_id in self.workers:
-                    _, row = self.workers[fs_id]
-                else:
-                    row = self.get_row_by_fsid(fs_id)
-                if not row:
-                    print('on worker received, row is None:', row)
-                    return
-                row[CURRSIZE_COL] = current_size
-                total_size = util.get_human_size(row[SIZE_COL])[0]
-                curr_size = util.get_human_size(row[CURRSIZE_COL])[0]
-                row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
-                row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
-            GLib.idle_add(_on_worker_received)
+            GLib.idle_add(do_worker_received, fs_id, current_size)
+
+        def do_worker_received(fs_id, current_size):
+            row = None
+            if fs_id in self.workers:
+                row = self.workers[fs_id][1]
+            else:
+                row = self.get_row_by_fsid(fs_id)
+            if not row:
+                print('on worker received, row is None:', row)
+                return
+            row[CURRSIZE_COL] = current_size
+            curr_size = util.get_human_size(row[CURRSIZE_COL])[0]
+            total_size = util.get_human_size(row[SIZE_COL])[0]
+            row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
+            row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
+            self.update_task_db(row)
 
         def on_worker_downloaded(worker, fs_id):
-            def _on_worker_downloaded():
-                row = self.get_row_by_fsid(fs_id)
-                row = self.workers[fs_id][1]
-                row[CURRSIZE_COL] = row[SIZE_COL]
-                row[STATE_COL] = State.FINISHED
-                row[PERCENT_COL] = 100
-                total_size = util.get_human_size(row[SIZE_COL])[0]
-                row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
-                row[STATENAME_COL] = StateNames[State.FINISHED]
-                self.workers.pop(row[FSID_COL], None)
-                self.app.toast(_('{0} downloaded'.format(row[NAME_COL])))
-                self.launch_app(fs_id)
-                self.scan_tasks()
-            GLib.idle_add(_on_worker_downloaded)
+            GLib.idle_add(do_worker_downloaded, fs_id)
+
+        def do_worker_downloaded(fs_id):
+            row = self.get_row_by_fsid(fs_id)
+            row = self.workers[fs_id][1]
+            row[CURRSIZE_COL] = row[SIZE_COL]
+            row[STATE_COL] = State.FINISHED
+            row[PERCENT_COL] = 100
+            total_size = util.get_human_size(row[SIZE_COL])[0]
+            row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
+            row[STATENAME_COL] = StateNames[State.FINISHED]
+            self.update_task_db(row)
+            self.workers.pop(row[FSID_COL], None)
+            self.app.toast(_('{0} downloaded'.format(row[NAME_COL])))
+            self.launch_app(fs_id)
+            self.scan_tasks()
 
         def on_worker_network_error(worker, fs_id):
+            GLib.idle_add(do_worker_network_error, fs_id)
+
+        def do_worker_network_error(fs_id):
             row = self.get_row_by_fsid(fs_id)
             row = self.workers[fs_id][1]
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
+            self.update_task_db(row)
             self.remove_worker(row[FSID_COL])
 
         if row[FSID_COL] in self.workers:
@@ -387,10 +426,12 @@ class DownloadPage(Gtk.Box):
         将任务状态设定为Downloading, 如果没有超过最大任务数的话;
         否则将它设定为Waiting.
         '''
+        print('start task:', row, scan)
         if row[STATE_COL] in RUNNING_STATES :
             return
         row[STATE_COL] = State.WAITING
         row[STATENAME_COL] = StateNames[State.WAITING]
+        self.update_task_db(row)
         if scan:
             self.scan_tasks()
 
@@ -408,6 +449,7 @@ class DownloadPage(Gtk.Box):
         if row[STATE_COL] in (State.DOWNLOADING, State.WAITING):
             row[STATE_COL] = State.PAUSED
             row[STATENAME_COL] = StateNames[State.PAUSED]
+            self.update_task_db(row)
             if scan:
                 self.scan_tasks()
 
@@ -421,6 +463,7 @@ class DownloadPage(Gtk.Box):
             if os.path.exists(filepath):
                 os.remove(filepath)
         self.app_infos.pop(row[FSID_COL], None)
+        self.remove_task_db(row[FSID_COL])
         tree_iter = row.iter
         if tree_iter:
             self.liststore.remove(tree_iter)
