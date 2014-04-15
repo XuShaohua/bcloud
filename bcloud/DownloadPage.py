@@ -184,7 +184,7 @@ class DownloadPage(Gtk.Box):
             self.first_run = False
             self.load()
 
-    def do_destroy(self, *args):
+    def on_destroy(self, *args):
         if not self.first_run:
             self.pause_tasks()
             self.conn.commit()

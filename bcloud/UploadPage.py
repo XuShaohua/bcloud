@@ -253,7 +253,7 @@ class UploadPage(Gtk.Box):
         self.cursor.execute(sql, [fid, ])
         self.check_commit()
 
-    def do_destroy(self, *args):
+    def on_destroy(self, *args):
         if not self.first_run:
             self.conn.commit()
             for row in self.liststore:

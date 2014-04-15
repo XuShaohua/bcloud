@@ -39,7 +39,6 @@ BLINK_DELTA = 250    # 字体闪烁间隔, 250 miliseconds
 BLINK_SUSTAINED = 3  # 字体闪烁持续时间, 5 seconds
 
 
-
 class App:
 
     profile = None
@@ -151,7 +150,8 @@ class App:
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
         if self.profile:
-            gutil.dump_profile(self.profile)
+            self.upload_page.on_destroy()
+            self.download_page.on_destroy()
 
     def run(self, argv):
         self.app.run(argv)
