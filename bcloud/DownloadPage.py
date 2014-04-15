@@ -239,9 +239,9 @@ class DownloadPage(Gtk.Box):
             None
 
     def check_commit(self):
-        '''当修改数据库超过5次后, 就自动commit数据.'''
+        '''当修改数据库超过100次后, 就自动commit数据.'''
         self.commit_count = self.commit_count + 1
-        if self.commit_count >= 5:
+        if self.commit_count >= 100:
             self.commit_count = 0
             self.conn.commit()
 
@@ -283,6 +283,8 @@ class DownloadPage(Gtk.Box):
     def launch_app(self, fs_id):
         if fs_id in self.app_infos:
             row = self.get_row_by_fsid(fs_id)
+            if not row:
+                return
             app_info = self.app_infos[fs_id]
             filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
             gfile = Gio.File.new_for_path(filepath)
@@ -357,8 +359,6 @@ class DownloadPage(Gtk.Box):
 
     def scan_tasks(self):
         '''扫描所有下载任务, 并在需要时启动新的下载'''
-        if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
-            return
         for row in self.liststore:
             if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
                 break
@@ -367,6 +367,13 @@ class DownloadPage(Gtk.Box):
 
     def start_worker(self, row):
         '''为task新建一个后台下载线程, 并开始下载.'''
+        def on_worker_started(worker, fs_id):
+            GLib.idle_add(do_worker_started)
+
+        def do_worker_started():
+            self.downloading_size = 0
+            self.downloading_timestamp = time.time()
+
         def on_worker_received(worker, fs_id, current_size):
             GLib.idle_add(do_worker_received, fs_id, current_size)
 
@@ -395,8 +402,13 @@ class DownloadPage(Gtk.Box):
             GLib.idle_add(do_worker_downloaded, fs_id)
 
         def do_worker_downloaded(fs_id):
-            row = self.get_row_by_fsid(fs_id)
-            row = self.workers[fs_id][1]
+            row = None
+            if fs_id in self.workers:
+                row = self.workers[fs_id][1]
+            else:
+                row = self.get_row_by_fsid(fs_id)
+            if not row:
+                return
             row[CURRSIZE_COL] = row[SIZE_COL]
             row[STATE_COL] = State.FINISHED
             row[PERCENT_COL] = 100
@@ -413,8 +425,13 @@ class DownloadPage(Gtk.Box):
             GLib.idle_add(do_worker_network_error, fs_id)
 
         def do_worker_network_error(fs_id):
-            row = self.get_row_by_fsid(fs_id)
-            row = self.workers[fs_id][1]
+            row = self.workers.get(fs_id, None)
+            if row:
+                row = row[1]
+            else:
+                row = self.get_row_by_fsid(fs_id)
+                if not row:
+                    return
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
             self.update_task_db(row)
@@ -429,12 +446,11 @@ class DownloadPage(Gtk.Box):
         row[STATENAME_COL] = StateNames[State.DOWNLOADING]
         worker = Downloader(self, row, self.app.cookie, self.app.tokens)
         self.workers[row[FSID_COL]] = (worker, row)
+        worker.connect('started', on_worker_started)
         worker.connect('received', on_worker_received)
         worker.connect('downloaded', on_worker_downloaded)
         worker.connect('network-error', on_worker_network_error)
         worker.start()
-        self.downloading_size = 0
-        self.downloading_timestamp = time.time()
 
     def pause_worker(self, row):
         self.remove_worker(row[FSID_COL], stop=False)
@@ -516,7 +532,8 @@ class DownloadPage(Gtk.Box):
             fs_ids.append(model[tree_path][FSID_COL])
         for fs_id in fs_ids:
             row = self.get_row_by_fsid(fs_id)
-            operator(row)
+            if row:
+                operator(row)
 
     def on_start_button_clicked(self, button):
         self.operate_selected_rows(self.start_task)
