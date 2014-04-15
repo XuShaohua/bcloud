@@ -198,9 +198,9 @@ class UploadPage(Gtk.Box):
             self.liststore.append(task)
 
     def check_commit(self):
-        '''当修改数据库超过5次后, 就自动commit数据.'''
+        '''当修改数据库超过50次后, 就自动commit数据.'''
         self.commit_count = self.commit_count + 1
-        if self.commit_count >= 5:
+        if self.commit_count >= 50:
             self.commit_count = 0
             self.conn.commit()
 
@@ -429,6 +429,8 @@ class UploadPage(Gtk.Box):
             if fid not in self.workers:
                 return
             row = self.get_row_by_fid(fid)
+            if not row:
+                return
             row[CURRSIZE_COL] = slice_end
             total_size = util.get_human_size(row[SIZE_COL])[0]
             curr_size = util.get_human_size(slice_end)[0]
@@ -443,6 +445,7 @@ class UploadPage(Gtk.Box):
         def do_worker_merge_files(fid):
             def on_create_superfile(pcs_file, error=None):
                 if error or not pcs_file:
+                    print('on create superfile:', pcs_file, error)
                     do_worker_error(fid)
                     return
                 else:
@@ -450,8 +453,13 @@ class UploadPage(Gtk.Box):
                     do_worker_uploaded(fid)
 
             block_list = self.get_slice_db(fid)
+            if fid not in self.workers:
+                return
             row = self.get_row_by_fid(fid)
+            if not row:
+                return
             if not block_list:
+                # TODO
                 pass
             else:
                 gutil.async_call(
@@ -465,6 +473,8 @@ class UploadPage(Gtk.Box):
             if fid not in self.workers:
                 return
             row = self.get_row_by_fid(fid)
+            if not row:
+                return
             row[PERCENT_COL] = 100
             total_size = util.get_human_size(row[SIZE_COL])[0]
             row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
@@ -483,6 +493,8 @@ class UploadPage(Gtk.Box):
 
         def do_worker_error(fid):
             row = self.get_row_by_fid(fid)
+            if not row:
+                return
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
             self.update_task_db(row)
@@ -539,7 +551,8 @@ class UploadPage(Gtk.Box):
             fids.append(model[tree_path][FID_COL])
         for fid in fids:
             row = self.get_row_by_fid(fid)
-            operator(row)
+            if row:
+                operator(row)
 
     def on_start_button_clicked(self, button):
         self.operate_selected_rows(self.start_task)

@@ -60,8 +60,7 @@ def xdg_open(uri):
     try:
         subprocess.call(['xdg-open', uri, ])
     except FileNotFoundError as e:
-        # TODO
-        pass
+        print(e)
 
 def update_liststore_image(liststore, tree_iter, col, pcs_file,
                            dir_name, icon_size=96):
@@ -139,8 +138,7 @@ def load_profile(profile_name):
                     Config.DBUS_APP_NAME, profile['username'])
             break
         except dbus.exceptions.DBusException as e:
-            # TODO
-            pass
+            print(e)
     if password:
         profile['password'] = password
     return profile
@@ -162,8 +160,7 @@ def dump_profile(profile):
                         profile['password'])
                 break
             except dbus.exceptions.DBusException as e:
-                # TODO
-                pass
+                print(e)
     profile['password'] = ''
     with open(path, 'w') as fh:
         json.dump(profile, fh)

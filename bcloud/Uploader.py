@@ -81,9 +81,7 @@ class Uploader(threading.Thread, GObject.GObject):
     # Open API
     def pause(self):
         self.row[STATE_COL] = State.PAUSED
-        if self.is_slice_upload:
-            # TODO:
-            pass
+        #if self.is_slice_upload:
 
     # Open API
     def stop(self):
