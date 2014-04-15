@@ -197,9 +197,7 @@ class App:
     def on_main_window_drag_data_received(self, window, drag_context, x, y,
                                           data, info, time):
         uris = data.get_text()
-        print(':', uris, ':')
         source_paths = util.uris_to_paths(uris)
-        print(source_paths)
         if source_paths and self.profile:
             self.upload_page.add_file_tasks(source_paths)
 
@@ -210,7 +208,7 @@ class App:
             dialog.destroy()
             if self.profile:
                 gutil.dump_profile(self.profile)
-                if self.profile['use-status-icon']:
+                if self.profile['use-status-icon'] and not self.status_icon:
                     self.init_status_icon()
 
     def on_signout_action_activated(self, action, params):
