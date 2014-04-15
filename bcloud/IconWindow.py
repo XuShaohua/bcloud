@@ -305,7 +305,7 @@ class IconWindow(Gtk.ScrolledWindow):
             如果pls为None的话, 说明没能得到播放列表, 这时就需要使用之前的方
             法, 先得琶视频地址, 再用播放器去打开它.
             '''
-            if error or not pls:
+            if error or not pls or b'error_code' in pls:
                 print('save_playlist:', pls, error)
                 print('Failed to get playlist, now try to get video dlink')
                 gutil.async_call(
