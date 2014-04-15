@@ -160,7 +160,7 @@ class DownloadPage(Gtk.Box):
         db = os.path.join(cache_path, TASK_FILE)
         self.conn = sqlite3.connect(db)
         self.cursor = self.conn.cursor()
-        sql = '''CREATE TABLE IF NOT EXISTS download (
+        sql = '''CREATE TABLE IF NOT EXISTS tasks (
         name CHAR NOT NULL,
         path CHAR NOT NULL,
         fsid CHAR NOT NULL,
@@ -173,7 +173,8 @@ class DownloadPage(Gtk.Box):
         state INT NOT NULL,
         statename CHAR NOT NULL,
         humansize CHAR NOT NULL,
-        percent INT NOT NULL
+        percent INT NOT NULL,
+        tooltip CHAR
         )
         '''
         self.cursor.execute(sql)
@@ -193,14 +194,14 @@ class DownloadPage(Gtk.Box):
                 row[CURRSIZE_COL] = worker.row[CURRSIZE_COL]
     
     def load_tasks_from_db(self):
-        req = self.cursor.execute('SELECT * FROM download')
+        req = self.cursor.execute('SELECT * FROM tasks')
         for task in req:
-            self.liststore.append(task + (gutil.escape(task[PATH_COL]), ))
+            self.liststore.append(task)
 
     def add_task_db(self, task):
         '''向数据库中写入一个新的任务记录'''
-        sql = 'INSERT INTO download VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)'
-        req = self.cursor.execute(sql, task[:-1])
+        sql = 'INSERT INTO tasks VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+        req = self.cursor.execute(sql, task)
         self.check_commit()
 
     def get_task_db(self, fs_id):
@@ -209,7 +210,7 @@ class DownloadPage(Gtk.Box):
         如果存在的话, 就返回这条记录;
         如果没有的话, 就返回None
         '''
-        sql = 'SELECT * FROM download WHERE fsid=? LIMIT 1'
+        sql = 'SELECT * FROM tasks WHERE fsid=? LIMIT 1'
         req = self.cursor.execute(sql, [fs_id, ])
         if req:
             return req.fetchone()
@@ -225,7 +226,7 @@ class DownloadPage(Gtk.Box):
 
     def update_task_db(self, row):
         '''更新数据库中的任务信息'''
-        sql = '''UPDATE download SET 
+        sql = '''UPDATE tasks SET 
         currsize=?, state=?, statename=?, humansize=?, percent=?
         WHERE fsid=? LIMIT 1;
         '''
@@ -237,7 +238,7 @@ class DownloadPage(Gtk.Box):
 
     def remove_task_db(self, fs_id):
         '''将任务从数据库中删除'''
-        sql = 'DELETE FROM download WHERE fsid=?'
+        sql = 'DELETE FROM tasks WHERE fsid=?'
         self.cursor.execute(sql, [fs_id, ])
         self.check_commit()
 
@@ -310,8 +311,9 @@ class DownloadPage(Gtk.Box):
         saveDir = os.path.split(
                 self.app.profile['save-dir'] + pcs_file['path'])[0]
         saveName = pcs_file['server_filename']
-
         human_size = util.get_human_size(pcs_file['size'])[0]
+        tooltip = gutil.escape(
+                _('From {0}\nTo {1}').format(pcs_file['path'], saveDir))
         task = (
             pcs_file['server_filename'],
             pcs_file['path'],
@@ -326,7 +328,7 @@ class DownloadPage(Gtk.Box):
             StateNames[State.WAITING],
             human_size,
             0,
-            gutil.escape(pcs_file['path']),
+            tooltip,
             )
         self.liststore.append(task)
         self.add_task_db(task)

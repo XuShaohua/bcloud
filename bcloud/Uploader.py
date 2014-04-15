@@ -12,8 +12,9 @@ from gi.repository import GObject
 
 from bcloud import pcs
 
-(FID_COL, NAME_COL, SOURCEPATH_COL, PATH_COL, SIZE_COL, CURRSIZE_COL, 
-    STATE_COL, STATENAME_COL, HUMANSIZE_COL, PERCENT_COL) = list(range(10))
+(FID_COL, NAME_COL, SOURCEPATH_COL, PATH_COL, SIZE_COL,
+    CURRSIZE_COL, STATE_COL, STATENAME_COL, HUMANSIZE_COL,
+    PERCENT_COL, TOOLTIP_COL, THRESHOLD_COL) = list(range(12))
 
 class State:
     '''下载状态常量'''
@@ -23,6 +24,8 @@ class State:
     FINISHED = 3
     CANCELED = 4
     ERROR = 5
+
+SLICE_THRESHOLD = 2 ** 18  # 256k, 小于这个值, 不允许使用分片上传
 
 
 class Uploader(threading.Thread, GObject.GObject):
@@ -50,21 +53,15 @@ class Uploader(threading.Thread, GObject.GObject):
 
     is_slice_upload = False
 
-    def __init__(self, parent, row, threshold, cookie, tokens):
+    def __init__(self, parent, row, cookie, tokens):
         '''
         parent    - UploadPage
         row       - UploadPage.liststore中的一个记录
-        threshold - 阈值, 当上传的文件大小超过这个值时就使用快速上传,
-                    分片上传, 这个值可以由用户指定, 这个值的范围要限制为
-                    1-20Mb, 默认值为1M, 这样可以在上传小文件时很快, 上传大
-                    文件时, 可以更快的产生一个slice-sent信号, 让前端能更新
-                    一下上传进度. 最多有1024个这样的分片, 即最大能上传20G.
-                    '''
+        '''
         threading.Thread.__init__(self)
         GObject.GObject.__init__(self)
 
         self.parent = parent
-        self.threshold = threshold
         self.cookie = cookie
         self.tokens = tokens
 
@@ -77,12 +74,10 @@ class Uploader(threading.Thread, GObject.GObject):
         # 否则先尝试快速上传模式, 如果没有中的话, 就再进行分片上传.
         # 分片上传, 是最费事的, 也最占带宽.
         # 分片上传, 支持断点续传.
-        if self.row[SIZE_COL] > self.threshold:
-            print('Upload.will use rapid_upload()')
+        if self.row[SIZE_COL] > SLICE_THRESHOLD:
             self.rapid_upload()
         else:
-            print('Uploader.will use upload_small_file()')
-            self.upload_small_file()
+            self.slice_upload()
 
     # Open API
     def pause(self):
@@ -101,15 +96,6 @@ class Uploader(threading.Thread, GObject.GObject):
         meta = pcs.get_metas(self.row[PATH_COL])
         print(meta)
 
-    def upload_small_file(self):
-        print('Uploader.upload_small_file:')
-        info = pcs.upload(
-            self.cookie, self.row[SOURCEPATH_COL], self.row[PATH_COL])
-        if info:
-            self.emit('uploaded', self.row[FID_COL])
-        else:
-            self.emit('network-error', self.row[FID_COL])
-
     def rapid_upload(self):
         '''快速上传.
 
@@ -123,11 +109,12 @@ class Uploader(threading.Thread, GObject.GObject):
             self.emit('uploaded', self.row[FID_COL])
         else:
             print('Uploader.will use slice upload')
-            self.is_slice_upload = True
             self.slice_upload()
 
     def slice_upload(self):
+        '''分片上传'''
         print('Uploader.slice_upload()')
+        self.is_slice_upload = True
         fid = self.row[FID_COL]
         slice_start = self.row[CURRSIZE_COL]
         slice_end = self.row[CURRSIZE_COL]
@@ -146,7 +133,7 @@ class Uploader(threading.Thread, GObject.GObject):
                 self.emit('merge-files', self.row[FID_COL])
                 break
             slice_start = slice_end
-            slice_end = min(slice_start + self.threshold, file_size)
+            slice_end = min(slice_start + self.row[THRESHOLD_COL], file_size)
             data = fh.read(slice_end - slice_start)
             slice_end = slice_start + len(data)
             info = pcs.slice_upload(self.cookie, data)

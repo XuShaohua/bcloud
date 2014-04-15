@@ -3,6 +3,7 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import math
 import os
 import sqlite3
 
@@ -22,7 +23,7 @@ from bcloud import util
 
 (FID_COL, NAME_COL, SOURCEPATH_COL, PATH_COL, SIZE_COL,
     CURRSIZE_COL, STATE_COL, STATENAME_COL, HUMANSIZE_COL,
-    PERCENT_COL, TOOLTIP_COL) = list(range(11))
+    PERCENT_COL, TOOLTIP_COL, THRESHOLD_COL) = list(range(12))
 TASK_FILE = 'upload.sqlite'
 
 class State:
@@ -94,9 +95,11 @@ class UploadPage(Gtk.Box):
         
         # fid, source_name, source_path, path, size,
         # currsize, state, statename, humansize, percent, tooltip
+        # slice size
         self.liststore = Gtk.ListStore(
             GObject.TYPE_INT, str, str, str, GObject.TYPE_INT64,
-            GObject.TYPE_INT64, int, str, str, GObject.TYPE_INT, str)
+            GObject.TYPE_INT64, int, str, str, GObject.TYPE_INT, str,
+            GObject.TYPE_INT64)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_headers_clickable(True)
         self.treeview.set_reorderable(True)
@@ -147,7 +150,7 @@ class UploadPage(Gtk.Box):
         db = os.path.join(cache_path, TASK_FILE)
         self.conn = sqlite3.connect(db)
         self.cursor = self.conn.cursor()
-        sql = '''CREATE TABLE IF NOT EXISTS tasks(
+        sql = '''CREATE TABLE IF NOT EXISTS upload (
         fid INTEGER PRIMARY KEY,
         name CHAR NOT NULL,
         source_path CHAR NOT NULL,
@@ -157,11 +160,13 @@ class UploadPage(Gtk.Box):
         state INTEGER NOT NULL,
         state_name CHAR NOT NULL,
         human_size CHAR NOT NULL,
-        percent INTEGER NOT NULL
+        percent INTEGER NOT NULL,
+        tooltip CHAR,
+        threshold INTEGER NOT NULL
         )
         '''
         self.cursor.execute(sql)
-        sql = '''CREATE TABLE IF NOT EXISTS slice(
+        sql = '''CREATE TABLE IF NOT EXISTS slice (
         fid INTEGER NOT NULL,
         slice_end INTEGER NOT NULL,
         md5 CHAR NOT NULL
@@ -170,10 +175,10 @@ class UploadPage(Gtk.Box):
         self.cursor.execute(sql)
 
     def load_tasks_from_db(self):
-        sql = 'SELECT * FROM tasks'
+        sql = 'SELECT * FROM upload'
         req = self.cursor.execute(sql)
         for task in req:
-            self.liststore.append(task + (gutil.escape(task[PATH_COL]), ))
+            self.liststore.append(task)
 
     def check_commit(self):
         '''当修改数据库超过5次后, 就自动commit数据.'''
@@ -185,20 +190,19 @@ class UploadPage(Gtk.Box):
     def add_task_db(self, task):
         '''向数据库中写入一个新的任务记录, 并返回它的fid'''
         print('add task db:', task)
-        sql = '''INSERT INTO tasks(
+        sql = '''INSERT INTO upload (
         name, source_path, path, size, curr_size, state, state_name,
-        human_size, percent)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'''
-        req = self.cursor.execute(sql, task[:-1])
-        self.conn.commit()
+        human_size, percent, tooltip, threshold)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+        req = self.cursor.execute(sql, task)
+        self.check_commit()
         return req.lastrowid
 
     def add_slice_db(self, fid, slice_end, md5):
         '''在数据库中加入上传任务分片信息'''
-        print('add slice db:', fid, slice_end, md5)
         sql = 'INSERT INTO slice VALUES(?, ?, ?)'
         self.cursor.execute(sql, (fid, slice_end, md5))
-        self.conn.commit()
+        self.check_commit()
 
     def get_task_db(self, source_path):
         '''从数据库中查询source_path的信息.
@@ -206,8 +210,7 @@ class UploadPage(Gtk.Box):
         如果存在的话, 就返回这条记录;
         如果没有的话, 就返回None
         '''
-        print('get task_db:', source_path)
-        sql = 'SELECT * FROM tasks WHERE source_path=? LIMIT 1'
+        sql = 'SELECT * FROM upload WHERE source_path=? LIMIT 1'
         req = self.cursor.execute(sql, [source_path, ])
         if req:
             return req.fetchone()
@@ -230,7 +233,7 @@ class UploadPage(Gtk.Box):
     def update_task_db(self, row):
         '''更新数据库中的任务信息'''
         print('update task_db:', row[:])
-        sql = '''UPDATE tasks SET 
+        sql = '''UPDATE upload SET 
         curr_size=?, state=?, state_name=?, human_size=?, percent=?
         WHERE fid=? LIMIT 1;
         '''
@@ -238,20 +241,21 @@ class UploadPage(Gtk.Box):
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
             row[HUMANSIZE_COL], row[PERCENT_COL], row[FID_COL]
             ])
-        self.conn.commit()
+        self.check_commit()
 
     def remove_task_db(self, fid):
         '''将任务从数据库中删除'''
         print('remove task_db:', fid)
         self.remove_slice_db(fid)
-        sql = 'DELETE FROM tasks WHERE fid=?'
+        sql = 'DELETE FROM upload WHERE fid=?'
         self.cursor.execute(sql, [fid, ])
-        self.conn.commit()
+        self.check_commit()
 
     def remove_slice_db(self, fid):
         '''将上传任务的分片从数据库中删除'''
         sql = 'DELETE FROM slice WHERE fid=?'
         self.cursor.execute(sql, [fid, ])
+        self.check_commit()
 
     def do_destroy(self, *args):
         if not self.first_run:
@@ -321,6 +325,18 @@ class UploadPage(Gtk.Box):
         path = os.path.join(dir_name, filename)
         size = os.path.getsize(source_path)
         total_size = util.get_human_size(size)[0]
+        tooltip = gutil.escape(
+                _('From {0}\nTo {1}').format(source_path, path))
+        if size < 2 ** 27:           # 128M 
+            threshold = 2 ** 17      # 128K
+        elif size < 2 ** 29:         # 512M
+            threshold =  2 ** 19     # 512K
+        elif size < 10 * (2 ** 30):  # 10G
+            threshold = math.ceil(size / (2 ** 10))
+        else:
+            self.app.toast(
+                    _('{0} is too large to upload (>10G).').format(path))
+            return
         task = [
             filename,
             source_path,
@@ -331,7 +347,8 @@ class UploadPage(Gtk.Box):
             StateNames[State.WAITING],
             '0 / {0}'.format(total_size),
             0,
-            gutil.escape(path)
+            tooltip,
+            threshold,
             ]
         row_id = self.add_task_db(task)
         task.insert(0, row_id)
@@ -343,7 +360,6 @@ class UploadPage(Gtk.Box):
         将任务状态设定为Uploading, 如果没有超过最大任务数的话;
         否则将它设定为Waiting.
         '''
-        print('start task:', row[:])
         if row[STATE_COL] in RUNNING_STATES :
             self.scan_tasks()
             return
@@ -363,7 +379,6 @@ class UploadPage(Gtk.Box):
 
     def pause_task(self, row, scan=True):
         '''暂停下载任务'''
-        print('pause task:', row[:])
         if row[STATE_COL] == State.UPLOADING:
             self.remove_worker(row[FID_COL], stop=False)
         if row[STATE_COL] in (State.UPLOADING, State.WAITING):
@@ -375,7 +390,6 @@ class UploadPage(Gtk.Box):
 
     def remove_task(self, row, scan=True):
         '''删除下载任务'''
-        print('remove task:', row[:])
         if row[STATE_COL] == State.UPLOADING:
             self.remove_worker(row[FID_COL], stop=True)
         self.remove_task_db(row[FID_COL])
@@ -386,26 +400,22 @@ class UploadPage(Gtk.Box):
             self.scan_tasks()
 
     def scan_tasks(self):
-        print('scan tasks()')
         if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
             return
         for row in self.liststore:
             if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
-                print('max concurrent tasks reached')
                 break
             if row[STATE_COL] == State.WAITING:
                 self.start_worker(row)
         return True
 
     def start_worker(self, row):
-        print('start worker:', row[:])
         def on_worker_slice_sent(worker, fid, slice_end, md5):
             GLib.idle_add(do_worker_slice_sent, fid, slice_end, md5)
 
         def do_worker_slice_sent(fid, slice_end, md5):
             if fid not in self.workers:
                 return
-            print('will add slice to db:', fid, slice_end, md5)
             row = self.get_row_by_fid(fid)
             row[CURRSIZE_COL] = slice_end
             total_size = util.get_human_size(row[SIZE_COL])[0]
@@ -479,8 +489,7 @@ class UploadPage(Gtk.Box):
             return
         row[STATE_COL] = State.UPLOADING
         row[STATENAME_COL] = StateNames[State.UPLOADING]
-        threshold = self.app.profile['upload-threshold'] * (2 ** 20)
-        worker = Uploader(self, row, threshold, self.app.cookie, self.app.tokens)
+        worker = Uploader(self, row, self.app.cookie, self.app.tokens)
         self.workers[row[FID_COL]] = (worker, row)
         # For slice upload
         worker.connect('slice-sent', on_worker_slice_sent)
@@ -492,7 +501,6 @@ class UploadPage(Gtk.Box):
         worker.start()
 
     def remove_worker(self, fid, stop=True):
-        print('remove worker:', fid)
         if fid not in self.workers:
             return
         worker = self.workers[fid][0]
