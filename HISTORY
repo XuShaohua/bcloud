@@ -1,3 +1,15 @@
+v3.3.1 - 2014.4.15
+* Remove all debug info
+* Explicitly destroy DownloadPage and UploadPage
+* Fixed: status icon disappears after preferences dialog destroyed
+* Automatically adjust uploading slice size based on file size
+* Uploading slice size option removed from Preferences dialog
+* Fixed: Saving uploading/downloading status of current user before loggint out
+* Fixed: Check video streaming status before loading with player
+* Fixed: NameError global name `dbus` is not defined
+* Store downloading status to database
+* Automatically migrate tasks to new tables
+
 v3.2.1 - 2014.4.14
 * Fixed: catch dbus.exception.DBusExceptions when query user password from keyring
 * Automatically flush to disk when downloading files
