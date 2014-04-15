@@ -1,3 +1,8 @@
+v3.3.2 - 2014.4.15
+* Rewrite Downloader to accelerate downloading speed
+* Fixed: check row is not None
+* Show downloading speed
+
 v3.3.1 - 2014.4.15
 * Remove all debug info
 * Explicitly destroy DownloadPage and UploadPage
