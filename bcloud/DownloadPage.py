@@ -7,6 +7,7 @@ import json
 import os
 import sqlite3
 import threading
+import time
 
 from gi.repository import Gio
 from gi.repository import GLib
@@ -68,6 +69,8 @@ class DownloadPage(Gtk.Box):
     workers = {} # { `fs_id': (worker,row) }
     app_infos = {} # { `fs_id': app }
     commit_count = 0
+    downloading_size = 0
+    downloading_timestamp = 0
 
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -94,6 +97,9 @@ class DownloadPage(Gtk.Box):
         open_folder_button.connect(
                 'clicked', self.on_open_folder_button_clicked)
         control_box.pack_end(open_folder_button, False, False, 10)
+
+        self.speed_label = Gtk.Label()
+        control_box.pack_end(self.speed_label, False, False, 0)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
@@ -372,6 +378,12 @@ class DownloadPage(Gtk.Box):
                 row = self.get_row_by_fsid(fs_id)
             if not row:
                 return
+            # update downloading speed
+            self.downloading_size += current_size - row[CURRSIZE_COL]
+            speed = (self.downloading_size /
+                        (time.time() - self.downloading_timestamp) / 1000)
+            self.speed_label.set_text(_('{0} kb/s').format(int(speed)))
+
             row[CURRSIZE_COL] = current_size
             curr_size = util.get_human_size(row[CURRSIZE_COL])[0]
             total_size = util.get_human_size(row[SIZE_COL])[0]
@@ -407,6 +419,9 @@ class DownloadPage(Gtk.Box):
             row[STATENAME_COL] = StateNames[State.ERROR]
             self.update_task_db(row)
             self.remove_worker(row[FSID_COL])
+            self.toast(_('Error occurs will downloading {0}').format(
+                row[NAME_COL]))
+            self.scan_tasks()
 
         if row[FSID_COL] in self.workers:
             return
@@ -418,6 +433,8 @@ class DownloadPage(Gtk.Box):
         worker.connect('downloaded', on_worker_downloaded)
         worker.connect('network-error', on_worker_network_error)
         worker.start()
+        self.downloading_size = 0
+        self.downloading_timestamp = time.time()
 
     def pause_worker(self, row):
         self.remove_worker(row[FSID_COL], stop=False)
@@ -457,6 +474,7 @@ class DownloadPage(Gtk.Box):
             return
         for row in self.liststore:
             self.pause_task(row, scan=False)
+        self.speed_label.set_text('')
 
     def pause_task(self, row, scan=True):
         if row[STATE_COL] == State.DOWNLOADING:
