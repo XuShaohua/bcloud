@@ -179,6 +179,21 @@ class DownloadPage(Gtk.Box):
         '''
         self.cursor.execute(sql)
 
+        # mig 3.2.1 -> 3.3.1
+        try:
+            req = self.cursor.execute('SELECT * FROM download')
+            tasks = []
+            for row in req:
+                tasks.append(row + ('', ))
+            if tasks:
+                sql = 'INSERT INTO tasks VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                self.cursor.executemany(sql, tasks)
+                self.check_commit()
+            self.cursor.execute('DROP TABLE download')
+            self.check_commit()
+        except sqlite3.OperationalError:
+            pass
+
     def check_first(self):
         if self.first_run:
             self.first_run = False
