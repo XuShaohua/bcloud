@@ -38,7 +38,6 @@ def base64_decode(text):
     try:
         return base64.b64decode(text.encode()).decode()
     except Exception as e:
-        print(e)
         return ''
 
 def url_split_param(text):
@@ -79,5 +78,4 @@ def json_beautify(text):
     try:
         return json.dumps(json.loads(text), indent=4)
     except Exception as e:
-        print(e)
         return ''

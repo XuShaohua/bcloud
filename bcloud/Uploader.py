@@ -66,7 +66,6 @@ class Uploader(threading.Thread, GObject.GObject):
         self.tokens = tokens
 
         self.row = row[:]
-        print('Uploader.__init__(), new worker inited:', self.row)
 
     def run(self):
         #self.check_exists()
@@ -81,39 +80,33 @@ class Uploader(threading.Thread, GObject.GObject):
 
     # Open API
     def pause(self):
-        print('Uploader.pause()')
         self.row[STATE_COL] = State.PAUSED
         if self.is_slice_upload:
             # TODO:
-            print('will dump slice upload')
+            pass
 
     # Open API
     def stop(self):
-        print('Uploader.stop() ')
         self.row[STATE_COL] = State.CANCELED
 
     def check_exists(self):
         meta = pcs.get_metas(self.row[PATH_COL])
-        print(meta)
 
     def rapid_upload(self):
         '''快速上传.
 
         如果失败, 就自动调用分片上传.
         '''
-        print('Uploader.rapid_upload!')
         info = pcs.rapid_upload(
             self.cookie, self.tokens,
             self.row[SOURCEPATH_COL], self.row[PATH_COL])
         if info and info['md5'] and info['fs_id']:
             self.emit('uploaded', self.row[FID_COL])
         else:
-            print('Uploader.will use slice upload')
             self.slice_upload()
 
     def slice_upload(self):
         '''分片上传'''
-        print('Uploader.slice_upload()')
         self.is_slice_upload = True
         fid = self.row[FID_COL]
         slice_start = self.row[CURRSIZE_COL]
@@ -129,7 +122,6 @@ class Uploader(threading.Thread, GObject.GObject):
         fh.seek(slice_start)
         while self.row[STATE_COL] == State.UPLOADING:
             if slice_end >= file_size:
-                print('will emit merge-files signal:', fid)
                 self.emit('merge-files', self.row[FID_COL])
                 break
             slice_start = slice_end
@@ -138,10 +130,8 @@ class Uploader(threading.Thread, GObject.GObject):
             slice_end = slice_start + len(data)
             info = pcs.slice_upload(self.cookie, data)
             if info and 'md5' in info:
-                print('will emit slice-sent signal:', fid, slice_end, info['md5'])
                 self.emit('slice-sent', fid, slice_end, info['md5'])
             else:
-                print('Failed to upload this slice:', slice_start, slice_end)
                 self.emit('network-error', fid)
                 break
         if not fh.closed:

@@ -116,13 +116,9 @@ class CloudPage(Gtk.Box):
     def load(self):
         '''获取当前的离线任务列表'''
         def on_list_task(info, error=None):
-            print('on list task() --', info)
             if error or not info:
-                print('Error: failed to list cloud tasks')
                 return
             if 'error_code' in info and info['error_code'] != 0:
-                print('Error: ', info['error_msg'])
-                print(info)
                 return
             tasks = info['task_info']
             for task in tasks:
@@ -168,7 +164,6 @@ class CloudPage(Gtk.Box):
         '''定期获取离线下载任务的信息, 比如10秒钟'''
         def update_task_status(info, error=None):
             if error or not info:
-                print('Error: failed to update task status')
                 return
             tasks = info['task_info']
             for row in self.liststore:
@@ -202,7 +197,6 @@ class CloudPage(Gtk.Box):
         '''
         def check_vcode(info, error=None):
             if error or not info:
-                print('Error in check_vcode:', info, Error)
                 return
             if 'task_id' in info or info['error_code'] == 0:
                 self.reload()
@@ -219,7 +213,6 @@ class CloudPage(Gtk.Box):
                     selected_idx, file_sha1, info['vcode'], vcode_input,
                     callback=check_vcode)
             else:
-                print('Unknown error info:', info)
                 self.app.toast(_('Error: {0}').format(info['error_msg']))
 
         self.check_first()
@@ -249,7 +242,6 @@ class CloudPage(Gtk.Box):
         '''新建普通的链接任务'''
         def on_link_task_added(info, error=None):
             if error or not info:
-                print(info)
                 return
             if 'task_id' in info or info['error_code'] == 0:
                 self.reload()
@@ -266,7 +258,6 @@ class CloudPage(Gtk.Box):
                     self.app.tokens, source_url, save_path, vcode,
                     vcode_input, callback=on_link_task_added)
             else:
-                print('Unknown error info:', info)
                 self.app.toast(_('Error: {0}').format(info['error_msg']))
 
         self.check_first()
@@ -303,10 +294,7 @@ class CloudPage(Gtk.Box):
 
         priv_url = decoder.decode(source_url)
         if priv_url:
-            print('private link:', priv_url)
             source_url = priv_url 
-        else:
-            print('Failed to parse private link:', source_url)
         folder_browser = FolderBrowserDialog(
                 self, self.app, _('Save to..'))
         response = folder_browser.run()
@@ -350,11 +338,9 @@ class CloudPage(Gtk.Box):
 
     def on_remove_button_clicked(self, button):
         def on_task_removed(resp, error=None):
-            print('on task removed:', resp)
             self.reload()
         model, tree_paths = self.selection.get_selected_rows()
         if not tree_paths or len(tree_paths) != 1:
-            print('on remove button clicked: do nothing:', tree_paths)
             return
         tree_path = tree_paths[0]
         task_id = model[tree_path][TASKID_COL]

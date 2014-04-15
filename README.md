@@ -30,6 +30,7 @@ DEPENDENCIES
 * python3-urllib3 urllib的封装, 更易用, 在这里 https://pypi.python.org/pypi/urllib3.
 * gnome-icon-theme-symbolic Gnome3 提供的一套按纽.
 * python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到
+* python3-dbus  dbus的python3绑定, 如果在密码时超时, 会产生一个dbus.exceptions.Exception异常.
 gnome-keyring或kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
 * gir1.2-notify 这个是GtkNotification的接口, 显示桌面消息通知
 
@@ -58,10 +59,9 @@ Q&A
 
 4. 能不能支持其它网盘?
 
-我本人时间和精力都非常有限, 单单开发bcloud就占用了我一个多月的业余时间. 而且
+我时间和精力都非常有限, 单单开发bcloud就占用了我一个多月的业余时间. 而且
 本来工作之外的时间就非常少, 还有很多其它事情要处理. 所以如果你报告了bug或者
 反馈了问题, 没有及时收到回复, 请多等待一下, 我会安排时间处理这些问题的.
-
 
 
 COPYRIGHT

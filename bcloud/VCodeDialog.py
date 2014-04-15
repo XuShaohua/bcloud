@@ -48,7 +48,6 @@ class VCodeDialog(Gtk.Dialog):
     def update_img(self, request, error=None):
         if error or not request:
             # TODO: add a refresh button
-            print('failed to get vcode image')
             return
         vcode_path = os.path.join(
                 Config.get_tmp_path(self.app.profile['username']),

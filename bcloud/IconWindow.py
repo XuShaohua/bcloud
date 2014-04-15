@@ -288,13 +288,12 @@ class IconWindow(Gtk.ScrolledWindow):
         if app_infos:
             self.launch_app_with_app_info(app_infos[0])
         else:
-            print('Unknown file type')
+            pass
 
     def launch_app_with_app_info(self, app_info):
         def open_video_link(resp, error=None):
             '''得到视频最后地址后, 调用播放器直接播放'''
             if error or not resp:
-                print('Failed to get video dlink!')
                 return
             red_url, req_id = resp
             gutil.async_call(app_info.launch_uris, [red_url, ], None)
@@ -306,8 +305,6 @@ class IconWindow(Gtk.ScrolledWindow):
             法, 先得琶视频地址, 再用播放器去打开它.
             '''
             if error or not pls or b'error_code' in pls:
-                print('save_playlist:', pls, error)
-                print('Failed to get playlist, now try to get video dlink')
                 gutil.async_call(
                         pcs.get_download_link, self.app.cookie,
                         pcs_file['dlink'], callback=open_video_link)

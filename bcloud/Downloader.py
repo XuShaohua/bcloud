@@ -57,8 +57,6 @@ class Downloader(threading.Thread, GObject.GObject):
         self.tokens = tokens
 
         self.row = row[:]  # 复制一份
-        print('Downloader.__init__(), new worker inited:')
-        print(self.row)
 
         self.pool = urllib3.PoolManager()
 
@@ -106,13 +104,11 @@ class Downloader(threading.Thread, GObject.GObject):
     def get_download_link(self):
         meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
         if not meta or meta['errno'] != 0 or 'info' not in meta:
-            print('Error: failed to get meta info:', meta)
             self.emit('network-error', self.row[FSID_COL])
         else:
             dlink = meta['info'][0]['dlink']
             red_url, req_id = pcs.get_download_link(self.cookie, dlink)
             if not req_id:
-                print('Error: failed to get req_id:', req_id)
                 self.emit('network-error', self.row[FSID_COL])
             else:
                 self.red_url = red_url
@@ -166,7 +162,8 @@ class Downloader(threading.Thread, GObject.GObject):
                 self.write_bytes(range_, resp.data)
                 return
             except OSError as e:
-                print(e)
+                # TODO
+                pass
         self.emit('network-error', self.row[FSID_COL])
 
     def write_bytes(self, range_, block):

@@ -305,7 +305,6 @@ def list_dir_all(cookie, tokens, path):
         if not content:
             return (path, None)
         if not content['list']:
-            print(pcs_files)
             return (path, pcs_files)
         pcs_files.extend(content['list'])
         page = page + 1
@@ -613,7 +612,6 @@ def upload(cookie, source_path, path, ondup='overwrite'):
 
 def rapid_upload(cookie, tokens, source_path, path):
     '''快速上传'''
-    print('rapid_upload:', source_path)
     content_length = os.path.getsize(source_path)
     assert content_length > RAPIDUPLOAD_THRESHOLD, 'file size is not satisfied!'
     dir_name, file_name = os.path.split(path)

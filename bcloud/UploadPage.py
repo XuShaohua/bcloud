@@ -189,7 +189,6 @@ class UploadPage(Gtk.Box):
 
     def add_task_db(self, task):
         '''向数据库中写入一个新的任务记录, 并返回它的fid'''
-        print('add task db:', task)
         sql = '''INSERT INTO upload (
         name, source_path, path, size, curr_size, state, state_name,
         human_size, percent, tooltip, threshold)
@@ -222,7 +221,6 @@ class UploadPage(Gtk.Box):
         
         返回的是一个list, 里面是按顺序排好的md5的值
         '''
-        print('get slice db:', fid)
         sql = 'SELECT md5 FROM slice WHERE fid=?'
         req = self.cursor.execute(sql, [fid, ])
         if req:
@@ -232,7 +230,6 @@ class UploadPage(Gtk.Box):
 
     def update_task_db(self, row):
         '''更新数据库中的任务信息'''
-        print('update task_db:', row[:])
         sql = '''UPDATE upload SET 
         curr_size=?, state=?, state_name=?, human_size=?, percent=?
         WHERE fid=? LIMIT 1;
@@ -245,7 +242,6 @@ class UploadPage(Gtk.Box):
 
     def remove_task_db(self, fid):
         '''将任务从数据库中删除'''
-        print('remove task_db:', fid)
         self.remove_slice_db(fid)
         sql = 'DELETE FROM upload WHERE fid=?'
         self.cursor.execute(sql, [fid, ])
@@ -318,7 +314,6 @@ class UploadPage(Gtk.Box):
         '''创建新的上传任务'''
         row = self.get_task_db(source_path)
         if row:
-            print('Task is already in uploading schedule, do nothing.')
             return
         source_dir, filename = os.path.split(source_path)
         
@@ -426,15 +421,11 @@ class UploadPage(Gtk.Box):
             self.add_slice_db(fid, slice_end, md5)
 
         def on_worker_merge_files(worker, fid):
-            print('merge_files:', worker, fid)
             GLib.idle_add(do_worker_merge_files, fid)
 
         def do_worker_merge_files(fid):
-            print('do worker merge files:', fid)
             def on_create_superfile(pcs_file, error=None):
-                print('on create superfile:', pcs_file, error)
                 if error or not pcs_file:
-                    print('failed to create super file.')
                     do_worker_error(fid)
                     return
                 else:
@@ -444,7 +435,7 @@ class UploadPage(Gtk.Box):
             block_list = self.get_slice_db(fid)
             row = self.get_row_by_fid(fid)
             if not block_list:
-                print('Block list is empty while creating super file:', fid)
+                pass
             else:
                 gutil.async_call(
                     pcs.create_superfile, self.app.cookie, row[PATH_COL],
@@ -454,7 +445,6 @@ class UploadPage(Gtk.Box):
             GLib.idle_add(do_worker_uploaded, fid)
 
         def do_worker_uploaded(fid):
-            print('do worker uploaded:', fid)
             if fid not in self.workers:
                 return
             row = self.get_row_by_fid(fid)
@@ -469,15 +459,12 @@ class UploadPage(Gtk.Box):
             self.scan_tasks()
 
         def on_worker_disk_error(worker, fid):
-            print('UploadPage.disk_error')
             GLib.idle_add(do_worker_error, fid)
 
         def on_worker_network_error(worker, fid):
-            print('UploadPage.network error')
             GLib.idle_add(do_worker_error, fid)
 
         def do_worker_error(fid):
-            print('do worker error:', fid)
             row = self.get_row_by_fid(fid)
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]

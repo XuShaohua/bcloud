@@ -356,7 +356,6 @@ class DownloadPage(Gtk.Box):
             else:
                 row = self.get_row_by_fsid(fs_id)
             if not row:
-                print('on worker received, row is None:', row)
                 return
             row[CURRSIZE_COL] = current_size
             curr_size = util.get_human_size(row[CURRSIZE_COL])[0]
@@ -428,7 +427,6 @@ class DownloadPage(Gtk.Box):
         将任务状态设定为Downloading, 如果没有超过最大任务数的话;
         否则将它设定为Waiting.
         '''
-        print('start task:', row, scan)
         if row[STATE_COL] in RUNNING_STATES :
             return
         row[STATE_COL] = State.WAITING

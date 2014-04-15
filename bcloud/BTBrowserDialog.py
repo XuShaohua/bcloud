@@ -76,7 +76,6 @@ class BTBrowserDialog(Gtk.Dialog):
         '''在调用dialog.run()之前先调用这个函数来获取数据'''
         def on_tasks_received(info, error=None):
             if error or not info:
-                print('error occurred, or info is None:', info)
                 return
             if 'magnet_info' in info:
                 tasks = info['magnet_info']
@@ -84,7 +83,6 @@ class BTBrowserDialog(Gtk.Dialog):
                 tasks = info['torrent_info']['file_info']
                 self.file_sha1 = info['torrent_info']['sha1']
             else:
-                print('tasks is null:', info)
                 return
             for task in tasks:
                 size = int(task['size'])
