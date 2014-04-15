@@ -8,6 +8,7 @@ import os
 import subprocess
 import threading
 
+import dbus
 from gi.repository import GdkPixbuf
 from gi.repository import Gtk
 from gi.repository import GLib
