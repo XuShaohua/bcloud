@@ -532,8 +532,11 @@ class DownloadPage(Gtk.Box):
             fs_ids.append(model[tree_path][FSID_COL])
         for fs_id in fs_ids:
             row = self.get_row_by_fsid(fs_id)
-            if row:
-                operator(row)
+            if not row:
+                return
+            operator(row, scan=False)
+        self.scan_tasks()
+
 
     def on_start_button_clicked(self, button):
         self.operate_selected_rows(self.start_task)
