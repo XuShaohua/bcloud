@@ -214,7 +214,10 @@ class App:
                     self.init_status_icon()
 
     def on_signout_action_activated(self, action, params):
+        '''在退出登录前, 应该保存当前用户的所有数据'''
         if self.profile:
+            self.upload_page.pause_tasks()
+            self.download_page.pause_tasks()
             self.show_signin_dialog(auto_signin=False)
 
     def on_about_action_activated(self, action, params):
