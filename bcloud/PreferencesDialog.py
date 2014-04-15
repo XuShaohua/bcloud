@@ -53,17 +53,6 @@ class PreferencesDialog(Gtk.Dialog):
         concurr_spin.connect('value-changed', self.on_concurr_value_changed)
         general_grid.attach(concurr_spin, 1, 1, 1, 1)
 
-        upload_label = Gtk.Label.new(_('Uploading slice size:'))
-        upload_label.props.xalign = 1
-        general_grid.attach(upload_label, 0, 2, 1, 1)
-        upload_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
-        upload_spin.set_tooltip_text(
-                _('Specify size, in Megabyte, of each slice data to upload.\nSliced data will be merge on server. Default is 1'))
-        upload_spin.set_value(self.app.profile['upload-threshold'])
-        upload_spin.props.halign = Gtk.Align.START
-        upload_spin.connect('value-changed', self.on_upload_value_changed)
-        general_grid.attach(upload_spin, 1, 2, 1, 1)
-
         notify_label = Gtk.Label.new(_('Use Notification:'))
         notify_label.props.xalign = 1
         general_grid.attach(notify_label, 0, 3, 1, 1)
@@ -104,9 +93,6 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_concurr_value_changed(self, concurr_spin):
         self.app.profile['concurr-tasks'] = concurr_spin.get_value()
-
-    def on_upload_value_changed(self, upload_spin):
-        self.app.profile['upload-threshold'] = upload_spin.get_value()
 
     def on_notify_switch_activate(self, switch, event):
         self.app.profile['use-notify'] = switch.get_active()
