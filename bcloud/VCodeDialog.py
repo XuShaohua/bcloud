@@ -37,7 +37,9 @@ class VCodeDialog(Gtk.Dialog):
         box.pack_start(self.img, False, False, 0)
 
         self.entry = Gtk.Entry()
-        self.entry.connect('activate', lambda *args: self.hide())
+        self.entry.connect(
+                'activate',
+                lambda *args: self.response(Gtk.ResponseType.OK))
         box.pack_start(self.entry, False, False, 0)
 
         box.show_all()

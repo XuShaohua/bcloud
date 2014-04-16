@@ -85,7 +85,7 @@ class SigninVcodeDialog(Gtk.Dialog):
 
     def check_entry(self, *args):
         if len(self.vcode_entry.get_text()) == 4:
-            self.hide()
+            self.response(Gtk.ResponseType.OK)
 
     def on_vcode_refresh_clicked(self, button):
         self.refresh_vcode()
