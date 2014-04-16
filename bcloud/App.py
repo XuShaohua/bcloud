@@ -190,9 +190,9 @@ class App:
     def on_main_window_deleted(self, window, event):
         if self.profile and self.profile['use-status-icon']:
             window.hide()
-            return True
         else:
-            return False
+            self.quit()
+        return True
 
     def on_main_window_drag_data_received(self, window, drag_context, x, y,
                                           data, info, time):
