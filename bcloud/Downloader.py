@@ -107,16 +107,27 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def get_download_link(self):
         meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
+        print('meta:', meta)
         if not meta or meta['errno'] != 0 or 'info' not in meta:
             self.network_error()
+            return
+        pcs_files = meta['info']
+        if not pcs_files:
+            print('pcs_files in meta is empty, abort')
+            self.network_error()
+            return
+        pcs_file = pcs_files[0]
+        if pcs_file['fs_id'] != self.row[FSID_COL]:
+            print('FSID not match, abort.')
+            self.network_error()
+            return
+        dlink = pcs_file['dlink']
+        red_url, req_id = pcs.get_download_link(self.cookie, dlink)
+        if not req_id:
+            self.network_error()
         else:
-            dlink = meta['info'][0]['dlink']
-            red_url, req_id = pcs.get_download_link(self.cookie, dlink)
-            if not req_id:
-                self.network_error()
-            else:
-                self.red_url = red_url
-                self.download()
+            self.red_url = red_url
+            self.download()
 
     def download(self):
         self.emit('started', self.row[FSID_COL])

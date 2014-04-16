@@ -689,11 +689,12 @@ def create_superfile(cookie, path, block_list):
         return None
 
 
-def get_metas(cookie, tokens, filelist):
+def get_metas(cookie, tokens, filelist, dlink=True):
     '''获取多个文件的metadata.
 
     filelist - 一个list, 里面是每个文件的绝对路径.
                也可以是一个字符串, 只包含一个文件的绝对路径.
+    dlink    - 是否包含下载链接, 默认为True, 包含.
 
     @return 包含了文件的下载链接dlink, 通过它可以得到最终的下载链接.
     '''
@@ -704,7 +705,12 @@ def get_metas(cookie, tokens, filelist):
         'filemetas?channel=chunlei&clienttype=0&web=1',
         '&bdstoken=', tokens['bdstoken'],
         ])
-    data = 'dlink=1&target=' + encoder.encode_uri_component(json.dumps(filelist))
+    if dlink:
+        data = ('dlink=1&target=' +
+                encoder.encode_uri_component(json.dumps(filelist)))
+    else:
+        data = ('dlink=0&target=' +
+                encoder.encode_uri_component(json.dumps(filelist)))
     req = net.urlopen(url, headers={
         'Cookie': cookie.sub_output('BDUSS'),
         'Content-type': const.CONTENT_FORM,
