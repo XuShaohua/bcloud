@@ -88,6 +88,14 @@ class HomePage(Gtk.Box):
         self.path_box.props.valign = Gtk.Align.START
         path_viewport.add(self.path_box)
 
+        # show loading process
+        loading_button = Gtk.ToolItem()
+        nav_bar.insert(loading_button, 1)
+        loading_button.props.margin_right = 10
+        self.loading_spin = Gtk.Spinner()
+        loading_button.add(self.loading_spin)
+        self.loading_spin.props.valign = Gtk.Align.CENTER
+
         # search button
         search_button = Gtk.ToggleToolButton()
         search_button.set_label(_('Search'))
@@ -95,7 +103,7 @@ class HomePage(Gtk.Box):
         search_button.set_tooltip_text(
                 _('Search documents and folders by name'))
         search_button.connect('toggled', self.on_search_button_toggled)
-        nav_bar.insert(search_button, 1)
+        nav_bar.insert(search_button, 2)
         search_button.props.valign = Gtk.Align.START
         search_button.props.margin_right = 10
 
@@ -105,7 +113,7 @@ class HomePage(Gtk.Box):
         list_view_button.set_icon_name('list-view-symbolic')
         list_view_button.connect(
                 'clicked', self.on_list_view_button_clicked)
-        nav_bar.insert(list_view_button, 2)
+        nav_bar.insert(list_view_button, 3)
         list_view_button.props.valign = Gtk.Align.START
 
         grid_view_button = Gtk.ToolButton()
@@ -113,7 +121,7 @@ class HomePage(Gtk.Box):
         grid_view_button.set_icon_name('grid-view-symbolic')
         grid_view_button.connect(
                 'clicked', self.on_grid_view_button_clicked)
-        nav_bar.insert(grid_view_button, 3)
+        nav_bar.insert(grid_view_button, 4)
         grid_view_button.props.valign = Gtk.Align.START
 
         # serch entry
@@ -142,6 +150,8 @@ class HomePage(Gtk.Box):
     # Open API
     def load(self, path='/'):
         def on_load(info, error=None):
+            self.loading_spin.stop()
+            self.loading_spin.hide()
             if error or not info or info['errno'] != 0:
                 return
             self.icon_window.load(info['list'])
@@ -150,6 +160,8 @@ class HomePage(Gtk.Box):
         self.page_num = 1
         self.has_next = True
         self.path_box.set_path(path)
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         gutil.async_call(
                 pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
                 self.page_num, callback=on_load)
@@ -160,6 +172,8 @@ class HomePage(Gtk.Box):
     def load_next(self):
         '''载入下一页'''
         def on_load_next(info, error=None):
+            self.loading_spin.stop()
+            self.loading_spin.hide()
             if error or not info or info['errno'] != 0:
                 return
             if info['list']:
@@ -171,6 +185,8 @@ class HomePage(Gtk.Box):
             return
         self.page_num = self.page_num + 1
         self.path_box.set_path(self.path)
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         gutil.async_call(
                 pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
                 self.page_num, callback=on_load_next)

@@ -33,7 +33,17 @@ class CategoryPage(Gtk.Box):
         nav_bar.props.show_arrow = False
         nav_bar.props.toolbar_style = Gtk.ToolbarStyle.ICONS
         nav_bar.props.icon_size = Gtk.IconSize.LARGE_TOOLBAR
+        nav_bar.props.halign = Gtk.Align.END
         self.pack_start(nav_bar, False, False, 0)
+
+        # show loading process
+        loading_button = Gtk.ToolItem()
+        nav_bar.insert(loading_button, 0)
+        loading_button.props.margin_right = 10
+        self.loading_spin = Gtk.Spinner()
+        loading_button.add(self.loading_spin)
+        self.loading_spin.props.valign = Gtk.Align.CENTER
+        nav_bar.child_set_property(loading_button, 'expand', True)
 
         # toggle view mode
         list_view_button = Gtk.ToolButton()
@@ -41,34 +51,38 @@ class CategoryPage(Gtk.Box):
         list_view_button.set_icon_name('list-view-symbolic')
         list_view_button.connect(
                 'clicked', self.on_list_view_button_clicked)
-        nav_bar.insert(list_view_button, 0)
-        nav_bar.child_set_property(list_view_button, 'expand', True)
-        nav_bar.props.halign = Gtk.Align.END
+        nav_bar.insert(list_view_button, 1)
 
         grid_view_button = Gtk.ToolButton()
         grid_view_button.set_label(_('ListView'))
         grid_view_button.set_icon_name('grid-view-symbolic')
         grid_view_button.connect(
                 'clicked', self.on_grid_view_button_clicked)
-        nav_bar.insert(grid_view_button, 1)
+        nav_bar.insert(grid_view_button, 2)
 
         self.icon_window = IconWindow(self, app)
         self.pack_end(self.icon_window, True, True, 0)
 
     def load(self):
         def on_load(info, error=None):
+            self.loading_spin.stop()
+            self.loading_spin.hide()
             if error or not info or info['errno'] != 0:
                 return
             self.icon_window.load(info['info'])
 
         has_next = True
         self.page_num = 1
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         gutil.async_call(
                 pcs.get_category, self.app.cookie, self.app.tokens,
                 self.category, self.page_num, callback=on_load)
 
     def load_next(self):
         def on_load_next(info, error=None):
+            self.loading_spin.stop()
+            self.loading_spin.hide()
             if error or not info or info['errno'] != 0:
                 return
             if info['info']:
@@ -78,6 +92,8 @@ class CategoryPage(Gtk.Box):
 
         if not self.has_next:
             return
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         self.page_num = self.page_num + 1
         gutil.async_call(
                 pcs.get_category, self.app.cookie, self.app.tokens,
