@@ -4,6 +4,7 @@
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
 import mimetypes
+import json
 import os
 import time
 
@@ -26,7 +27,8 @@ from bcloud import pcs
 from bcloud import util
 
 (PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
-    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL) = list(range(10))
+    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL
+    ) = list(range(11))
 TYPE_TORRENT = 'application/x-bittorrent'
 
 class IconWindow(Gtk.ScrolledWindow):
@@ -36,7 +38,6 @@ class IconWindow(Gtk.ScrolledWindow):
     其中的网络操作部分多半是异步进行的.
     '''
 
-    filelist = []  # to store pcs_files
     ICON_SIZE = 64
 
     def __init__(self, parent, app):
@@ -45,10 +46,10 @@ class IconWindow(Gtk.ScrolledWindow):
         self.app = app
 
         # pixbuf, name, path, tooltip, size, humansize,
-        # isdir, mtime, human mtime, type 
+        # isdir, mtime, human mtime, type, pcs_file
         self.liststore = Gtk.ListStore(
             GdkPixbuf.Pixbuf, str, str, str, GObject.TYPE_INT64, str,
-            GObject.TYPE_INT, GObject.TYPE_INT64, str, str)
+            GObject.TYPE_INT, GObject.TYPE_INT64, str, str, str)
         self.init_ui()
 
     def init_ui(self):
@@ -68,7 +69,6 @@ class IconWindow(Gtk.ScrolledWindow):
 
     def load(self, pcs_files):
         '''载入一个目录并显示里面的内容.'''
-        self.filelist = []
         self.liststore.clear()
         self.display_files(pcs_files)
 
@@ -85,7 +85,6 @@ class IconWindow(Gtk.ScrolledWindow):
         cache_path = Config.get_cache_path(self.app.profile['username'])
         for pcs_file in pcs_files:
             path = pcs_file['path']
-            self.filelist.append(pcs_file)
             pixbuf, type_ = self.app.mime.get(
                     path, pcs_file['isdir'], icon_size=self.ICON_SIZE)
             name = os.path.split(path)[NAME_COL]
@@ -96,10 +95,15 @@ class IconWindow(Gtk.ScrolledWindow):
             human_mtime = time.ctime(mtime)
             tree_iter = self.liststore.append([
                 pixbuf, name, path, tooltip, size, human_size,
-                pcs_file['isdir'], mtime, human_mtime, type_])
+                pcs_file['isdir'], mtime, human_mtime, type_,
+                json.dumps(pcs_file), ])
             gutil.update_liststore_image(
                 self.liststore, tree_iter, PIXBUF_COL, pcs_file,
                 cache_path, icon_size=self.ICON_SIZE)
+
+    def get_pcs_file(self, tree_path):
+        '''获取原始的pcs文件信息'''
+        return json.loads(self.liststore[tree_path][PCS_FILE_COL])
 
     def on_scrolled(self, adj):
         if gutil.reach_scrolled_bottom(adj) and self.parent.has_next:
@@ -323,11 +327,7 @@ class IconWindow(Gtk.ScrolledWindow):
             return
         tree_path = tree_paths[0]
         file_type = self.liststore[tree_path][TYPE_COL]
-        indices = tree_path.get_indices()
-        if not indices:
-            return
-        index = tree_path.get_indices()[0]
-        pcs_file = self.filelist[index]
+        pcs_file = self.get_pcs_file(tree_path)
         # 'media' 对应于rmvb格式.
         # 如果是视频等多媒体格式的话, 默认是直接调用播放器进行网络播放的
         if 'video' in file_type or 'media' in file_type:
@@ -387,9 +387,7 @@ class IconWindow(Gtk.ScrolledWindow):
         tree_paths = self.iconview.get_selected_items()
         if not tree_paths:
             return
-        tree_path = tree_paths[0]
-        index = tree_path.get_indices()[0]
-        pcs_file = self.filelist[index]
+        pcs_file = self.get_pcs_file(tree_paths[0])
         gutil.async_call(
                 pcs.get_download_link, self.app.cookie, pcs_file['dlink'],
                 callback=copy_link_to_clipboard)
@@ -399,7 +397,7 @@ class IconWindow(Gtk.ScrolledWindow):
         tree_paths = self.iconview.get_selected_items()
         if not tree_paths:
             return
-        pcs_files = [self.filelist[p.get_indices()[0]] for p in tree_paths]
+        pcs_files = [self.get_pcs_file(p) for p in tree_paths]
         self.app.blink_page(self.app.download_page)
         self.app.download_page.add_tasks(pcs_files)
 
@@ -415,8 +413,7 @@ class IconWindow(Gtk.ScrolledWindow):
             return
         fid_list = []
         for tree_path in tree_paths:
-            index = tree_path.get_indices()[0]
-            pcs_file = self.filelist[index]
+            pcs_file = self.get_pcs_file(tree_path)
             fid_list.append(pcs_file['fs_id'])
             gutil.async_call(
                     pcs.enable_share, self.app.cookie, self.app.tokens,
@@ -506,8 +503,7 @@ class IconWindow(Gtk.ScrolledWindow):
             dialog.destroy()
         else:
             for tree_path in tree_paths:
-                index = tree_path.get_indices()[0]
-                pcs_file = self.filelist[index]
+                pcs_file = self.get_pcs_file(tree_path)
                 dialog = PropertiesDialog(self.parent, self.app, pcs_file)
                 dialog.run()
                 dialog.destroy()
