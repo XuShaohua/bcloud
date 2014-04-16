@@ -13,6 +13,12 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 * Ubuntu 12.04
 * OpenSuse 13
 
+类似项目
+=======
+[pypy](https://github.com/houtianze/bypy), 终端里使用的百度网盘客户端, 它
+使用了百度网盘PCS接口.
+
+
 安装
 ====
 请用户直接到 [bcloud-packages](https://github.com/LiuLang/bcloud-packages)
