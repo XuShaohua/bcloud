@@ -268,6 +268,7 @@ class CloudPage(Gtk.Box):
                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
         dialog.set_border_width(10)
         dialog.set_default_size(480, 180)
+        dialog.set_default_response(Gtk.ResponseType.OK)
         box = dialog.get_content_area()
         entry = Gtk.Entry()
         entry.set_placeholder_text(_('Link ..'))

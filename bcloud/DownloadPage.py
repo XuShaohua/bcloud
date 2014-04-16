@@ -436,7 +436,7 @@ class DownloadPage(Gtk.Box):
             row[STATENAME_COL] = StateNames[State.ERROR]
             self.update_task_db(row)
             self.remove_worker(row[FSID_COL])
-            self.toast(_('Error occurs will downloading {0}').format(
+            self.app.toast(_('Error occurs will downloading {0}').format(
                 row[NAME_COL]))
             self.scan_tasks()
 

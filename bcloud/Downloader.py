@@ -107,7 +107,6 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def get_download_link(self):
         meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
-        print('meta:', meta)
         if not meta or meta['errno'] != 0 or 'info' not in meta:
             self.network_error()
             return
@@ -117,7 +116,7 @@ class Downloader(threading.Thread, GObject.GObject):
             self.network_error()
             return
         pcs_file = pcs_files[0]
-        if pcs_file['fs_id'] != self.row[FSID_COL]:
+        if str(pcs_file['fs_id']) != self.row[FSID_COL]:
             print('FSID not match, abort.')
             self.network_error()
             return

@@ -36,6 +36,7 @@ class BTBrowserDialog(Gtk.Dialog):
         self.source_url = source_url
         self.save_path = save_path
 
+        self.set_default_response(Gtk.ResponseType.OK)
         self.set_default_size(520, 480)
         self.set_border_width(10)
         box = self.get_content_area()

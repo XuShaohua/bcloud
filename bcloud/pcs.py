@@ -532,8 +532,10 @@ def download(cookie, url, targ_path, range_=None):
     with open(targ_path, 'wb') as fh:
         fh.write(content)
 
-def stream_download():
+def stream_download(tokens, path):
     '''下载流媒体文件.
+
+    path - 流文件的绝对路径.
     '''
     pass
 
