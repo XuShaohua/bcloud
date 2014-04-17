@@ -48,6 +48,7 @@ def async_call(func, *args, callback=None):
             GLib.idle_add(callback, result, error)
 
     thread = threading.Thread(target=do_call)
+    thread.daemon = True
     thread.start()
 
 def xdg_open(uri):
