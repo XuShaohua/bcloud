@@ -75,7 +75,7 @@ class MimeProvider:
 
     def get_app_img(self, app_info):
         themed_icon = app_info.get_icon()
-        if isinstance(themed_icon, Gio.FileIcon):
+        if not themed_icon or isinstance(themed_icon, Gio.FileIcon):
             return None
         icon_names = themed_icon.get_names()
         if icon_names:
