@@ -1,3 +1,15 @@
+v3.3.3 - 2014.4.17
+* Call App.quit explicitly
+* Fixed: VCodeDialog response type error
+* Fixed: FS_ID not match in Downloader
+* Fixed: DownloadPage has no attribute `toast`
+* Fixed: Information in properties dialog does not match with its contents
+* Fixed: Check meta status before downloading
+* Add loading spinner to pages
+* Add similar projects
+* Scan downloading tasks in the last process
+* i18n updated
+
 v3.3.2 - 2014.4.15
 * Rewrite Downloader to accelerate downloading speed
 * Fixed: check row is not None
