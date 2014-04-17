@@ -54,21 +54,25 @@ class CloudPage(Gtk.Box):
         open_button.connect('clicked', self.on_open_button_clicked)
         control_box.pack_start(open_button, False, False, 0)
 
-        cancel_button = Gtk.Button.new_with_label(_('Cancel'))
-        cancel_button.set_tooltip_text(_('Cancel selected tasks'))
-        cancel_button.props.margin_left = 40
-        cancel_button.connect('clicked', self.on_cancel_button_clicked)
-        control_box.pack_start(cancel_button, False, False, 0)
+        clear_button = Gtk.Button.new_with_label(_('Clear'))
+        clear_button.set_tooltip_text(_('Clear finished or canceled tasks'))
+        clear_button.connect('clicked', self.on_clear_button_clicked)
+        control_box.pack_end(clear_button, False, False, 0)
 
         remove_button = Gtk.Button.new_with_label(_('Remove'))
         remove_button.set_tooltip_text(_('Remove selected tasks'))
         remove_button.connect('clicked', self.on_remove_button_clicked)
-        control_box.pack_start(remove_button, False, False, 0)
+        control_box.pack_end(remove_button, False, False, 0)
 
-        clear_button = Gtk.Button.new_with_label(_('Clear'))
-        clear_button.set_tooltip_text(_('Clear finished or canceled tasks'))
-        clear_button.connect('clicked', self.on_clear_button_clicked)
-        control_box.pack_start(clear_button, False, False, 0)
+        cancel_button = Gtk.Button.new_with_label(_('Cancel'))
+        cancel_button.set_tooltip_text(_('Cancel selected tasks'))
+        cancel_button.connect('clicked', self.on_cancel_button_clicked)
+        control_box.pack_end(cancel_button, False, False, 0)
+
+        # show loading process
+        self.loading_spin = Gtk.Spinner()
+        self.loading_spin.props.margin_right = 5
+        control_box.pack_end(self.loading_spin, False, False, 0)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
@@ -116,6 +120,8 @@ class CloudPage(Gtk.Box):
     def load(self):
         '''获取当前的离线任务列表'''
         def on_list_task(info, error=None):
+            self.loading_spin.stop()
+            self.loading_spin.hide()
             if error or not info:
                 return
             if 'error_code' in info and info['error_code'] != 0:
@@ -144,6 +150,8 @@ class CloudPage(Gtk.Box):
                     pcs.cloud_list_task, self.app.cookie, self.app.tokens,
                     start, callback=on_list_task)
 
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         start = 0
         gutil.async_call(
             pcs.cloud_list_task, self.app.cookie, self.app.tokens,

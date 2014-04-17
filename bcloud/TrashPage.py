@@ -55,7 +55,12 @@ class TrashPage(Gtk.Box):
 
         reload_button = Gtk.Button.new_with_label(_('Reload'))
         reload_button.connect('clicked', self.on_reload_button_clicked)
-        control_box.pack_end(reload_button, False, False, 20)
+        control_box.pack_end(reload_button, False, False, 0)
+
+        # show loading process
+        self.loading_spin = Gtk.Spinner()
+        self.loading_spin.props.margin_right = 5
+        control_box.pack_end(self.loading_spin, False, False, 0)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
@@ -113,6 +118,8 @@ class TrashPage(Gtk.Box):
 
 
     def load(self):
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         self.page_num = 1
         self.liststore.clear()
         gutil.async_call(
@@ -120,6 +127,8 @@ class TrashPage(Gtk.Box):
                 self.page_num, callback=self.append_filelist)
 
     def load_next(self):
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         self.page_num = self.page_num + 1
         gutil.async_call(
                 pcs.list_trash, self.app.cookie, self.app.tokens, '/',
@@ -129,6 +138,8 @@ class TrashPage(Gtk.Box):
         self.load()
 
     def append_filelist(self, infos, error=None):
+        self.loading_spin.stop()
+        self.loading_spin.hide()
         if error or not infos or infos['errno'] != 0:
             return
         for pcs_file in infos['list']:

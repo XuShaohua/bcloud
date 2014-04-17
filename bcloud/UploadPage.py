@@ -84,7 +84,7 @@ class UploadPage(Gtk.Box):
         open_folder_button = Gtk.Button.new_with_label(_('Open Directory'))
         open_folder_button.connect(
                 'clicked', self.on_open_folder_button_clicked)
-        control_box.pack_end(open_folder_button, False, False, 10)
+        control_box.pack_end(open_folder_button, False, False, 0)
 
         upload_button = Gtk.Button.new_with_label(_('Upload files'))
         upload_button.set_tooltip_text(_('Upload files and folders'))
