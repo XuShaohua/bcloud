@@ -346,7 +346,7 @@ class UploadPage(Gtk.Box):
         elif size < 2 ** 29:         # 512M
             threshold =  2 ** 19     # 512K
         elif size < 10 * (2 ** 30):  # 10G
-            threshold = math.ceil(size / (2 ** 10))
+            threshold = math.ceil(size / 1000)
         else:
             self.app.toast(
                     _('{0} is too large to upload (>10G).').format(path))
