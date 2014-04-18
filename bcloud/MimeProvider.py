@@ -60,7 +60,9 @@ class MimeProvider:
             return (pixbuf, file_type)
         else:
             key = (UNKNOWN, icon_size)
-            pixbuf = self._data.get(key)
+            pixbuf = self._data.get(key, None)
+            if not pixbuf:
+                pixbuf = self.get('/placeholder', isdir, icon_size)[0]
             return (pixbuf, file_type)
 
     def get_icon_name(self, path, isdir):
