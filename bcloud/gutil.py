@@ -10,6 +10,7 @@ import threading
 
 import dbus
 from gi.repository import GdkPixbuf
+from gi.repository import Gio
 from gi.repository import Gtk
 from gi.repository import GLib
 import keyring
@@ -71,21 +72,14 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
     dir_name - 缓存目录, 下载到的图片会保存这个目录里.
     size     - 指定图片的缩放大小, 默认是96px.
     '''
-    def _update_image(error=None):
-        if error:
-            return
-        if os.stat(filepath).st_size == 0:
-            return
+    def _update_image():
         try:
             pix = GdkPixbuf.Pixbuf.new_from_file_at_size(
                     filepath, icon_size, icon_size)
             tree_path = liststore.get_path(tree_iter)
             if tree_path is None:
                 return
-            row = liststore[tree_path]
-            if row is None:
-                return
-            row[col] = pix
+            liststore[tree_path][col] = pix
         except GLib.GError as e:
             pass
 
@@ -94,19 +88,32 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
             return
         with open(filepath, 'wb') as fh:
             fh.write(req.data)
-        _update_image()
+        # Now, check its mime type
+        file_ = Gio.File.new_for_path(filepath)
+        file_info = file_.query_info(
+                Gio.FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+                Gio.FileQueryInfoFlags.NONE)
+        content_type = file_info.get_content_type()
+        if 'image' in content_type:
+            _update_image()
 
-    if 'thumbs' not in pcs_file or 'url1' not in pcs_file['thumbs']:
+    if 'thumbs' not in pcs_file:
+        return
+    if 'url1' in pcs_file['thumbs']:
+        key = 'url1'
+    elif 'url2' in pcs_file['thumbs']:
+        key = 'url2'
+    else:
         return
     fs_id = pcs_file['fs_id']
-    url = pcs_file['thumbs']['url1']
+    url = pcs_file['thumbs'][key]
 
-    if len(url) < 10:
-        return
     filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
-    if os.path.exists(filepath) and os.stat(filepath).st_blocks:
+    if os.path.exists(filepath) and os.path.getsize(filepath):
         _update_image()
     else:
+        if not url or len(url) < 10:
+            return
         async_call(net.urlopen, url, callback=_dump_image)
 
 def ellipse_text(text, length=10):
