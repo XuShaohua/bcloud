@@ -60,6 +60,7 @@ class Uploader(threading.Thread, GObject.GObject):
         '''
         threading.Thread.__init__(self)
         GObject.GObject.__init__(self)
+        self.daemon = True
 
         self.parent = parent
         self.cookie = cookie

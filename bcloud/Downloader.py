@@ -57,6 +57,7 @@ class Downloader(threading.Thread, GObject.GObject):
 
     def __init__(self, parent, row, cookie, tokens):
         threading.Thread.__init__(self)
+        self.daemon = True
         GObject.GObject.__init__(self)
 
         self.parent = parent
