@@ -15,7 +15,7 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
 
 类似项目
 =======
-[pypy](https://github.com/houtianze/bypy), 终端里使用的百度网盘客户端, 它
+[bypy](https://github.com/houtianze/bypy), 终端里使用的百度网盘客户端, 它
 使用了百度网盘PCS接口.
 
 
