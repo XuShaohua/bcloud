@@ -322,6 +322,9 @@ class UploadPage(Gtk.Box):
             dir_name = folder_dialog.get_path()
             folder_dialog.destroy()
         for source_path in source_paths:
+            if (os.path.split(source_path)[1].startswith('.') and
+                    not self.app.profile['uploading-hidden-files']):
+                continue
             if os.path.isfile(source_path):
                 self.add_file_task(source_path, dir_name)
             elif os.path.isdir(source_path):

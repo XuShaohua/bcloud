@@ -32,6 +32,7 @@ DEFAULT_PROFILE = {
     'password': '',
     'remember-password': False,
     'auto-signin': False,
+    'upload-hidden-files': True,  # 同时上传隐藏文件.
     }
 RETRIES = 5   # 调用keyring模块与libgnome-keyring交互的尝试次数
 
@@ -133,6 +134,9 @@ def load_profile(profile_name):
         # 3.1.2 -> 3.1.3
         if 'use-streaming' not in profile:
             profile['use-streaming'] = DEFAULT_PROFILE['use-streaming']
+        # 3.3.3 -> 3.3.4
+        if 'upload-hidden-files' not in profile:
+            profile['upload-hidden-files'] = True
 
     path = os.path.join(Config.CONF_DIR, profile_name)
     if not os.path.exists(path):

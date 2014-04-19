@@ -53,6 +53,19 @@ class PreferencesDialog(Gtk.Dialog):
         concurr_spin.connect('value-changed', self.on_concurr_value_changed)
         general_grid.attach(concurr_spin, 1, 1, 1, 1)
 
+        upload_hidden_label = Gtk.Label.new(_('Upload hidden files:'))
+        upload_hidden_label.props.xalign = 1
+        general_grid.attach(upload_hidden_label, 0, 2, 1, 1)
+        upload_hidden_switch = Gtk.Switch()
+        upload_hidden_switch.props.halign = Gtk.Align.START
+        upload_hidden_switch.set_tooltip_text(
+                _('Also upload hidden files and folders'))
+        upload_hidden_switch.set_active(
+                self.app.profile['upload-hidden-files'])
+        upload_hidden_switch.connect(
+                'notify::active', self.on_upload_hidden_switch_activate)
+        general_grid.attach(upload_hidden_switch, 1, 2, 1, 1)
+
         notify_label = Gtk.Label.new(_('Use Notification:'))
         notify_label.props.xalign = 1
         general_grid.attach(notify_label, 0, 3, 1, 1)
@@ -93,6 +106,9 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_concurr_value_changed(self, concurr_spin):
         self.app.profile['concurr-tasks'] = concurr_spin.get_value()
+
+    def on_upload_hidden_switch_activate(self, switch, event):
+        self.app.profile['upload-hidden-files'] = switch.get_active()
 
     def on_notify_switch_activate(self, switch, event):
         self.app.profile['use-notify'] = switch.get_active()
