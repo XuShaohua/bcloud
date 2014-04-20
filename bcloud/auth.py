@@ -159,7 +159,7 @@ def get_bduss(cookie, token, username, password, verifycode='', codeString=''):
         '&isPhone=false&quick_user=0',
         '&loginmerge=true&logintype=basicLogin&logLoginType=pc_loginBasic',
         '&username=', encoder.encode_uri_component(username),
-        '&password=', password,
+        '&password=', encoder.encode_uri_component(password),
         '&verifycode=', verifycode,
         '&mem_pass=on',
         '&ppui_logintime=', get_ppui_logintime(),
