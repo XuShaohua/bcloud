@@ -192,6 +192,9 @@ class UploadPage(Gtk.Box):
         except sqlite3.OperationalError:
             pass
 
+    def reload(self):
+        pass
+
     def load_tasks_from_db(self):
         sql = 'SELECT * FROM upload'
         req = self.cursor.execute(sql)
