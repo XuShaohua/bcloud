@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-17 08:50+0800\n"
+"POT-Creation-Date: 2014-05-01 07:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,15 +58,15 @@ msgstr ""
 msgid "Select All"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:65 ../bcloud/CloudPage.py:91
+#: ../bcloud/BTBrowserDialog.py:65 ../bcloud/CloudPage.py:95
 #: ../bcloud/DownloadPage.py:125 ../bcloud/IconWindow.py:541
-#: ../bcloud/TrashPage.py:82 ../bcloud/UploadPage.py:115
+#: ../bcloud/TrashPage.py:87 ../bcloud/UploadPage.py:115
 msgid "Name"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:70 ../bcloud/CloudPage.py:99
+#: ../bcloud/BTBrowserDialog.py:70 ../bcloud/CloudPage.py:103
 #: ../bcloud/DownloadPage.py:140 ../bcloud/IconWindow.py:558
-#: ../bcloud/PropertiesDialog.py:53 ../bcloud/TrashPage.py:98
+#: ../bcloud/PropertiesDialog.py:53 ../bcloud/TrashPage.py:103
 #: ../bcloud/UploadPage.py:130
 msgid "Size"
 msgstr ""
@@ -136,58 +136,58 @@ msgid "Open Directory"
 msgstr ""
 
 #: ../bcloud/CloudPage.py:57
-msgid "Cancel"
+msgid "Clear"
 msgstr ""
 
 #: ../bcloud/CloudPage.py:58
-msgid "Cancel selected tasks"
+msgid "Clear finished or canceled tasks"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:63 ../bcloud/DownloadPage.py:92
+#: ../bcloud/CloudPage.py:62 ../bcloud/DownloadPage.py:92
 #: ../bcloud/UploadPage.py:80
 msgid "Remove"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:64
+#: ../bcloud/CloudPage.py:63
 msgid "Remove selected tasks"
 msgstr ""
 
+#: ../bcloud/CloudPage.py:67
+msgid "Cancel"
+msgstr ""
+
 #: ../bcloud/CloudPage.py:68
-msgid "Clear"
+msgid "Cancel selected tasks"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:69
-msgid "Clear finished or canceled tasks"
-msgstr ""
-
-#: ../bcloud/CloudPage.py:106 ../bcloud/DownloadPage.py:133
+#: ../bcloud/CloudPage.py:110 ../bcloud/DownloadPage.py:133
 #: ../bcloud/UploadPage.py:123
 msgid "Progress"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:216 ../bcloud/CloudPage.py:261
+#: ../bcloud/CloudPage.py:224 ../bcloud/CloudPage.py:269
 #, python-brace-format
 msgid "Error: {0}"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:220 ../bcloud/CloudPage.py:300
+#: ../bcloud/CloudPage.py:228 ../bcloud/CloudPage.py:308
 #: ../bcloud/FolderBrowserDialog.py:22
 msgid "Save to.."
 msgstr ""
 
-#: ../bcloud/CloudPage.py:229
+#: ../bcloud/CloudPage.py:237
 msgid "Choose.."
 msgstr ""
 
-#: ../bcloud/CloudPage.py:265
+#: ../bcloud/CloudPage.py:273
 msgid "Add new link task"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:274
+#: ../bcloud/CloudPage.py:282
 msgid "Link .."
 msgstr ""
 
-#: ../bcloud/CloudPage.py:282
+#: ../bcloud/CloudPage.py:290
 msgid "Support http/https/ftp/thunder/qqdl/flashget/eMule/Magnet format"
 msgstr ""
 
@@ -240,7 +240,7 @@ msgstr ""
 msgid "Please download {0} again"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:339 ../bcloud/UploadPage.py:343
+#: ../bcloud/DownloadPage.py:339 ../bcloud/UploadPage.py:349
 #, python-brace-format
 msgid ""
 "From {0}\n"
@@ -365,18 +365,26 @@ msgid "Concurrent Downloads:"
 msgstr ""
 
 #: ../bcloud/PreferencesDialog.py:56
+msgid "Upload hidden files:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:62
+msgid "Also upload hidden files and folders"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:69
 msgid "Use Notification:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:66
+#: ../bcloud/PreferencesDialog.py:79
 msgid "Minimize To System Tray:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:76
+#: ../bcloud/PreferencesDialog.py:89
 msgid "Use streaming mode:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:84
+#: ../bcloud/PreferencesDialog.py:97
 msgid ""
 "When opening a video file, try to download a m3u8 playlist, instread of "
 "getting its file source link"
@@ -549,11 +557,11 @@ msgstr ""
 msgid "Will delete all files in trash"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:104
+#: ../bcloud/TrashPage.py:109
 msgid "Time"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:110
+#: ../bcloud/TrashPage.py:115
 msgid "Remaining"
 msgstr ""
 
@@ -577,16 +585,16 @@ msgstr ""
 msgid "Upload files and folders"
 msgstr ""
 
-#: ../bcloud/UploadPage.py:284
+#: ../bcloud/UploadPage.py:287
 msgid "Choose a file.."
 msgstr ""
 
-#: ../bcloud/UploadPage.py:352
+#: ../bcloud/UploadPage.py:358
 #, python-brace-format
 msgid "{0} is too large to upload (>10G)."
 msgstr ""
 
-#: ../bcloud/UploadPage.py:487
+#: ../bcloud/UploadPage.py:493
 #, python-brace-format
 msgid "{0} uploaded"
 msgstr ""

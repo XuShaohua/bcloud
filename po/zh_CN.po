@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-17 08:50+0800\n"
+"POT-Creation-Date: 2014-05-01 07:12+0800\n"
 "PO-Revision-Date: 2014-03-20 11:25+0800\n"
 "Last-Translator: LiuLang <gsushzhsosgsu@gmail.com>\n"
 "Language-Team: Chinese (simplified)\n"
@@ -57,15 +57,15 @@ msgstr "{0} 已被复制到剪贴板"
 msgid "Select All"
 msgstr "全选"
 
-#: ../bcloud/BTBrowserDialog.py:65 ../bcloud/CloudPage.py:91
+#: ../bcloud/BTBrowserDialog.py:65 ../bcloud/CloudPage.py:95
 #: ../bcloud/DownloadPage.py:125 ../bcloud/IconWindow.py:541
-#: ../bcloud/TrashPage.py:82 ../bcloud/UploadPage.py:115
+#: ../bcloud/TrashPage.py:87 ../bcloud/UploadPage.py:115
 msgid "Name"
 msgstr "文件名"
 
-#: ../bcloud/BTBrowserDialog.py:70 ../bcloud/CloudPage.py:99
+#: ../bcloud/BTBrowserDialog.py:70 ../bcloud/CloudPage.py:103
 #: ../bcloud/DownloadPage.py:140 ../bcloud/IconWindow.py:558
-#: ../bcloud/PropertiesDialog.py:53 ../bcloud/TrashPage.py:98
+#: ../bcloud/PropertiesDialog.py:53 ../bcloud/TrashPage.py:103
 #: ../bcloud/UploadPage.py:130
 msgid "Size"
 msgstr "大小"
@@ -135,58 +135,58 @@ msgid "Open Directory"
 msgstr "打开所在目录"
 
 #: ../bcloud/CloudPage.py:57
-msgid "Cancel"
-msgstr "取消"
+msgid "Clear"
+msgstr "清空"
 
 #: ../bcloud/CloudPage.py:58
-msgid "Cancel selected tasks"
-msgstr "取消选中的任务"
+msgid "Clear finished or canceled tasks"
+msgstr "清空已完成或已取消的任务"
 
-#: ../bcloud/CloudPage.py:63 ../bcloud/DownloadPage.py:92
+#: ../bcloud/CloudPage.py:62 ../bcloud/DownloadPage.py:92
 #: ../bcloud/UploadPage.py:80
 msgid "Remove"
 msgstr "删除"
 
-#: ../bcloud/CloudPage.py:64
+#: ../bcloud/CloudPage.py:63
 msgid "Remove selected tasks"
 msgstr "删除选中的的任务"
 
+#: ../bcloud/CloudPage.py:67
+msgid "Cancel"
+msgstr "取消"
+
 #: ../bcloud/CloudPage.py:68
-msgid "Clear"
-msgstr "清空"
+msgid "Cancel selected tasks"
+msgstr "取消选中的任务"
 
-#: ../bcloud/CloudPage.py:69
-msgid "Clear finished or canceled tasks"
-msgstr "清空已完成或已取消的任务"
-
-#: ../bcloud/CloudPage.py:106 ../bcloud/DownloadPage.py:133
+#: ../bcloud/CloudPage.py:110 ../bcloud/DownloadPage.py:133
 #: ../bcloud/UploadPage.py:123
 msgid "Progress"
 msgstr "进度"
 
-#: ../bcloud/CloudPage.py:216 ../bcloud/CloudPage.py:261
+#: ../bcloud/CloudPage.py:224 ../bcloud/CloudPage.py:269
 #, python-brace-format
 msgid "Error: {0}"
 msgstr "错误: {0}"
 
-#: ../bcloud/CloudPage.py:220 ../bcloud/CloudPage.py:300
+#: ../bcloud/CloudPage.py:228 ../bcloud/CloudPage.py:308
 #: ../bcloud/FolderBrowserDialog.py:22
 msgid "Save to.."
 msgstr "保存到.."
 
-#: ../bcloud/CloudPage.py:229
+#: ../bcloud/CloudPage.py:237
 msgid "Choose.."
 msgstr "选择.."
 
-#: ../bcloud/CloudPage.py:265
+#: ../bcloud/CloudPage.py:273
 msgid "Add new link task"
 msgstr "新建链接任务"
 
-#: ../bcloud/CloudPage.py:274
+#: ../bcloud/CloudPage.py:282
 msgid "Link .."
 msgstr "链接.."
 
-#: ../bcloud/CloudPage.py:282
+#: ../bcloud/CloudPage.py:290
 msgid "Support http/https/ftp/thunder/qqdl/flashget/eMule/Magnet format"
 msgstr "支持 HTTP/HTTPS/FTP/迅雷/旋风/快车/电驴/磁链 等格式"
 
@@ -239,12 +239,14 @@ msgstr "扫描目录出错"
 msgid "Please download {0} again"
 msgstr "请重新下载 {0}"
 
-#: ../bcloud/DownloadPage.py:339 ../bcloud/UploadPage.py:343
+#: ../bcloud/DownloadPage.py:339 ../bcloud/UploadPage.py:349
 #, python-brace-format
 msgid ""
 "From {0}\n"
 "To {1}"
-msgstr "从 {0}\n到{1}"
+msgstr ""
+"从 {0}\n"
+"到{1}"
 
 #: ../bcloud/DownloadPage.py:392
 #, python-brace-format
@@ -364,18 +366,26 @@ msgid "Concurrent Downloads:"
 msgstr "同时下载:"
 
 #: ../bcloud/PreferencesDialog.py:56
+msgid "Upload hidden files:"
+msgstr "上传隐藏文件:"
+
+#: ../bcloud/PreferencesDialog.py:62
+msgid "Also upload hidden files and folders"
+msgstr "同时上传隐藏文件文件和目录"
+
+#: ../bcloud/PreferencesDialog.py:69
 msgid "Use Notification:"
 msgstr "使用消息通知:"
 
-#: ../bcloud/PreferencesDialog.py:66
+#: ../bcloud/PreferencesDialog.py:79
 msgid "Minimize To System Tray:"
 msgstr "使用系统托盘:"
 
-#: ../bcloud/PreferencesDialog.py:76
+#: ../bcloud/PreferencesDialog.py:89
 msgid "Use streaming mode:"
 msgstr "流媒体模式:"
 
-#: ../bcloud/PreferencesDialog.py:84
+#: ../bcloud/PreferencesDialog.py:97
 msgid ""
 "When opening a video file, try to download a m3u8 playlist, instread of "
 "getting its file source link"
@@ -549,11 +559,11 @@ msgstr "清空回收站"
 msgid "Will delete all files in trash"
 msgstr "永久删除所有文件"
 
-#: ../bcloud/TrashPage.py:104
+#: ../bcloud/TrashPage.py:109
 msgid "Time"
 msgstr "时间"
 
-#: ../bcloud/TrashPage.py:110
+#: ../bcloud/TrashPage.py:115
 msgid "Remaining"
 msgstr "剩余时间"
 
@@ -577,16 +587,16 @@ msgstr "上传文件"
 msgid "Upload files and folders"
 msgstr "上传文件/目录"
 
-#: ../bcloud/UploadPage.py:284
+#: ../bcloud/UploadPage.py:287
 msgid "Choose a file.."
 msgstr "选择文件.."
 
-#: ../bcloud/UploadPage.py:352
+#: ../bcloud/UploadPage.py:358
 #, python-brace-format
 msgid "{0} is too large to upload (>10G)."
 msgstr "{0} 太大, 无法上传(>10G)"
 
-#: ../bcloud/UploadPage.py:487
+#: ../bcloud/UploadPage.py:493
 #, python-brace-format
 msgid "{0} uploaded"
 msgstr "{0} 已上传"
