@@ -1,3 +1,18 @@
+v3.3.4 - 2014.5.1
+* Fixed: 'uploadPage' object has no attribute 'reload'
+* Fixed: escape special HTML chars in password; reported by @zhoujy
+* pypy -> bypy; reported by @hot123tea123
+* Set Uploader/Downloader as daemon
+* Support uploading hidden files option
+* Fixed: loading UNKNOWN icon
+* Fixed: check image is intact before loading
+* Fixed: check themed icon is not None; reported by @fclucky777
+* Add loading spin to TrashPage and CloudPage
+* Delete outdated information
+* Set background thread as Daemon
+* Split a large file(512M~10G) to 1000 pieces
+* i18n updated
+
 v3.3.3 - 2014.4.17
 * Call App.quit explicitly
 * Fixed: VCodeDialog response type error
