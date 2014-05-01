@@ -77,19 +77,20 @@ class UploadPage(Gtk.Box):
         pause_button.connect('clicked', self.on_pause_button_clicked)
         control_box.pack_start(pause_button, False, False, 0)
 
-        remove_button = Gtk.Button.new_with_label(_('Remove'))
-        remove_button.connect('clicked', self.on_remove_button_clicked)
-        control_box.pack_start(remove_button, False, False, 0)
+        upload_button = Gtk.Button.new_with_label(_('Upload files'))
+        upload_button.set_tooltip_text(_('Upload files and folders'))
+        upload_button.connect('clicked', self.on_upload_button_clicked)
+        control_box.pack_start(upload_button, False, False, 0)
 
         open_folder_button = Gtk.Button.new_with_label(_('Open Directory'))
         open_folder_button.connect(
                 'clicked', self.on_open_folder_button_clicked)
-        control_box.pack_end(open_folder_button, False, False, 0)
+        open_folder_button.props.margin_left = 40
+        control_box.pack_start(open_folder_button, False, False, 0)
 
-        upload_button = Gtk.Button.new_with_label(_('Upload files'))
-        upload_button.set_tooltip_text(_('Upload files and folders'))
-        upload_button.connect('clicked', self.on_upload_button_clicked)
-        control_box.pack_end(upload_button, False, False, 0)
+        remove_button = Gtk.Button.new_with_label(_('Remove'))
+        remove_button.connect('clicked', self.on_remove_button_clicked)
+        control_box.pack_end(remove_button, False, False, 0)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)

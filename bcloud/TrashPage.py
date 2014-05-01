@@ -43,19 +43,19 @@ class TrashPage(Gtk.Box):
         restore_button.connect('clicked', self.on_restore_button_clicked)
         control_box.pack_start(restore_button, False, False, 0)
 
-        delete_button = Gtk.Button.new_with_label(_('Delete'))
-        delete_button.set_tooltip_text(_('Delete selected files permanently'))
-        delete_button.connect('clicked', self.on_delete_button_clicked)
-        control_box.pack_start(delete_button, False, False, 0)
+        reload_button = Gtk.Button.new_with_label(_('Reload'))
+        reload_button.connect('clicked', self.on_reload_button_clicked)
+        control_box.pack_start(reload_button, False, False, 0)
 
         clear_button = Gtk.Button.new_with_label(_('Clear Trash'))
         clear_button.set_tooltip_text(_('Will delete all files in trash'))
         clear_button.connect('clicked', self.on_clear_button_clicked)
         control_box.pack_end(clear_button, False, False, 0)
 
-        reload_button = Gtk.Button.new_with_label(_('Reload'))
-        reload_button.connect('clicked', self.on_reload_button_clicked)
-        control_box.pack_end(reload_button, False, False, 0)
+        delete_button = Gtk.Button.new_with_label(_('Delete'))
+        delete_button.set_tooltip_text(_('Delete selected files permanently'))
+        delete_button.connect('clicked', self.on_delete_button_clicked)
+        control_box.pack_end(delete_button, False, False, 0)
 
         # show loading process
         self.loading_spin = Gtk.Spinner()
