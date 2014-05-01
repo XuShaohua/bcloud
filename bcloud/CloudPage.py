@@ -244,6 +244,7 @@ class CloudPage(Gtk.Box):
             pcs.cloud_add_bt_task, self.app.cookie, self.app.tokens,
             source_url, save_path, selected_idx, file_sha1,
             callback=check_vcode)
+        self.app.blink_page(self.app.cloud_page)
 
     # Open API
     def add_link_task(self):

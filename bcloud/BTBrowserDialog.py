@@ -83,7 +83,12 @@ class BTBrowserDialog(Gtk.Dialog):
             elif 'torrent_info' in info:
                 tasks = info['torrent_info']['file_info']
                 self.file_sha1 = info['torrent_info']['sha1']
+            elif 'error_code' in info:
+                self.app.toast(info.get('error_msg', ''))
+                return
             else:
+                print('unknown error:', info)
+                self.app.toast(_('Unknown error occured'))
                 return
             for task in tasks:
                 size = int(task['size'])
