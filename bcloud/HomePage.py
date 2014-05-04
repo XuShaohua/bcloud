@@ -149,13 +149,6 @@ class HomePage(Gtk.Box):
 
     # Open API
     def load(self, path='/'):
-        def on_load(info, error=None):
-            self.loading_spin.stop()
-            self.loading_spin.hide()
-            if error or not info or info['errno'] != 0:
-                return
-            self.icon_window.load(info['list'])
-
         self.path = path
         self.page_num = 1
         self.has_next = True
@@ -164,10 +157,17 @@ class HomePage(Gtk.Box):
         self.loading_spin.show_all()
         gutil.async_call(
                 pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
-                self.page_num, callback=on_load)
+                self.page_num, callback=self.on_load)
         gutil.async_call(
                 pcs.get_quota, self.app.cookie, self.app.tokens,
                 callback=self.app.update_quota)
+
+    def on_load(self, info, error=None):
+        self.loading_spin.stop()
+        self.loading_spin.hide()
+        if error or not info or info['errno'] != 0:
+            return
+        self.icon_window.load(info['list'])
 
     def load_next(self):
         '''载入下一页'''
@@ -223,6 +223,8 @@ class HomePage(Gtk.Box):
         text = search_entry.get_text()
         if not text:
             return
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         gutil.async_call(
                 pcs.search, self.app.cookie, self.app.tokens, text,
-                self.path, callback=self.icon_window.load)
+                self.path, callback=self.on_load)
