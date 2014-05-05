@@ -14,6 +14,9 @@ from bcloud import util
 from bcloud.Widgets import LeftLabel
 from bcloud.Widgets import SelectableLeftLabel
 
+(PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
+    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL
+    ) = list(range(11))
 
 
 class PropertiesDialog(Gtk.Dialog):
@@ -118,8 +121,8 @@ class FolderPropertyDialog(Gtk.Dialog):
 
         file_count = 0
         folder_count = 0
-        for pcs_file in icon_window.filelist:
-            if pcs_file['isdir']:
+        for row in icon_window.liststore:
+            if row[ISDIR_COL]:
                 folder_count = folder_count + 1
             else:
                 file_count = file_count + 1

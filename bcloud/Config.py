@@ -52,7 +52,7 @@ def check_first():
     if not os.path.exists(CONF_DIR):
         os.makedirs(CONF_DIR, exist_ok=True)
     if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
+        os.makedirs(CACHE_DIR, exist_ok=True)
 
 def load_conf():
     '''获取基本设定信息, 里面存放着所有可用的profiles, 以及默认的profile'''
