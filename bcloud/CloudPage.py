@@ -198,10 +198,11 @@ class CloudPage(Gtk.Box):
 
 
     # Open API
-    def add_cloud_bt_task(self, source_url):
+    def add_cloud_bt_task(self, source_url, save_path=None):
         '''从服务器上获取种子, 并建立离线下载任务
 
         source_url - BT 种子在服务器上的绝对路径, 或者是磁链的地址.
+        save_path  - 要保存到的路径, 如果为None, 就会弹出目录选择的对话框
         '''
         def check_vcode(info, error=None):
             if error or not info:
@@ -224,14 +225,17 @@ class CloudPage(Gtk.Box):
                 self.app.toast(_('Error: {0}').format(info['error_msg']))
 
         self.check_first()
-        folder_browser = FolderBrowserDialog(
-                self, self.app, _('Save to..'))
-        response = folder_browser.run()
-        if response != Gtk.ResponseType.OK:
+
+        if not save_path:
+            folder_browser = FolderBrowserDialog(
+                    self, self.app, _('Save to..'))
+            response = folder_browser.run()
+            save_path = folder_browser.get_path()
             folder_browser.destroy()
+            if response != Gtk.ResponseType.OK:
+                return
+        if not save_path:
             return
-        save_path = folder_browser.get_path()
-        folder_browser.destroy()
 
         bt_browser = BTBrowserDialog(
                 self, self.app, _('Choose..'), source_url, save_path)
@@ -271,17 +275,20 @@ class CloudPage(Gtk.Box):
 
         self.check_first()
         dialog = Gtk.Dialog(
-                _('Add new link task'), self.app.window,
+                _('Add new link tasks'), self.app.window,
                 Gtk.DialogFlags.MODAL,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
         dialog.set_border_width(10)
-        dialog.set_default_size(480, 180)
+        dialog.set_default_size(480, 300)
         dialog.set_default_response(Gtk.ResponseType.OK)
         box = dialog.get_content_area()
-        entry = Gtk.Entry()
-        entry.set_placeholder_text(_('Link ..'))
-        box.pack_start(entry, False, False, 0)
+        scrolled_win = Gtk.ScrolledWindow()
+        box.pack_start(scrolled_win, True, True, 0)
+        links_buf = Gtk.TextBuffer()
+        links_tv = Gtk.TextView.new_with_buffer(links_buf)
+        links_tv.set_tooltip_text(_('Paste links here, line by line'))
+        scrolled_win.add(links_tv)
 
         infobar = Gtk.InfoBar()
         infobar.set_message_type(Gtk.MessageType.INFO)
@@ -293,29 +300,39 @@ class CloudPage(Gtk.Box):
 
         box.show_all()
         response = dialog.run()
-        source_url = entry.get_text()
+        contents = gutil.text_buffer_get_all_text(links_buf)
         dialog.destroy()
-        if response != Gtk.ResponseType.OK or not len(source_url):
+        if response != Gtk.ResponseType.OK or not contents:
             return
+        link_tasks = []
+        bt_tasks = []
+        for source_url in contents.split('\n'):
+            source_url = source_url.strip()
+            if not source_url:
+                continue
+            if source_url.startswith('magnet'):
+                bt_tasks.append(source_url)
+            else:
+                priv_url = decoder.decode(source_url)
+                if priv_url:
+                    link_tasks.append(priv_url)
+                else:
+                    link_tasks.append(source_url)
 
-        if source_url.startswith('magnet'):
-            self.add_cloud_bt_task(source_url)
-            return
-
-        priv_url = decoder.decode(source_url)
-        if priv_url:
-            source_url = priv_url 
         folder_browser = FolderBrowserDialog(
                 self, self.app, _('Save to..'))
         response = folder_browser.run()
-        if response != Gtk.ResponseType.OK:
-            folder_browser.destroy()
-            return
         save_path = folder_browser.get_path()
         folder_browser.destroy()
-        gutil.async_call(
-            pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
-            source_url, save_path, callback=on_link_task_added)
+        if response != Gtk.ResponseType.OK or not save_path:
+            return
+        for source_url in link_tasks:
+            gutil.async_call(
+                pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
+                source_url, save_path, callback=on_link_task_added)
+        for source_url in bt_tasks:
+            self.add_cloud_bt_task(source_url, save_path)
+
 
     def on_bt_button_clicked(self, button):
         self.add_local_bt_task()
@@ -354,6 +371,8 @@ class CloudPage(Gtk.Box):
             return
         tree_path = tree_paths[0]
         task_id = model[tree_path][TASKID_COL]
+        self.loading_spin.start()
+        self.loading_spin.show_all()
         if model[tree_path][STATUS_COL] == Status[0]:
             gutil.async_call(
                 pcs.cloud_delete_task, self.app.cookie, self.app.tokens,

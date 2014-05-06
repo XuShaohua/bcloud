@@ -197,3 +197,7 @@ def tree_model_natsort(model, row1, row2, user_data=None):
 def escape(tooltip):
     '''Escape special characters in tooltip text'''
     return GLib.markup_escape_text(tooltip)
+
+def text_buffer_get_all_text(buf):
+    '''Get all text in a GtkTextBuffer'''
+    return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
