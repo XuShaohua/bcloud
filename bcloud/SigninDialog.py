@@ -16,7 +16,7 @@ _ = Config._
 from bcloud import gutil
 from bcloud.RequestCookie import RequestCookie
 
-DELTA = 7 * 24 * 60 * 60   # 7 days
+DELTA = 3 * 24 * 60 * 60   # 3 days
 
 class SigninVcodeDialog(Gtk.Dialog):
     def __init__(self, parent, username, cookie, token, codeString, vcodetype):
@@ -333,11 +333,12 @@ class SigninDialog(Gtk.Dialog):
 
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
-        # 使用本地的缓存token, 有效期是七天
-        cookie, tokens = self.load_auth(username)
-        if cookie and tokens:
-            self.update_profile(username, password, cookie, tokens)
-            return
+        # 使用本地的缓存token, 有效期是三天
+        if self.signin_check.get_active():
+            cookie, tokens = self.load_auth(username)
+            if cookie and tokens:
+                self.update_profile(username, password, cookie, tokens)
+                return
 
         cookie = RequestCookie()
         tokens = {}
