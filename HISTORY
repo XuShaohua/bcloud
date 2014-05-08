@@ -1,3 +1,13 @@
+v3.3.5 - 2014.5.8
+* Handle cloud error code
+* Control buttons are redesigned
+* Fixed: TypeError: load() takes 2 positional argumenst but 3 were given; found by @ly0
+* Fixed: AttributeError: 'IconWindow' object has no attribute 'filelist'
+* Support downloading multiple cloud tasks; adviced by @nanpuyue
+* Using local auth cache only if this account is allowed to signin automatically.
+* Add reload button to FolderBrowserDialog
+* i18n updated
+
 v3.3.4 - 2014.5.1
 * Fixed: 'uploadPage' object has no attribute 'reload'
 * Fixed: escape special HTML chars in password; reported by @zhoujy
