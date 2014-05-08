@@ -32,13 +32,19 @@ class FolderBrowserDialog(Gtk.Dialog):
 
         box = self.get_content_area()
 
+        control_box = Gtk.Box()
+        box.pack_start(control_box, False, False, 0)
+
         mkdir_button = Gtk.Button.new_with_label(_('Create Folder'))
-        box.pack_start(mkdir_button, False, False, 0)
-        mkdir_button.props.halign = Gtk.Align.END
+        control_box.pack_end(mkdir_button, False, False, 0)
         mkdir_button.connect('clicked', self.on_mkdir_clicked)
 
+        reload_button = Gtk.Button.new_with_label(_('Reload'))
+        control_box.pack_end(reload_button, False, False, 5)
+        reload_button.connect('clicked', self.on_reload_clicked)
+
         scrolled_win = Gtk.ScrolledWindow()
-        box.pack_start(scrolled_win, True, True, 0)
+        box.pack_start(scrolled_win, True, True, 5)
 
         # disname, path, empty, loaded
         self.treestore = Gtk.TreeStore(str, str, bool, bool)
@@ -59,6 +65,10 @@ class FolderBrowserDialog(Gtk.Dialog):
 
         box.show_all()
 
+        self.reset()
+
+    def reset(self):
+        self.treestore.clear()
         root_iter = self.treestore.append(None, ['/', '/', False, False,])
         GLib.timeout_add(500, self.list_dir, root_iter)
 
@@ -110,14 +120,15 @@ class FolderBrowserDialog(Gtk.Dialog):
         else:
             return model[tree_iter][PATH_COL]
 
+    def on_reload_clicked(self, button):
+        self.reset()
+
     def on_mkdir_clicked(self, button):
         path = self.get_path()
         dialog = NewFolderDialog(self, self.app, path)
         dialog.run()
         dialog.destroy()
-        self.treestore.clear()
-        root_iter = self.treestore.append(None, ['/', '/', False, False,])
-        GLib.idle_add(self.list_dir, root_iter)
+        self.reset()
 
     def on_row_expanded(self, treeview, tree_iter, tree_path):
         if self.is_loading:
