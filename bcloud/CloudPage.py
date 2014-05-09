@@ -138,8 +138,7 @@ class CloudPage(Gtk.Box):
                     int(task['status']),
                     0,
                     '0',
-                    gutil.escape(
-                        os.path.join(task['save_path'], task['task_name'])),
+                    gutil.escape(task['save_path'])
                     ])
             self.scan_tasks()
 
