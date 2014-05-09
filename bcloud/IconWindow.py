@@ -311,7 +311,9 @@ class IconWindow(Gtk.ScrolledWindow):
             if error or not pls or b'error_code' in pls:
                 gutil.async_call(
                         pcs.get_download_link, self.app.cookie,
-                        pcs_file['dlink'], callback=open_video_link)
+                        self.app.tokens,
+                        self.liststore[tree_paths][0][PATH_COL],
+                        callback=open_video_link)
             else:
                 pls_filepath = os.path.join(
                         '/tmp', pcs_file['server_filename'] + '.m3u8')
@@ -338,7 +340,9 @@ class IconWindow(Gtk.ScrolledWindow):
             else:
                 gutil.async_call(
                         pcs.get_download_link, self.app.cookie,
-                        pcs_file['dlink'], callback=open_video_link)
+                        self.app.tokens,
+                        self.liststore[tree_paths][0][PATH_COL],
+                        callback=open_video_link)
         else:
             self.app.blink_page(self.app.download_page)
             self.app.download_page.add_launch_task(pcs_file, app_info)
@@ -377,18 +381,17 @@ class IconWindow(Gtk.ScrolledWindow):
             self.liststore[tree_paths[0]][PATH_COL])
 
     def on_copy_link_activated(self, menu_item):
-        def copy_link_to_clipboard(res, error=None):
-            if error or not res:
+        def copy_link_to_clipboard(url, error=None):
+            if error or not url:
                 return
-            red_url, req_id = res
-            self.app.update_clipboard(red_url)
+            self.app.update_clipboard(url)
 
         tree_paths = self.iconview.get_selected_items()
         if not tree_paths:
             return
-        pcs_file = self.get_pcs_file(tree_paths[0])
         gutil.async_call(
-                pcs.get_download_link, self.app.cookie, pcs_file['dlink'],
+                pcs.get_download_link, self.app.cookie, self.app.tokens,
+                self.liststore[tree_paths[0]][PATH_COL],
                 callback=copy_link_to_clipboard)
 
     def on_download_activated(self, menu_item):

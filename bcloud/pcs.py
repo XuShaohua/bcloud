@@ -236,7 +236,7 @@ def list_trash(cookie, tokens, path='/', page=1, num=100):
 def restore_trash(cookie, tokens, fidlist):
     '''从回收站中还原文件/目录.
 
-    fildlist - 要还要的文件/目录列表, fs_id.
+    fildlist - 要还原的文件/目录列表, fs_id.
     '''
     url = ''.join([
         const.PAN_API_URL,
@@ -485,18 +485,20 @@ def get_category(cookie, tokens, category, page=1):
     else:
         return None
 
-def get_download_link(cookie, dlink):
-    '''在下载之前, 要先获取最终的下载链接, 因为中间要进行一次302跳转.
+def get_download_link(cookie, tokens, path):
+    '''在下载之前, 要先获取最终的下载链接.
 
-    这一步是为了得到最终的下载地址. 如果得不到最终的下载地址, 那下载速度就
-    会受到很大的限制.
-
-    dlink - 在pcs_file里面的dlink项, 这个链接是一个临时下载链接.
+    path - 一个文件的绝对路径.
 
     @return (red_url, request_id), red_url 是重定向后的URL, 如果获取失败,
             就返回原来的dlink; request_id 是一个字符串, 用于下载文件时的认
             证, 如果获取失败, 它的值就为空.
     '''
+    metas = get_metas(cookie, tokens, path)
+    if (not metas or metas.get('errno', 1) != 0 or
+            'info' not in metas or len(metas['info']) != 1):
+        return None
+    dlink = metas['info'][0]['dlink']
     url = ''.join([
         dlink,
         '&cflg=', cookie.get('cflag').value
@@ -506,31 +508,9 @@ def get_download_link(cookie, dlink):
             'Accept': const.ACCEPT_HTML,
             })
     if not req:
-        return (url, '')
-    red_url = req.getheader('Location', url)
-    req_id = req.getheader('x-pcs-request-id', '')
-    return (red_url, req_id)
-
-def download(cookie, url, targ_path, range_=None):
-    '''以普通方式下载文件.
-
-    @deprecated
-    在Downloader中, 已经实现了这个接口, 还包括断点续传功能.
-    如果指定range的话, 可以下载指定的数据段.
-    pcs_file - 文件的详细信息.
-    targ_path - 保存文件的目标路径
-    range_ - 要下载的数据范围, 利用这个可以实现断点续传; 如果不指定它,
-             就会一次性下载文件的全部内容(在pcs_file中有文件的大小信息).
-
-    @return
-    '''
-    headers = {'Cookie': cookie.header_output()}
-    if range_:
-        headers['Range'] = range_
-    req = net.urlopen(url, headers=headers)
-    content = req.data
-    with open(targ_path, 'wb') as fh:
-        fh.write(content)
+        return url
+    else:
+        return req.getheader('Location', url)
 
 def stream_download(tokens, path):
     '''下载流媒体文件.

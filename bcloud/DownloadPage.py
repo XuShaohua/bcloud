@@ -344,7 +344,7 @@ class DownloadPage(Gtk.Box):
             fs_id,
             pcs_file['size'],
             0,
-            pcs_file['dlink'],
+            '',  # pcs['dlink' removed in new version.
             pcs_file['isdir'],
             saveName,
             saveDir,
