@@ -23,6 +23,7 @@ DEFAULT_PROFILE = {
     'version': Config.VERSION,
     'window-size': (960, 680),
     'use-status-icon': True,
+    'use-dark-theme': True, # 默认启动深色主题
     'use-notify': True,
     'first-run': True,
     'save-dir': Config.HOME_DIR,
@@ -130,20 +131,16 @@ def load_profile(profile_name):
     会失效, 此时, profile['password'] 是一个空字符串, 所以在下一步, 应该去
     检查一下password是否有效, 如果无效, 应该提醒用户.
     '''
-    def mig_5_6():
-        # 3.1.2 -> 3.1.3
-        if 'use-streaming' not in profile:
-            profile['use-streaming'] = DEFAULT_PROFILE['use-streaming']
-        # 3.3.3 -> 3.3.4
-        if 'upload-hidden-files' not in profile:
-            profile['upload-hidden-files'] = True
-
     path = os.path.join(Config.CONF_DIR, profile_name)
     if not os.path.exists(path):
         return DEFAULT_PROFILE
     with open(path) as fh:
         profile = json.load(fh)
-    mig_5_6()
+
+    for key in DEFAULT_PROFILE:
+        if key not in profile:
+            profile[key] = DEFAULT_PROFILE[key]
+
     for i in range(RETRIES):
         try:
             password = keyring.get_password(

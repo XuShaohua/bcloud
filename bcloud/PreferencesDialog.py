@@ -44,7 +44,7 @@ class PreferencesDialog(Gtk.Dialog):
         dir_button.connect('file-set', self.on_dir_update)
         general_grid.attach(dir_button, 1, 0, 1, 1)
 
-        concurr_label = Gtk.Label.new(_('Concurrent Downloads:'))
+        concurr_label = Gtk.Label.new(_('Concurrent downloads:'))
         concurr_label.props.xalign = 1
         general_grid.attach(concurr_label, 0, 1, 1, 1)
         concurr_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
@@ -66,7 +66,7 @@ class PreferencesDialog(Gtk.Dialog):
                 'notify::active', self.on_upload_hidden_switch_activate)
         general_grid.attach(upload_hidden_switch, 1, 2, 1, 1)
 
-        notify_label = Gtk.Label.new(_('Use Notification:'))
+        notify_label = Gtk.Label.new(_('Use notification:'))
         notify_label.props.xalign = 1
         general_grid.attach(notify_label, 0, 3, 1, 1)
         notify_switch = Gtk.Switch()
@@ -76,26 +76,36 @@ class PreferencesDialog(Gtk.Dialog):
                 'notify::active', self.on_notify_switch_activate)
         general_grid.attach(notify_switch, 1, 3, 1, 1)
 
-        status_label = Gtk.Label.new(_('Minimize To System Tray:'))
+        dark_theme_label = Gtk.Label.new(_('Use dark theme:'))
+        dark_theme_label.props.xalign = 1
+        general_grid.attach(dark_theme_label, 0, 4, 1, 1)
+        dark_theme_switch = Gtk.Switch()
+        dark_theme_switch.set_active(self.app.profile['use-dark-theme'])
+        dark_theme_switch.connect(
+                'notify::active', self.on_dark_theme_switch_toggled)
+        dark_theme_switch.props.halign = Gtk.Align.START
+        general_grid.attach(dark_theme_switch, 1, 4, 1, 1)
+
+        status_label = Gtk.Label.new(_('Minimize to system tray:'))
         status_label.props.xalign = 1
-        general_grid.attach(status_label, 0, 4, 1, 1)
+        general_grid.attach(status_label, 0, 5, 1, 1)
         status_switch = Gtk.Switch()
         status_switch.set_active(self.app.profile['use-status-icon'])
         status_switch.connect(
                 'notify::active', self.on_status_switch_activate)
         status_switch.props.halign = Gtk.Align.START
-        general_grid.attach(status_switch, 1, 4, 1, 1)
+        general_grid.attach(status_switch, 1, 5, 1, 1)
 
         stream_label = Gtk.Label.new(_('Use streaming mode:'))
         stream_label.props.xalign = 1
-        general_grid.attach(stream_label, 0, 5, 1, 1)
+        general_grid.attach(stream_label, 0, 6, 1, 1)
         stream_switch = Gtk.Switch()
         stream_switch.set_active(self.app.profile['use-streaming'])
         stream_switch.connect(
                 'notify::active', self.on_stream_switch_activate)
         stream_switch.props.halign = Gtk.Align.START
         stream_switch.set_tooltip_text(_('When opening a video file, try to download a m3u8 playlist, instread of getting its file source link'))
-        general_grid.attach(stream_switch, 1, 5, 1, 1)
+        general_grid.attach(stream_switch, 1, 6, 1, 1)
 
         box.show_all()
 
@@ -112,6 +122,9 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_notify_switch_activate(self, switch, event):
         self.app.profile['use-notify'] = switch.get_active()
+
+    def on_dark_theme_switch_toggled(self, switch, event):
+        self.app.profile['use-dark-theme'] = switch.get_active()
 
     def on_status_switch_activate(self, switch, event):
         self.app.profile['use-status-icon'] = switch.get_active()

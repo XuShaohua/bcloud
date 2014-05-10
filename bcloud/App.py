@@ -44,7 +44,9 @@ class App:
     profile = None
     cookie = None
     tokens = None
-    default_color = Gdk.RGBA(0.9, 0.9, 0.9, 1)
+    default_dark_color = Gdk.RGBA(0.9, 0.9, 0.9, 1)
+    default_light_color = Gdk.RGBA(0.1, 0.1, 0.1, 1)
+    default_color = default_dark_color
     status_icon = None
 
     def __init__(self):
@@ -58,8 +60,7 @@ class App:
         #self.icon_theme.append_search_path(Config.ICON_PATH)
         self.mime = MimeProvider(self)
         self.color_schema = Config.load_color_schema()
-        settings = Gtk.Settings.get_default()
-        settings.props.gtk_application_prefer_dark_theme = True
+        self.set_dark_theme(True)
 
         self.window = Gtk.ApplicationWindow.new(application=app)
         self.window.set_default_size(*gutil.DEFAULT_PROFILE['window-size'])
@@ -159,6 +160,17 @@ class App:
     def quit(self):
         self.app.quit()
 
+    def set_dark_theme(self, status):
+        settings = Gtk.Settings.get_default()
+        settings.props.gtk_application_prefer_dark_theme = status
+        if status:
+            self.default_color = self.default_dark_color
+        else:
+            self.default_color = self.default_light_color
+        if self.profile:
+            for row in self.nav_liststore:
+                row[3] = self.default_color
+
     def show_signin_dialog(self, auto_signin=True):
         self.profile = None
         signin = SigninDialog(self, auto_signin=auto_signin)
@@ -170,6 +182,7 @@ class App:
             self.notebook.connect('switch-page', self.on_notebook_switched)
             self.init_status_icon()
             self.init_notify()
+            self.set_dark_theme(self.profile['use-dark-theme'])
 
             if self.profile['first-run']:
                 self.profile['first-run'] = False
@@ -210,6 +223,7 @@ class App:
                 gutil.dump_profile(self.profile)
                 if self.profile['use-status-icon'] and not self.status_icon:
                     self.init_status_icon()
+                self.set_dark_theme(self.profile['use-dark-theme'])
 
     def on_signout_action_activated(self, action, params):
         '''在退出登录前, 应该保存当前用户的所有数据'''
