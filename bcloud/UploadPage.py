@@ -442,7 +442,7 @@ class UploadPage(Gtk.Box):
                 return
             row[CURRSIZE_COL] = slice_end
             total_size = util.get_human_size(row[SIZE_COL])[0]
-            curr_size = util.get_human_size(slice_end)[0]
+            curr_size = util.get_human_size(slice_end, False)[0]
             row[PERCENT_COL] = int(slice_end / row[SIZE_COL] * 100)
             row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)
             self.update_task_db(row)

@@ -393,7 +393,7 @@ class DownloadPage(Gtk.Box):
             self.speed_label.set_text(_('{0} kb/s').format(int(speed)))
 
             row[CURRSIZE_COL] = current_size
-            curr_size = util.get_human_size(row[CURRSIZE_COL])[0]
+            curr_size = util.get_human_size(row[CURRSIZE_COL], False)[0]
             total_size = util.get_human_size(row[SIZE_COL])[0]
             row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
             row[HUMANSIZE_COL] = '{0} / {1}'.format(curr_size, total_size)

@@ -41,7 +41,13 @@ def rec_split_path(path):
     result.reverse()
     return result
 
-def get_human_size(size):
+def get_human_size(size, use_giga=True):
+    '''将文件大小由byte, 转为人类可读的字符串
+    size     -  整数, 文件的大小, 以byte为单位
+    use_giga - 如果这个选项为False, 那最大的单位就是MegaBytes, 而不会用到
+               GigaBytes, 这个在显示下载进度时很有用, 因为可以动态的显示下载
+               状态.
+    '''
 
     '''将文件大小转为人类可读的形式'''
     size_kb = '{0:,}'.format(size)
@@ -49,7 +55,7 @@ def get_human_size(size):
         return ('{0} B'.format(size), size_kb)
     if size < SIZE_M:
         return ('{0:.1f} kB'.format(size / SIZE_K), size_kb)
-    if size < SIZE_G:
+    if size < SIZE_G or not use_giga:
         return ('{0:.1f} MB'.format(size / SIZE_M), size_kb)
     if size < SIZE_T:
         return ('{0:.1f} GB'.format(size / SIZE_G), size_kb)
