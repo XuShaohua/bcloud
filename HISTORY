@@ -1,3 +1,11 @@
+v3.3.6 - 2014.5.15
+* Support RSA encryption
+* Show MegaBytes in DownloadPage
+* Add dark-theme switch
+* Fixed: dlink not in pcs_file
+* Fixed: tooltip of filelist in CloudPage error
+* i18n updated
+
 v3.3.5 - 2014.5.8
 * Handle cloud error code
 * Control buttons are redesigned
