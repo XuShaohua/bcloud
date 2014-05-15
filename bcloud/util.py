@@ -3,6 +3,7 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import base64
 import datetime
 import hashlib
 import os
@@ -10,6 +11,10 @@ import random
 import re
 import urllib.parse
 import time
+
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+#from Crypto.Cipher import PKCS1_v1_5
 
 SIZE_K = 2 ** 10
 SIZE_M = 2 ** 20
@@ -103,3 +108,17 @@ def natsort(string):
     http://www.codinghorror.com/blog/2007/12/sorting-for-humans-natural-sort-order.html
     '''
     return [int(s) if s.isdigit() else s for s in re.split('(\d+)', string)]
+
+
+def RSA_encrypt(public_key, message):
+    '''用RSA加密字符串.
+
+    public_key - 公钥
+    message    - 要加密的信息, 使用UTF-8编码的字符串
+    @return 使用base64编码的字符串
+    '''
+    rsakey = RSA.importKey(public_key)
+    rsakey = PKCS1_OAEP.new(rsakey)
+    #rsakey = PKCS1_v1_5.new(rsakey)
+    encrypted = rsakey.encrypt(message.encode())
+    return base64.encodestring(encrypted).decode()

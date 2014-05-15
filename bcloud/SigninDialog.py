@@ -41,7 +41,7 @@ class SigninVcodeDialog(Gtk.Dialog):
         box.pack_start(self.vcode_entry, False, False, 0)
 
         button_box = Gtk.Box(spacing=10)
-        box.pack_start(button_box, False, False, 0)
+        box.pack_end(button_box, False, False, 0)
         vcode_refresh = Gtk.Button.new_from_stock(Gtk.STOCK_REFRESH)
         vcode_refresh.connect('clicked', self.on_vcode_refresh_clicked)
         button_box.pack_start(vcode_refresh, False, False, 0)
@@ -74,6 +74,10 @@ class SigninVcodeDialog(Gtk.Dialog):
 
     def refresh_vcode(self):
         def _refresh_vcode(info, error=None):
+            print('refresh vcode:', info, error)
+            if not info or error:
+                print('Failed to refresh vcode:', info, error)
+                return
             self.codeString = info['data']['verifyStr']
             gutil.async_call(
                 auth.get_signin_vcode, self.cookie, self.codeString,
@@ -227,12 +231,68 @@ class SigninDialog(Gtk.Dialog):
         self.signin()
 
     def signin(self):
+        def on_get_rsa_bduss(result, error=None):
+            status, info = result
+            if status == 4:
+                self.signin_failed(
+                    _('Please check username and password are correct!'))
+            elif status == 0:
+                cookie.load_list(info)
+                self.signin_button.set_label(_('Get bdstoken...'))
+                gutil.async_call(
+                    auth.get_bdstoken, cookie, callback=on_get_bdstoken)
+            elif status == 257:
+                vcodetype, codeString = info
+                dialog = SigninVcodeDialog(
+                    self, username, cookie, tokens['token'],
+                    codeString, vcodetype)
+                dialog.run()
+                vcode = dialog.get_vcode()
+                dialog.destroy()
+                if not vcode or len(vcode) != 4:
+                    self.signin_failed(
+                        _('Please input verification code!'))
+                    return
+                self.signin_button.set_label(_('Get bduss...'))
+                gutil.async_call(
+                        auth.get_bduss, cookie,
+                        tokens['token'], username, password, vcode,
+                        codeString, callback=on_get_rsa_bduss)
+            else:
+                print(status, info)
+                self.signin_failed(
+                    _('Unknown err_no {0}, please try again!').format(
+                        status))
+
+        def on_get_public_key(info, error=None):
+            '''获取公钥之后'''
+            if not info or error:
+                self.signin_failed(
+                    _('Error: Failed to get RSA public key!'))
+                return
+            else:
+                nonlocal public_key
+                nonlocal rsakey
+                public_key = info['pubkey']
+                rsakey = info['key']
+                gutil.async_call(
+                    auth.get_rsa_bduss, cookie, tokens['token'],
+                    username, password, public_key, rsakey,
+                    callback=on_get_rsa_bduss)
+
         def on_get_bdstoken(bdstokens, error=None):
             if error or not bdstokens:
                 self.signin_failed(
                     _('Error: Failed to get bdstokens!'))
+                return
+            nonlocal tokens
+            if not bdstokens['bdstoken']:
+                # Failed to get bdstoken, try RSA encryption
+                self.signin_button.set_label(_('Try RSA encryption..'))
+                gutil.async_call(
+                        auth.get_public_key, cookie, tokens,
+                        callback=on_get_public_key)
             else:
-                nonlocal tokens
                 for token in bdstokens:
                     tokens[token] = bdstokens[token]
                 self.update_profile(
@@ -322,6 +382,7 @@ class SigninDialog(Gtk.Dialog):
 
         def on_get_BAIDUID(uid_cookie, error=None):
             if error or not uid_cookie:
+                print(uid_cookie, error)
                 self.signin_failed(
                         _('Failed to get BAIDUID cookie, please try agin.'))
             else:
@@ -342,6 +403,8 @@ class SigninDialog(Gtk.Dialog):
 
         cookie = RequestCookie()
         tokens = {}
+        public_key = ''
+        rsakey = ''
         cookie.load('cflag=65535%3A1; PANWEB=1;')
         self.signin_button.set_label(_('Get cookie...'))
         gutil.async_call(
