@@ -70,5 +70,3 @@ share/icons/hicolor/scalable/places/share-symbolic.svg
 share/icons/hicolor/scalable/places/trash-symbolic.svg
 share/locale/zh_CN/LC_MESSAGES/bcloud.mo
 share/locale/zh_TW/LC_MESSAGES/bcloud.mo
-test/test-pcs.py
-test/test-post.py

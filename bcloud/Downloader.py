@@ -141,9 +141,12 @@ class Downloader(threading.Thread, GObject.GObject):
                 buff = req.read(CHUNK_SIZE)
             except Exception as e:
                 self.network_error()
-                return
+                break
             if not buff:
-                self.finished()
+                if self.row[CURRSIZE_COL] == self.row[SIZE_COL]:
+                    self.finished()
+                else:
+                    self.network_error()
                 break
             range_from, range_to = range_to, range_to + len(buff)
             if not self.fh or self.row[STATE_COL] != State.DOWNLOADING:
