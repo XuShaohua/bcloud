@@ -157,6 +157,7 @@ class Downloader(threading.Thread, GObject.GObject):
             if self.flush_count > THRESHOLD_TO_FLUSH:
                 self.fh.flush()
                 self.flush_count = 0
+            self.row[CURRSIZE_COL] += len(buff)
         self.close_file()
 
     def pause(self):
