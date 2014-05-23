@@ -295,11 +295,10 @@ class IconWindow(Gtk.ScrolledWindow):
             pass
 
     def launch_app_with_app_info(self, app_info):
-        def open_video_link(resp, error=None):
+        def open_video_link(red_url, error=None):
             '''得到视频最后地址后, 调用播放器直接播放'''
-            if error or not resp:
+            if error or not red_url:
                 return
-            red_url, req_id = resp
             gutil.async_call(app_info.launch_uris, [red_url, ], None)
 
         def save_playlist(pls, error=None):
@@ -312,7 +311,7 @@ class IconWindow(Gtk.ScrolledWindow):
                 gutil.async_call(
                         pcs.get_download_link, self.app.cookie,
                         self.app.tokens,
-                        self.liststore[tree_paths][0][PATH_COL],
+                        self.liststore[tree_paths[0]][PATH_COL],
                         callback=open_video_link)
             else:
                 pls_filepath = os.path.join(
@@ -341,7 +340,7 @@ class IconWindow(Gtk.ScrolledWindow):
                 gutil.async_call(
                         pcs.get_download_link, self.app.cookie,
                         self.app.tokens,
-                        self.liststore[tree_paths][0][PATH_COL],
+                        self.liststore[tree_paths[0]][PATH_COL],
                         callback=open_video_link)
         else:
             self.app.blink_page(self.app.download_page)

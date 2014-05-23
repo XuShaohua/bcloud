@@ -490,9 +490,8 @@ def get_download_link(cookie, tokens, path):
 
     path - 一个文件的绝对路径.
 
-    @return (red_url, request_id), red_url 是重定向后的URL, 如果获取失败,
-            就返回原来的dlink; request_id 是一个字符串, 用于下载文件时的认
-            证, 如果获取失败, 它的值就为空.
+    @return red_url, red_url 是重定向后的URL, 如果获取失败,
+            就返回原来的dlink;
     '''
     metas = get_metas(cookie, tokens, path)
     if (not metas or metas.get('errno', 1) != 0 or
@@ -512,12 +511,23 @@ def get_download_link(cookie, tokens, path):
     else:
         return req.getheader('Location', url)
 
-def stream_download(tokens, path):
+def stream_download(cookie, tokens, path):
     '''下载流媒体文件.
 
     path - 流文件的绝对路径.
     '''
-    pass
+    url = ''.join([
+        const.PCS_URL_D,
+        'file?method=download',
+        '&path=', encoder.encode_uri_component(path),
+        '&app_id=250528',
+        ])
+    req = net.urlopen_without_redirect(
+            url, headers={'Cookie': cookie.header_output()})
+    if req:
+        return req
+    else:
+        return None
 
 def get_streaming_playlist(cookie, path, video_type='M3U8_AUTO_480'):
     '''获取流媒体(通常是视频)的播放列表.
