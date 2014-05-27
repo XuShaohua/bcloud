@@ -3,7 +3,6 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
-import binascii
 import base64
 
 def decode_flashget(link):
@@ -33,7 +32,7 @@ def decode(link):
     if lower_pref in _router:
         try:
             return _router[lower_pref](link)
-        except binascii.Error as e:
+        except ValueError as e:
             print(e)
             return ''
     else:
