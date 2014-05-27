@@ -252,25 +252,29 @@ class CloudPage(Gtk.Box):
     # Open API
     def add_link_task(self):
         '''新建普通的链接任务'''
-        def on_link_task_added(info, error=None):
-            if error or not info:
-                return
-            if 'task_id' in info or info['error_code'] == 0:
-                self.reload()
-            elif info['error_code'] == -19:
-                vcode = info['vcode']
-                vcode_dialog = VCodeDialog(self, self.app, info)
-                response = vcode_dialog.run()
-                vcode_input = vcode_dialog.get_vcode()
-                vcode_dialog.destroy()
-                if response != Gtk.ResponseType.OK:
+        def do_add_link_task(source_url):
+            def on_link_task_added(info, error=None):
+                if error or not info:
                     return
-                gutil.async_call(
-                    pcs.cloud_add_link_task, self.app.cookie,
-                    self.app.tokens, source_url, save_path, vcode,
-                    vcode_input, callback=on_link_task_added)
-            else:
-                self.app.toast(_('Error: {0}').format(info['error_msg']))
+                if 'task_id' in info or info['error_code'] == 0:
+                    self.reload()
+                elif info['error_code'] == -19:
+                    vcode = info['vcode']
+                    vcode_dialog = VCodeDialog(self, self.app, info)
+                    response = vcode_dialog.run()
+                    vcode_input = vcode_dialog.get_vcode()
+                    vcode_dialog.destroy()
+                    if response != Gtk.ResponseType.OK:
+                        return
+                    gutil.async_call(
+                        pcs.cloud_add_link_task, self.app.cookie,
+                        self.app.tokens, source_url, save_path, vcode,
+                        vcode_input, callback=on_link_task_added)
+                else:
+                    self.app.toast(_('Error: {0}').format(info['error_msg']))
+            gutil.async_call(
+                pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
+                source_url, save_path, callback=on_link_task_added)
 
         self.check_first()
         dialog = Gtk.Dialog(
@@ -326,9 +330,7 @@ class CloudPage(Gtk.Box):
         if response != Gtk.ResponseType.OK or not save_path:
             return
         for source_url in link_tasks:
-            gutil.async_call(
-                pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
-                source_url, save_path, callback=on_link_task_added)
+            do_add_link_task(source_url)
         for source_url in bt_tasks:
             self.add_cloud_bt_task(source_url, save_path)
 
