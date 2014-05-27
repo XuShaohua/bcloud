@@ -30,6 +30,10 @@ def decode(link):
         return ''
     lower_pref = link[:7].lower()
     if lower_pref in _router:
-        return _router[lower_pref](link)
+        try:
+            return _router[lower_pref](link)
+        except binascii.Error as e:
+            print(e)
+            return ''
     else:
         return ''
