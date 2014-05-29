@@ -19,6 +19,7 @@ from bcloud.RequestCookie import RequestCookie
 DELTA = 3 * 24 * 60 * 60   # 3 days
 
 class SigninVcodeDialog(Gtk.Dialog):
+
     def __init__(self, parent, username, cookie, token, codeString, vcodetype):
         super().__init__(
             _('Verification..'), parent, Gtk.DialogFlags.MODAL)
@@ -74,7 +75,6 @@ class SigninVcodeDialog(Gtk.Dialog):
 
     def refresh_vcode(self):
         def _refresh_vcode(info, error=None):
-            print('refresh vcode:', info, error)
             if not info or error:
                 print('Failed to refresh vcode:', info, error)
                 return
@@ -101,6 +101,7 @@ class SigninVcodeDialog(Gtk.Dialog):
 class SigninDialog(Gtk.Dialog):
 
     profile = None
+    password_changed = False
 
     def __init__(self, app, auto_signin=True):
         super().__init__(
@@ -130,6 +131,7 @@ class SigninDialog(Gtk.Dialog):
         self.password_entry = Gtk.Entry()
         self.password_entry.set_placeholder_text(_('Password ..'))
         self.password_entry.props.visibility = False
+        self.password_entry.connect('changed', self.on_password_entry_changed)
         box.pack_start(self.password_entry, False, False, 0)
 
         self.remember_check = Gtk.CheckButton.new_with_label(
@@ -167,6 +169,7 @@ class SigninDialog(Gtk.Dialog):
     def load_defualt_profile(self):
         if self.conf['default']:
             self.use_profile(self.conf['default'])
+            self.password_changed = False
             # auto_signin here
             if self.signin_check.get_active() and self.auto_signin:
                 self.signin_button.set_sensitive(False)
@@ -198,6 +201,7 @@ class SigninDialog(Gtk.Dialog):
             self.signin_check.set_active(self.profile['auto-signin'])
         else:
             self.signin_check.set_active(False)
+        self.password_changed = False
 
     def signin_failed(self, error=None):
         if error:
@@ -205,6 +209,9 @@ class SigninDialog(Gtk.Dialog):
         self.infobar.show_all()
         self.signin_button.set_sensitive(True)
         self.signin_button.set_label(_('Sign in'))
+
+    def on_password_entry_changed(self, entry):
+        self.password_changed = True
 
     def on_remember_check_toggled(self, button):
         if button.get_active():
@@ -259,7 +266,6 @@ class SigninDialog(Gtk.Dialog):
                         tokens['token'], username, password, vcode,
                         codeString, callback=on_get_rsa_bduss)
             else:
-                print(status, info)
                 self.signin_failed(
                     _('Unknown err_no {0}, please try again!').format(
                         status))
@@ -382,7 +388,6 @@ class SigninDialog(Gtk.Dialog):
 
         def on_get_BAIDUID(uid_cookie, error=None):
             if error or not uid_cookie:
-                print(uid_cookie, error)
                 self.signin_failed(
                         _('Failed to get BAIDUID cookie, please try agin.'))
             else:
@@ -395,12 +400,11 @@ class SigninDialog(Gtk.Dialog):
         username = self.username_combo.get_child().get_text()
         password = self.password_entry.get_text()
         # 使用本地的缓存token, 有效期是三天
-        if self.signin_check.get_active():
+        if not self.password_changed and self.signin_check.get_active():
             cookie, tokens = self.load_auth(username)
             if cookie and tokens:
                 self.update_profile(username, password, cookie, tokens)
                 return
-
         cookie = RequestCookie()
         tokens = {}
         public_key = ''
