@@ -16,7 +16,7 @@ from bcloud.const import State
 from bcloud.net import ForbiddenHandler
 from bcloud import pcs
 
-CHUNK_SIZE = 16384      # 16K
+CHUNK_SIZE = 131072 # 128K
 RETRIES = 5             # 下载数据出错时重试的次数
 TIMEOUT = 20
 THRESHOLD_TO_FLUSH = 100  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
