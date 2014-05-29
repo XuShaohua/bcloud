@@ -1,3 +1,12 @@
+v3.3.7 - 2014.5.29
+* Increase downloading chunk size
+* Check local file size
+* FIxed: local file is removed after downloading
+* Fixed: TypeError: 'pixbuf' object does not support indexing
+* Fixed: error occurs when adding multiple cloud tasks
+* Fixed: catch binascii.Error: Incorrect padding exception
+* Discard auth cache if current user password is modified
+
 v3.3.6 - 2014.5.15
 * Support RSA encryption
 * Show MegaBytes in DownloadPage
