@@ -12,9 +12,11 @@ import re
 import urllib.parse
 import time
 
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
-#from Crypto.Cipher import PKCS1_v1_5
+try:
+    from Crypto.PublicKey import RSA
+    from Crypto.Cipher import PKCS1_OAEP
+except ImportError as e:
+    print(e, ', RSA encryption will be disabled')
 
 SIZE_K = 2 ** 10
 SIZE_M = 2 ** 20
@@ -117,8 +119,12 @@ def RSA_encrypt(public_key, message):
     message    - 要加密的信息, 使用UTF-8编码的字符串
     @return 使用base64编码的字符串
     '''
+    # 如果没能成功导入RSA模块, 就直接返回空白字符串.
+    # ubuntu 12.04 中使用的python3-crypto-2.4.1, 里面就没有RSA模块.
+    if not globals().get('RSA'):
+        print('Error: no RSA module avaible!')
+        return ''
     rsakey = RSA.importKey(public_key)
     rsakey = PKCS1_OAEP.new(rsakey)
-    #rsakey = PKCS1_v1_5.new(rsakey)
     encrypted = rsakey.encrypt(message.encode())
     return base64.encodestring(encrypted).decode()

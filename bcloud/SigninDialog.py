@@ -239,6 +239,9 @@ class SigninDialog(Gtk.Dialog):
 
     def signin(self):
         def on_get_rsa_bduss(result, error=None):
+            if not result or error:
+                print('Failed to get RSA_BDUSS:', result, error)
+                return
             status, info = result
             if status == 4:
                 self.signin_failed(
