@@ -23,7 +23,7 @@ DEFAULT_PROFILE = {
     'version': Config.VERSION,
     'window-size': (960, 680),
     'use-status-icon': True,
-    'use-dark-theme': True, # 默认启动深色主题
+    'use-dark-theme': False, # 默认禁用深色主题
     'use-notify': True,
     'first-run': True,
     'save-dir': Config.HOME_DIR,
