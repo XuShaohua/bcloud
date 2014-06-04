@@ -231,7 +231,7 @@ class UploadPage(Gtk.Box):
         如果存在的话, 就返回这条记录;
         如果没有的话, 就返回None
         '''
-        sql = 'SELECT * FROM upload WHERE source_path=? LIMIT 1'
+        sql = 'SELECT * FROM upload WHERE source_path=?'
         req = self.cursor.execute(sql, [source_path, ])
         if req:
             return req.fetchone()
@@ -254,7 +254,7 @@ class UploadPage(Gtk.Box):
         '''更新数据库中的任务信息'''
         sql = '''UPDATE upload SET 
         curr_size=?, state=?, state_name=?, human_size=?, percent=?
-        WHERE fid=? LIMIT 1;
+        WHERE fid=?
         '''
         self.cursor.execute(sql, [
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],

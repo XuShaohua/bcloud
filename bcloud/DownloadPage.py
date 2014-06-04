@@ -232,7 +232,7 @@ class DownloadPage(Gtk.Box):
         如果存在的话, 就返回这条记录;
         如果没有的话, 就返回None
         '''
-        sql = 'SELECT * FROM tasks WHERE fsid=? LIMIT 1'
+        sql = 'SELECT * FROM tasks WHERE fsid=?'
         req = self.cursor.execute(sql, [fs_id, ])
         if req:
             return req.fetchone()
@@ -250,7 +250,7 @@ class DownloadPage(Gtk.Box):
         '''更新数据库中的任务信息'''
         sql = '''UPDATE tasks SET 
         currsize=?, state=?, statename=?, humansize=?, percent=?
-        WHERE fsid=? LIMIT 1;
+        WHERE fsid=?
         '''
         self.cursor.execute(sql, [
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
