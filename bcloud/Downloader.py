@@ -123,13 +123,12 @@ class Downloader(threading.Thread, GObject.GObject):
         for i in range(RETRIES):
             try:
                 req = opener.open(self.red_url)
+                break
             except OSError as e:
                 print(e)
                 if i == (RETRIES - 1):
                     self.network_error()
                     return
-            else:
-                break
 
         range_from = self.row[CURRSIZE_COL]
         range_to = range_from
@@ -140,6 +139,7 @@ class Downloader(threading.Thread, GObject.GObject):
             try:
                 buff = req.read(CHUNK_SIZE)
             except Exception as e:
+                print(e)
                 self.network_error()
                 break
             if not buff:
