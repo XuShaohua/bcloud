@@ -6,18 +6,27 @@
 import base64
 
 def decode_flashget(link):
-    l = base64.decodestring(link[11:len(link)-7].encode()).decode()
+    try:
+        l = base64.decodestring(link[11:len(link)-7].encode()).decode()
+    except ValueError:
+        l = base64.decodestring(link[11:len(link)-7].encode()).decode('gbk')
     return l[10:len(l)-10]
 
 def decode_thunder(link):
     # AAhttp://127.0.0.1
     if link.startswith('QUFodHRwOi8vMTI3LjAuMC4'):
         return ''
-    l = base64.decodestring(link[10:].encode()).decode()
+    try:
+        l = base64.decodestring(link[10:].encode()).decode('gbk')
+    except ValueError:
+        l = base64.decodestring(link[10:].encode()).decode()
     return l[2:-2]
 
 def decode_qqdl(link):
-    return base64.decodestring(link[7:].encode()).decode()
+    try:
+        return base64.decodestring(link[7:].encode()).decode()
+    except ValueError:
+        return base64.decodestring(link[7:].encode()).decode('gbk')
 
 _router = {
     'flashge': decode_flashget,
@@ -36,4 +45,5 @@ def decode(link):
             print(e)
             return ''
     else:
+        print('unknown protocol')
         return ''
