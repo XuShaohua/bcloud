@@ -13,7 +13,10 @@ from gi.repository import GdkPixbuf
 from gi.repository import Gio
 from gi.repository import Gtk
 from gi.repository import GLib
-import keyring
+try:
+    import keyring
+except (ImportError, ValueError) as e:
+    print(e, ', keyring will be disabled')
 
 from bcloud import Config
 from bcloud import net
@@ -141,15 +144,16 @@ def load_profile(profile_name):
         if key not in profile:
             profile[key] = DEFAULT_PROFILE[key]
 
-    for i in range(RETRIES):
-        try:
-            password = keyring.get_password(
-                    Config.DBUS_APP_NAME, profile['username'])
-            break
-        except dbus.exceptions.DBusException as e:
-            print(e)
-    if password:
-        profile['password'] = password
+    if globals().get('keyring'):
+        for i in range(RETRIES):
+            try:
+                password = keyring.get_password(
+                        Config.DBUS_APP_NAME, profile['username'])
+                break
+            except dbus.exceptions.DBusException as e:
+                print(e)
+        if password:
+            profile['password'] = password
     return profile
 
 def dump_profile(profile):

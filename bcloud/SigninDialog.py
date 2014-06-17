@@ -164,6 +164,12 @@ class SigninDialog(Gtk.Dialog):
         box.show_all()
         self.infobar.hide()
 
+        if not hasattr(gutil, 'keyring'):
+            self.signin_check.set_active(False)
+            self.signin_check.set_sensitive(False)
+            self.remember_check.set_active(False)
+            self.remember_check.set_sensitive(False)
+
         GLib.timeout_add(500, self.load_defualt_profile)
 
     def load_defualt_profile(self):

@@ -15,7 +15,7 @@ import time
 try:
     from Crypto.PublicKey import RSA
     from Crypto.Cipher import PKCS1_OAEP
-except ImportError as e:
+except (ImportError, ValueError) as e:
     print(e, ', RSA encryption will be disabled')
 
 SIZE_K = 2 ** 10
