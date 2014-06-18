@@ -120,7 +120,7 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_iconview_button_pressed(self, iconview, event):
         if ((event.type != Gdk.EventType.BUTTON_PRESS) or
                 (event.button != Gdk.BUTTON_SECONDARY)):
-            return
+            return False
 
         tree_path = self.iconview.get_path_at_pos(event.x, event.y)
         selected_tree_paths = self.iconview.get_selected_items()
@@ -135,6 +135,7 @@ class IconWindow(Gtk.ScrolledWindow):
                 self.iconview.unselect_all()
             self.iconview.select_path(tree_path)
             self.popup_item_menu(event)
+        return True
 
     def popup_folder_menu(self, event):
         # create folder; reload; share; properties
@@ -529,7 +530,7 @@ class TreeWindow(IconWindow):
                 'button-press-event', self.on_iconview_button_pressed)
         self.get_vadjustment().connect('value-changed', self.on_scrolled)
         self.iconview.set_headers_clickable(True)
-        self.iconview.set_reorderable(True)
+        self.iconview.set_rubber_banding(True)
         self.iconview.set_search_column(NAME_COL)
         self.selection = self.iconview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
@@ -575,6 +576,7 @@ class TreeWindow(IconWindow):
         self.iconview.select_path = self.selection.select_path
         # Gtk.TreeSelection.get_selected_rows() returns (model, tree_paths)
         self.iconview.get_selected_items = lambda: self.selection.get_selected_rows()[1]
+
         # Gtk.TreeView.get_path_at_pos() returns (path, column)
         def get_path_at_pos(x, y):
             selected = Gtk.TreeView.get_path_at_pos(self.iconview, x, y)
