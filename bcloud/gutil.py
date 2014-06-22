@@ -13,6 +13,7 @@ from gi.repository import GdkPixbuf
 from gi.repository import Gio
 from gi.repository import Gtk
 from gi.repository import GLib
+from gi.repository import WebKit
 try:
     import keyring
 except (ImportError, ValueError) as e:
@@ -202,3 +203,7 @@ def escape(tooltip):
 def text_buffer_get_all_text(buf):
     '''Get all text in a GtkTextBuffer'''
     return buf.get_text(buf.get_start_iter(), buf.get_end_iter(), False)
+
+def RSA_encrypt(pubkey, msg):
+    print('RSA encrypt():', pubkey, msg)
+    web = WebKit.WebView()

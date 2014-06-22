@@ -99,8 +99,11 @@ def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
     for _ in range(retries):
         try:
             conn = http.client.HTTPConnection(parse_result.netloc)
-            #conn.request('HEAD', url, body=data, headers=headers_merged)
-            conn.request('GET', url, body=data, headers=headers_merged)
+            if data:
+                print('net.103L:, will POST data')
+                conn.request('POST', url, body=data, headers=headers_merged)
+            else:
+                conn.request('GET', url, body=data, headers=headers_merged)
             return conn.getresponse()
         except OSError as e:
             print(e)

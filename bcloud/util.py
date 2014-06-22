@@ -127,4 +127,4 @@ def RSA_encrypt(public_key, message):
     rsakey = RSA.importKey(public_key)
     rsakey = PKCS1_OAEP.new(rsakey)
     encrypted = rsakey.encrypt(message.encode())
-    return base64.encodestring(encrypted).decode()
+    return base64.encodestring(encrypted).decode().replace('\n', '')
