@@ -1,3 +1,13 @@
+v3.4.1 - 2014.6.23
+* Update signin process
+* Fixed: sqlite3 has not LIMIT syntax in ubuntu 12.04
+* Disable dark theme by default
+* Check RSA module is availabel in old distributiions
+* Set keyring module as optional
+* Support GBK encoding in cloud-download page
+* Fixed: failed to download multiple selected items in treeview
+* i18n updated
+
 v3.3.7 - 2014.5.29
 * Increase downloading chunk size
 * Check local file size
