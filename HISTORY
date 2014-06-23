@@ -1,3 +1,6 @@
+v3.4.2 - 2014.6.23
+* Fixed: failed to check vcodestr in SigninDialog
+
 v3.4.1 - 2014.6.23
 * Update signin process
 * Fixed: sqlite3 has not LIMIT syntax in ubuntu 12.04
