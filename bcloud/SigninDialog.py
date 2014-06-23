@@ -54,7 +54,6 @@ class SigninVcodeDialog(Gtk.Dialog):
 
     def update_img(self, req_data, error=None):
         if error or not req_data:
-            self.refresh_vcode()
             return
         vcode_path = os.path.join(
                 Config.get_tmp_path(self.form['username']),
@@ -250,10 +249,13 @@ class SigninDialog(Gtk.Dialog):
                 form['username'] = username
                 form['password'] = password
                 cookie.load_list(cookie_str)
-                if 'vcodestr' in form:
+                if len(form.get('vcodestr', '')):
                     dialog = SigninVcodeDialog(self, cookie, form)
                     dialog.run()
                     dialog.destroy()
+                    if len(form.get('verifycode', '')) != 4:
+                        print('verifycode length is not 4!')
+                        return
                 self.signin_button.set_label(_('Signin...'))
                 gutil.async_call(auth.wap_signin, cookie, form,
                         callback=on_wap_signin)

@@ -83,7 +83,6 @@ def get_wap_passport():
 
 def wap_signin(cookie, form):
     '''进行WAP登录认证'''
-    print('wap_signin():', cookie, form)
     url = 'http://wappass.baidu.com/passport/login'
     req = net.urlopen_without_redirect(url, headers={
         'Cookie': cookie.header_output(),
@@ -98,7 +97,10 @@ def wap_signin(cookie, form):
 def get_wap_signin_vcode(cookie, codeString):
     '''获取wap登录时的验证码'''
     url = 'http://wappass.baidu.com/cgi-bin/genimage?' + codeString
-    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        'Referer': 'http://wappass.badu.com',
+        })
     if req:
         return req.data
     else:
@@ -109,7 +111,6 @@ def refresh_signin_vcode(cookie, token, vcodetype):
 
     vcodetype - 在调用check_login()时返回的vcodetype.
     '''
-    print('refresh_signin_vcode()', cookie, token, vcodetype)
     url = ''.join([
         const.PASSPORT_BASE,
         'v2/?reggetcodestr',
@@ -119,11 +120,9 @@ def refresh_signin_vcode(cookie, token, vcodetype):
         '&fr=ligin',
         '&vcodetype=', vcodetype,
         ])
-    print('url:', url)
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     if req:
         try:
-            print('req.data is:', req.data)
             return json.loads(req.data.decode('gbk'))
         except ValueError as e:
             print('Error occurs in refresh_signin_vcode()', e)
@@ -140,7 +139,6 @@ def parse_bdstoken(content):
     bdstoken = ''
     bds_re = re.compile('BDSTOKEN\s*=\s*"([^"]+)"')
     bds_match = bds_re.search(content)
-    print('bds match:', bds_match)
     if bds_match:
         bdstoken = bds_match.group(1)
     return bdstoken
