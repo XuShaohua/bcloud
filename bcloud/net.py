@@ -100,7 +100,6 @@ def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
         try:
             conn = http.client.HTTPConnection(parse_result.netloc)
             if data:
-                print('net.103L:, will POST data')
                 conn.request('POST', url, body=data, headers=headers_merged)
             else:
                 conn.request('GET', url, body=data, headers=headers_merged)
@@ -108,7 +107,6 @@ def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
         except OSError as e:
             print(e)
     return None
-
 
 def post_multipart(url, headers, fields, files, retries=RETRIES):
     content_type, body = encode_multipart_formdata(fields, files)

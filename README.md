@@ -1,22 +1,27 @@
 ABOUT
 =====
-bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端实现.
+bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 
-支持的系统版本:
+已经支持的Linux系统/版本:
 
-* Fedora 20
+* ArchLinux
 * Debian sid
 * Debian testing
 * Debian stable
+* Fedora 20
+* Gentoo
+* OpenSuse 13
 * Ubuntu 14.04
 * Ubuntu 13.10
 * Ubuntu 12.04
-* OpenSuse 13
 
 类似项目
 =======
-[bypy](https://github.com/houtianze/bypy), 终端里使用的百度网盘客户端, 它
+[bypy](https://github.com/houtianze/bypy) 终端里使用的百度网盘客户端, 它
 使用了百度网盘PCS接口.
+
+如果需要, 也可以直接调用bcloud提供的百度网盘接口, 使用bcloud/auth.py得到百度
+服务器的连接授权, 然后使用bcloud/pcs.py调用相应的网盘接口.
 
 
 安装
@@ -44,15 +49,18 @@ gnome-keyring或kwallet里面; 如果缺少了这个模块, 帐户的密码就�
 
 Q&A
 ===
-1. 为什么bcloud不支持本地与远程服务器同步?
+1.为什么bcloud不支持本地与远程服务器同步?
 
-因为百度网盘没有公开它的同步算法.
+因为百度网盘没有公开它的同步算法. 参考这个[issue](https://github.com/LiuLang/bcloud/issues/11)
 
-2. 能不能支持其它网盘?
+2.能不能支持其它网盘?
 
 我时间和精力都非常有限, 单单开发bcloud就占用了我一个多月的业余时间. 而且
 本来工作之外的时间就非常少, 还有很多其它事情要处理. 所以如果你报告了bug或者
 反馈了问题, 没有及时收到回复, 请多等待一下, 我会安排时间处理这些问题的.
+
+关于115 网盘, 前段时间写了一个[油㺅脚本](https://github.com/LiuLang/monkey-videos/tree/master/115),
+可以用它来直接观看网盘里的视频, 这个脚本属于[monkey-videos](https://github.com/LiuLang/monkey-videos)项目.
 
 
 COPYRIGHT
