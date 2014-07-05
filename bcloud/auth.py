@@ -60,7 +60,7 @@ def get_token(cookie):
 
 def parse_wap_passport(content):
     form = {}
-    tree = html.fromstring(content)
+    tree = html.document_fromstring(content.encode('utf-8'))
     input_sel = CSS('form input')
     input_elems = input_sel(tree)
     for item in input_elems:

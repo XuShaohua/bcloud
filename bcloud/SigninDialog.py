@@ -218,6 +218,7 @@ class SigninDialog(Gtk.Dialog):
         def on_get_bdstoken(bdstoken, error=None):
             if error or not bdstoken:
                 print('Error in get bdstoken:', bdstoken, error)
+                print('Please check your username and passowrd')
                 self.signin_failed(
                     _('Error: Failed to get bdstokens!'))
             else:
@@ -238,8 +239,12 @@ class SigninDialog(Gtk.Dialog):
                         callback=on_get_bdstoken)
 
         def on_get_wap_passport(info, error=None):
+            if error or not info:
+                print('Error occurs in on_get_wap_passport:', info, error)
+                self.signin_failed(
+                        _('Failed to get WAP page, please try again.'))
             cookie_str, _form = info
-            if not cookie_str or not _form or error:
+            if not cookie_str or not _form:
                 print('Error occurs in on_get_wap_passport:', info, error)
                 self.signin_failed(
                         _('Failed to get WAP page, please try again.'))
