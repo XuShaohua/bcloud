@@ -23,7 +23,6 @@ from bcloud import net
 from bcloud import util
 
 DEFAULT_PROFILE = {
-    'version': Config.VERSION,
     'window-size': (960, 680),
     'use-status-icon': True,
     'use-dark-theme': False, # 默认禁用深色主题

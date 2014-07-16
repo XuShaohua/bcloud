@@ -12,8 +12,9 @@ from distutils.command.sdist import sdist as distutils_sdist
 import glob
 import os
 import shutil
+import sys
 
-from bcloud import Config
+import bcloud
 
 def build_data_files():
     data_files = []
@@ -27,12 +28,13 @@ def build_data_files():
 scripts = ['bcloud-gui', ]
 
 if __name__ == '__main__':
+    assert sys.version_info.major > 2, 'Only works with python3'
     setup(
-        name = Config.NAME,
+        name = 'bcloud',
         description = 'Baidu Pan client for Linux Desktop users',
-        version = Config.VERSION,
+        version = bcloud.VERSION,
         license = 'GPLv3',
-        url = Config.HOMEPAGE,
+        url = 'https://github.com/LiuLang/bcloud',
 
         author = 'LiuLang',
         author_email = 'gsushzhsosgsu@gmail.com',
@@ -40,4 +42,20 @@ if __name__ == '__main__':
         packages = ['bcloud', ],
         scripts = scripts,
         data_files = build_data_files(),
+
+        platforms = 'any',
+        classifiers=[
+            'Development Status :: 5 - Production/Stable',
+            'Environment :: X11 Applications :: GTK',
+            'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+            'Natural Language :: Chinese (Simplified)',
+            'Natural Language :: Chinese (Traditional)',
+            'Natural Language :: English',
+            'Operating System :: POSIX :: Linux',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.2',
+            'Programming Language :: Python :: 3.3',
+            'Programming Language :: Python :: 3.4',
+            'Topic :: Communications :: File Sharing',
+            ],
         )

@@ -10,6 +10,8 @@ import os
 from gi.repository import Gdk
 from gi.repository import Gtk
 
+import bcloud
+
 if __file__.startswith('/usr/local/'):
     PREF = '/usr/local/share'
 elif __file__.startswith('/usr/'):
@@ -27,7 +29,7 @@ _ = gettext.gettext
 
 DBUS_APP_NAME = 'org.liulang.bcloud'
 APPNAME = 'BCloud'
-VERSION = '3.4.2'
+VERSION = bcloud.VERSION
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
 AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
