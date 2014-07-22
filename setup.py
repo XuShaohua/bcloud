@@ -32,7 +32,7 @@ if __name__ == '__main__':
     setup(
         name = 'bcloud',
         description = 'Baidu Pan client for Linux Desktop users',
-        version = bcloud.VERSION,
+        version = bcloud.__version__,
         license = 'GPLv3',
         url = 'https://github.com/LiuLang/bcloud',
 

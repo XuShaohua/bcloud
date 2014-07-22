@@ -64,11 +64,6 @@ class CloudPage(Gtk.Box):
         remove_button.connect('clicked', self.on_remove_button_clicked)
         control_box.pack_end(remove_button, False, False, 0)
 
-        cancel_button = Gtk.Button.new_with_label(_('Cancel'))
-        cancel_button.set_tooltip_text(_('Cancel selected tasks'))
-        cancel_button.connect('clicked', self.on_cancel_button_clicked)
-        control_box.pack_end(cancel_button, False, False, 0)
-
         # show loading process
         self.loading_spin = Gtk.Spinner()
         self.loading_spin.props.margin_right = 5
@@ -255,6 +250,8 @@ class CloudPage(Gtk.Box):
         def do_add_link_task(source_url):
             def on_link_task_added(info, error=None):
                 if error or not info:
+                    print('Error: on_link_task_added:', error, info)
+                    self.app.toast(_('Failed to parse download link'))
                     return
                 if 'task_id' in info or info['error_code'] == 0:
                     self.reload()
@@ -353,16 +350,6 @@ class CloudPage(Gtk.Box):
         dir_name = os.path.split(path)[0]
         self.app.home_page.load(dir_name)
         self.app.switch_page(self.app.home_page)
-
-    def on_cancel_button_clicked(self, button):
-        model, tree_paths = self.selection.get_selected_rows()
-        if not tree_paths or len(tree_paths) != 1:
-            return
-        tree_path = tree_paths[0]
-        task_id = model[tree_path][TASKID_COL]
-        gutil.async_call(
-            pcs.cloud_cancel_task, self.app.cookie, self.app.tokens,
-            task_id, callback=self.reload)
 
     def on_remove_button_clicked(self, button):
         def on_task_removed(resp, error=None):
