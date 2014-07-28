@@ -113,10 +113,10 @@ class FolderBrowserDialog(Gtk.Dialog):
         self.treestore[parent_iter][LOADED_COL] = True
 
     def get_path(self):
-        '''获取选择的路径, 如果没有选择, 就返回空.'''
+        '''获取选择的路径, 如果没有选择, 就返回根目录'''
         model, tree_iter = self.selection.get_selected()
         if not tree_iter:
-            return ''
+            return '/'
         else:
             return model[tree_iter][PATH_COL]
 
