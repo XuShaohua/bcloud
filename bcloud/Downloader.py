@@ -33,10 +33,6 @@ class Downloader(threading.Thread, GObject.GObject):
     断点续传功能基于HTTP/1.1 的Range, 百度网盘对它有很好的支持.
     '''
 
-    fh = None
-    red_url = ''
-    flush_count = 0
-
     __gsignals__ = {
             'started': (GObject.SIGNAL_RUN_LAST,
                 # fs_id
@@ -64,37 +60,31 @@ class Downloader(threading.Thread, GObject.GObject):
         self.cookie = cookie
         self.tokens = tokens
         self.row = row[:]  # 复制一份
+        self.fh = None
+        self.red_url = ''
+        self.flush_count = 0
 
     def init_files(self):
         row = self.row
         if not os.path.exists(self.row[SAVEDIR_COL]):
             os.makedirs(row[SAVEDIR_COL], exist_ok=True)
         self.filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL]) 
+        self.tmp_filepath = self.filepath + '.part'
         if os.path.exists(self.filepath):
             curr_size = os.path.getsize(self.filepath)
+            # file exists and size matches
             if curr_size == row[SIZE_COL]:
-                self.finished()
-                return
-            elif curr_size < row[SIZE_COL]:
-                if curr_size == row[CURRSIZE_COL]:
-                    self.fh = open(self.filepath, 'ab')
-                elif curr_size < row[CURRSIZE_COL]:
-                    self.fh = open(self.filepath, 'ab')
-                    row[CURRSIZE_COL] = curr_size
-                else:
-                    if 0 < row[CURRSIZE_COL]:
-                        self.fh = open(self.filepath, 'ab')
-                        self.fh.seek(row[CURRSIZE_COL])
-                    else:
-                        self.fh = open(self.filepath, 'wb')
-                        self.row[CURRSIZE_COL] = 0
+                self.finished(move=False)
+            # overwrite existing file
             else:
-                self.fh = open(self.filepath, 'wb')
+                os.remove(self.filepath)
+                self.fh = open(self.tmp_filepath, 'wb')
                 self.row[CURRSIZE_COL] = 0
+        elif os.path.exists(self.tmp_filepath):
+            self.fh = open(self.tmp_filepath, 'ab')
         else:
-            self.fh = open(self.filepath, 'wb')
+            self.fh = open(self.tmp_filepath, 'wb')
             self.row[CURRSIZE_COL] = 0
-
 
     def destroy(self):
         '''自毁'''
@@ -169,7 +159,7 @@ class Downloader(threading.Thread, GObject.GObject):
         '''停止下载, 并删除之前下载的片段'''
         self.row[STATE_COL] = State.CANCELED
         self.close_file()
-        os.remove(self.filepath)
+        os.remove(self.tmp_filepath)
 
     def close_file(self):
         if self.fh and not self.fh.closed:
@@ -177,10 +167,12 @@ class Downloader(threading.Thread, GObject.GObject):
             self.fh.close()
             self.fh = None
 
-    def finished(self):
+    def finished(self, move=True):
         self.row[STATE_COL] = State.FINISHED
         self.emit('downloaded', self.row[FSID_COL])
         self.close_file()
+        if move and os.path.exists(self.tmp_filepath):
+            os.rename(self.tmp_filepath, self.filepath)
 
     def network_error(self):
         self.row[STATE_COL] = State.ERROR
