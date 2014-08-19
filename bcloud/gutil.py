@@ -146,13 +146,11 @@ def load_profile(profile_name):
     if globals().get('keyring'):
         for i in range(RETRIES):
             try:
-                password = keyring.get_password(
+                profile['password'] = keyring.get_password(
                         Config.DBUS_APP_NAME, profile['username'])
                 break
             except dbus.exceptions.DBusException as e:
                 print(e)
-        if password:
-            profile['password'] = password
     return profile
 
 def dump_profile(profile):
