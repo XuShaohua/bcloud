@@ -16,7 +16,7 @@ _ = Config._
 from bcloud import gutil
 from bcloud.RequestCookie import RequestCookie
 
-DELTA = 3 * 24 * 60 * 60   # 3 days
+DELTA = 1 * 24 * 60 * 60   # 1 days
 
 class SigninVcodeDialog(Gtk.Dialog):
 
