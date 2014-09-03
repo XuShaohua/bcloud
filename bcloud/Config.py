@@ -19,7 +19,7 @@ elif __file__.startswith('/usr/'):
 else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
 NAME = 'bcloud'
-ICON_PATH = os.path.join(PREF, NAME, 'icons')
+ICON_PATH = os.path.join(PREF, NAME, 'bcloud.png')
 COLOR_SCHEMA = os.path.join(PREF, NAME, 'color_schema.json')
 
 LOCALEDIR = os.path.join(PREF, 'locale')

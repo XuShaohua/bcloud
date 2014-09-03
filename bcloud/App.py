@@ -66,7 +66,7 @@ class App:
         self.window.set_default_size(*gutil.DEFAULT_PROFILE['window-size'])
         self.window.set_title(Config.APPNAME)
         self.window.props.hide_titlebar_when_maximized = True
-        self.window.set_icon_name(Config.NAME)
+        self.window.set_icon_from_file(Config.ICON_PATH)
         self.window.connect('check-resize', self.on_main_window_resized)
         self.window.connect('delete-event', self.on_main_window_deleted)
         app.add_window(self.window)
