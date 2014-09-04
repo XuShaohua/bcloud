@@ -34,6 +34,7 @@ bcloud/net.py
 bcloud/pcs.py
 bcloud/util.py
 share/applications/bcloud.desktop
+share/bcloud/bcloud.png
 share/bcloud/color_schema.json
 share/icons/hicolor/128x128/apps/bcloud.png
 share/icons/hicolor/128x128/mimetypes/unknown.png

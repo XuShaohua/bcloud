@@ -1,3 +1,15 @@
+v3.5.1 - 2014.9.4
+* Automatically restart task when error occurs
+* Fixed: Gdk-WARNING **: gdk_window_set_icon_list: icons too large
+* Expires local cookie cache after 24h
+* Fixed: local variable password referenced before assignment; reported by @rmokerone
+* Fixe: failed to check upload folder; reported by @lilymona
+* Rename filename when downloading
+* Notify user if failed to parse remote download link
+* Support debian 7.5
+* Add classifiers
+* i18n updated
+
 v3.4.2 - 2014.6.23
 * Fixed: failed to check vcodestr in SigninDialog
 

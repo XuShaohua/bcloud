@@ -4,4 +4,4 @@
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
 
-__version__ = '3.4.2'
+__version__ = '3.5.1'
