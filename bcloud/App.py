@@ -64,9 +64,10 @@ class App:
 
         self.window = Gtk.ApplicationWindow.new(application=app)
         self.window.set_default_size(*gutil.DEFAULT_PROFILE['window-size'])
-        self.window.set_title(Config.APPNAME)
-        self.window.props.hide_titlebar_when_maximized = True
+        GLib.set_prgname(Config.NAME)
+        GLib.set_application_name(Config.APPNAME)
         self.window.set_icon_from_file(Config.ICON_PATH)
+        self.window.props.hide_titlebar_when_maximized = True
         self.window.connect('check-resize', self.on_main_window_resized)
         self.window.connect('delete-event', self.on_main_window_deleted)
         app.add_window(self.window)
@@ -103,7 +104,6 @@ class App:
         app.add_action(quit_action)
 
         paned = Gtk.Paned()
-        #paned.props.position = 15
         self.window.add(paned)
 
         left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)

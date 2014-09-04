@@ -30,12 +30,15 @@ DEFAULT_PROFILE = {
     'first-run': True,
     'save-dir': Config.HOME_DIR,
     'use-streaming': True,  # 使用流媒体方式播放视频
-    'concurr-tasks': 2,     # 下载/上传同时进行的任务数, 1~5
     'username': '',
     'password': '',
     'remember-password': False,
     'auto-signin': False,
     'upload-hidden-files': True,  # 同时上传隐藏文件.
+    'concurr-tasks': 2,     # 下载/上传同时进行的任务数, 1~5
+    'retries-each': 5,      # 隔5分钟后尝试重新下载
+    'max-retries': 5,       # 尝试下载次数, 默认为5次
+    'download-timeout': 30, # 30 秒后下载超时
     }
 RETRIES = 5   # 调用keyring模块与libgnome-keyring交互的尝试次数
 

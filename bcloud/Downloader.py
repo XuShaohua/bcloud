@@ -17,13 +17,16 @@ from bcloud.net import ForbiddenHandler
 from bcloud import pcs
 
 CHUNK_SIZE = 131072 # 128K
-RETRIES = 5             # 下载数据出错时重试的次数
-TIMEOUT = 20
 THRESHOLD_TO_FLUSH = 100  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
 
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
     ISDIR_COL, SAVENAME_COL, SAVEDIR_COL, STATE_COL, STATENAME_COL,
     HUMANSIZE_COL, PERCENT_COL) = list(range(13))
+
+def get_tmp_filepath(dir_name, save_name):
+    '''返回最终路径名及临时路径名'''
+    filepath = os.path.join(dir_name, save_name)
+    return filepath, filepath + '.part'
 
 
 class Downloader(threading.Thread, GObject.GObject):
@@ -44,21 +47,24 @@ class Downloader(threading.Thread, GObject.GObject):
                 # fs_id
                 GObject.TYPE_NONE, (str, )),
             'disk-error': (GObject.SIGNAL_RUN_LAST,
-                # fs_id
-                GObject.TYPE_NONE, (str, )),
+                # fs_id, tmp_filepath
+                GObject.TYPE_NONE, (str, str)),
             'network-error': (GObject.SIGNAL_RUN_LAST,
                 # fs_id
                 GObject.TYPE_NONE, (str, )),
             }
 
-    def __init__(self, parent, row, cookie, tokens):
+    def __init__(self, parent, row):
         threading.Thread.__init__(self)
         self.daemon = True
         GObject.GObject.__init__(self)
 
         self.parent = parent
-        self.cookie = cookie
-        self.tokens = tokens
+        self.app = parent.app
+        self.cookie = self.app.cookie
+        self.tokens = self.app.tokens
+        self.TIMEOUT = int(self.app.profile['download-timeout'])
+        self.RETRIES = int(self.app.profile['max-retries'])
         self.row = row[:]  # 复制一份
         self.fh = None
         self.red_url = ''
@@ -68,8 +74,8 @@ class Downloader(threading.Thread, GObject.GObject):
         row = self.row
         if not os.path.exists(self.row[SAVEDIR_COL]):
             os.makedirs(row[SAVEDIR_COL], exist_ok=True)
-        self.filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL]) 
-        self.tmp_filepath = self.filepath + '.part'
+        self.filepath, self.tmp_filepath = get_tmp_filepath(
+                row[SAVEDIR_COL], row[SAVENAME_COL]) 
         if os.path.exists(self.filepath):
             curr_size = os.path.getsize(self.filepath)
             # file exists and size matches
@@ -78,12 +84,31 @@ class Downloader(threading.Thread, GObject.GObject):
             # overwrite existing file
             else:
                 os.remove(self.filepath)
-                self.fh = open(self.tmp_filepath, 'wb')
+                try:
+                    self.fh = open(self.tmp_filepath, 'wb')
+                except (FileNotFoundError, PermissionError) as e:
+                    print('Error in L84:', e)
+                    self.emit('disk-error', self.row[FSID_COL],
+                              self.tmp_filepath)
+                    self.fh = None
+                    return
                 self.row[CURRSIZE_COL] = 0
         elif os.path.exists(self.tmp_filepath):
-            self.fh = open(self.tmp_filepath, 'ab')
+            try:
+                self.fh = open(self.tmp_filepath, 'ab')
+            except (FileNotFoundError, PermissionError) as e:
+                print('Error in L92:', e)
+                self.emit('disk-error', self.row[FSID_COL], self.tmp_filepath)
+                self.fh = None
+                return
         else:
-            self.fh = open(self.tmp_filepath, 'wb')
+            try:
+                self.fh = open(self.tmp_filepath, 'wb')
+            except (FileNotFoundError, PermissionError) as e:
+                print('Error in L101:', e)
+                self.emit('disk-error', self.row[FSID_COL], self.tmp_filepath)
+                self.fh = None
+                return
             self.row[CURRSIZE_COL] = 0
 
     def destroy(self):
@@ -100,7 +125,7 @@ class Downloader(threading.Thread, GObject.GObject):
         self.red_url = pcs.get_download_link(
                 self.cookie, self.tokens, self.row[PATH_COL])
         if not self.red_url:
-            print('Failed to get download link')
+            print('Error: Failed to get download link')
             self.network_error()
         self.download()
 
@@ -110,15 +135,16 @@ class Downloader(threading.Thread, GObject.GObject):
                 self.row[CURRSIZE_COL], self.row[SIZE_COL]-1)
         opener = request.build_opener(ForbiddenHandler)
         opener.addheaders = [('Range', content_range)]
-        for i in range(RETRIES):
+        for i in range(self.RETRIES):
             try:
-                req = opener.open(self.red_url)
+                req = opener.open(self.red_url, timeout=self.TIMEOUT)
                 break
             except OSError as e:
                 print(e)
-                if i == (RETRIES - 1):
-                    self.network_error()
-                    return
+                req = None
+        if not req:
+            self.network_error()
+            return
 
         range_from = self.row[CURRSIZE_COL]
         range_to = range_from
@@ -128,7 +154,8 @@ class Downloader(threading.Thread, GObject.GObject):
         while self.row[STATE_COL] == State.DOWNLOADING:
             try:
                 buff = req.read(CHUNK_SIZE)
-            except Exception as e:
+            # catch timeout error
+            except OSError as e:
                 print(e)
                 self.network_error()
                 break
@@ -141,13 +168,14 @@ class Downloader(threading.Thread, GObject.GObject):
             range_from, range_to = range_to, range_to + len(buff)
             if not self.fh or self.row[STATE_COL] != State.DOWNLOADING:
                 break
-            self.emit('received', self.row[FSID_COL], range_to)
             self.fh.write(buff)
             self.flush_count = self.flush_count + 1
             if self.flush_count > THRESHOLD_TO_FLUSH:
                 self.fh.flush()
                 self.flush_count = 0
             self.row[CURRSIZE_COL] += len(buff)
+            self.emit('received', self.row[FSID_COL], self.row[CURRSIZE_COL])
+
         self.close_file()
 
     def pause(self):

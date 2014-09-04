@@ -17,7 +17,7 @@ from gi.repository import Pango
 
 from bcloud import Config
 _ = Config._
-from bcloud.Downloader import Downloader
+from bcloud.Downloader import Downloader, get_tmp_filepath
 from bcloud import gutil
 from bcloud import pcs
 from bcloud import util
@@ -436,21 +436,35 @@ class DownloadPage(Gtk.Box):
             row[STATE_COL] = State.ERROR
             row[STATENAME_COL] = StateNames[State.ERROR]
             self.update_task_db(row)
-            self.remove_worker(row[FSID_COL])
-            self.app.toast(_('Error occurs will downloading {0}').format(
-                row[NAME_COL]))
+            self.remove_worker(row[FSID_COL], stop=False)
+            if self.app.profile['retries-each']:
+                GLib.timeout_add(self.app.profile['retries-each']*60000,
+                        self.restart_task, row)
+            else:
+                self.app.toast(
+                        _('Error occurs will downloading {0}').format(
+                            row[NAME_COL]))
             self.scan_tasks()
+
+        def do_worker_disk_error(fs_id, tmp_filepath):
+            self.app.toast(
+                    _('Dsiak Error: failed to read/write {0}').format(
+                    tmp_filepath))
+
+        def on_worker_disk_error(worker, fs_id, tmp_filepath):
+            GLib.idle_add(do_worker_disk_error, fs_id, tmp_filepath)
 
         if row[FSID_COL] in self.workers:
             return
         row[STATE_COL] = State.DOWNLOADING
         row[STATENAME_COL] = StateNames[State.DOWNLOADING]
-        worker = Downloader(self, row, self.app.cookie, self.app.tokens)
+        worker = Downloader(self, row)
         self.workers[row[FSID_COL]] = (worker, row)
         worker.connect('started', on_worker_started)
         worker.connect('received', on_worker_received)
         worker.connect('downloaded', on_worker_downloaded)
         worker.connect('network-error', on_worker_network_error)
+        worker.connect('disk-error', on_worker_disk_error)
         worker.start()
 
     def pause_worker(self, row):
@@ -469,6 +483,14 @@ class DownloadPage(Gtk.Box):
         else:
             worker.pause()
         self.workers.pop(fs_id, None)
+
+    def restart_task(self, row):
+        '''重启下载任务.
+
+        当指定的下载任务出现错误时(通常是网络连接超时), 如果用户允许, 就会在
+        指定的时间间隔之后, 重启这个任务.
+        '''
+        self.start_task(row)
 
     def start_task(self, row, scan=True):
         '''启动下载任务.
@@ -509,9 +531,10 @@ class DownloadPage(Gtk.Box):
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)
         elif row[CURRSIZE_COL] < row[SIZE_COL]:
-            filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
-            if os.path.exists(filepath):
-                os.remove(filepath)
+            tmp_filepath = get_tmp_filepath(row[SAVEDIR_COL],
+                    row[SAVENAME_COL])[1]
+            if os.path.exists(tmp_filepath):
+                os.remove(tmp_filepath)
         self.app_infos.pop(row[FSID_COL], None)
         self.remove_task_db(row[FSID_COL])
         tree_iter = row.iter
@@ -537,7 +560,6 @@ class DownloadPage(Gtk.Box):
                 return
             operator(row, scan=False)
         self.scan_tasks()
-
 
     def on_start_button_clicked(self, button):
         self.operate_selected_rows(self.start_task)
