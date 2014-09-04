@@ -127,30 +127,18 @@ class PreferencesDialog(Gtk.Dialog):
         retries_minute_label.props.xalign = 0
         network_grid.attach(retries_minute_label, 2, 1, 1, 1)
 
-        max_retries = Gtk.Label.new(_('Max. retries:'))
-        network_grid.attach(max_retries, 0, 2, 1, 1)
-        max_retries.props.xalign = 1
-        max_retries_spin = Gtk.SpinButton.new_with_range(0, 100, 1)
-        max_retries_spin.set_value(self.app.profile['max-retries'])
-        max_retries_spin.props.halign = Gtk.Align.START
-        max_retries_spin.set_tooltip_text(_('0: unlimit'))
-        max_retries_spin.connect('value-changed',
-                self.on_max_retries_value_changed)
-        network_grid.attach(max_retries_spin, 1, 2, 1, 1)
-        retries_spin.connect('value-changed', self.on_retries_value_changed)
-
         download_timeout = Gtk.Label.new(_('Download timeout:'))
         download_timeout.props.xalign = 1
-        network_grid.attach(download_timeout, 0, 3, 1, 1)
+        network_grid.attach(download_timeout, 0, 2, 1, 1)
         download_timeout_spin = Gtk.SpinButton.new_with_range(10, 240, 30)
         download_timeout_spin.set_value(self.app.profile['download-timeout'])
         download_timeout_spin.props.halign = Gtk.Align.START
         download_timeout_spin.connect('value-changed',
                 self.on_download_timeout_value_changed)
-        network_grid.attach(download_timeout_spin, 1, 3, 1, 1)
+        network_grid.attach(download_timeout_spin, 1, 2, 1, 1)
         download_timeout_second = Gtk.Label.new(_('seconds'))
         download_timeout_second.props.xalign = 0
-        network_grid.attach(download_timeout_second, 2, 3, 1, 1)
+        network_grid.attach(download_timeout_second, 2, 2, 1, 1)
 
         box.show_all()
 
@@ -179,9 +167,6 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_retries_value_changed(self, retries_spin):
         self.app.profile['retries-each'] = retries_spin.get_value()
-
-    def on_max_retries_value_changed(self, max_retries_spin):
-        self.app.profile['max-retries'] = max_retries_spin.get_value()
 
     def on_download_timeout_value_changed(self, download_timeout_spin):
         self.app.profile['download-timeout'] = download_timeout_spin.get_value()

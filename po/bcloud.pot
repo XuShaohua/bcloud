@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-23 02:28+0800\n"
+"POT-Creation-Date: 2014-09-04 10:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,19 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../bcloud/App.py:85 ../bcloud/PreferencesDialog.py:18
+#: ../bcloud/App.py:86 ../bcloud/PreferencesDialog.py:18
 msgid "Preferences"
 msgstr ""
 
-#: ../bcloud/App.py:86
+#: ../bcloud/App.py:87
 msgid "Sign out"
 msgstr ""
 
-#: ../bcloud/App.py:87
+#: ../bcloud/App.py:88
 msgid "About"
 msgstr ""
 
-#: ../bcloud/App.py:88 ../bcloud/App.py:379
+#: ../bcloud/App.py:89 ../bcloud/App.py:379
 msgid "Quit"
 msgstr ""
 
@@ -58,13 +58,13 @@ msgstr ""
 msgid "Select All"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:65 ../bcloud/CloudPage.py:95
+#: ../bcloud/BTBrowserDialog.py:65 ../bcloud/CloudPage.py:90
 #: ../bcloud/DownloadPage.py:126 ../bcloud/IconWindow.py:543
 #: ../bcloud/TrashPage.py:87 ../bcloud/UploadPage.py:116
 msgid "Name"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:70 ../bcloud/CloudPage.py:103
+#: ../bcloud/BTBrowserDialog.py:70 ../bcloud/CloudPage.py:98
 #: ../bcloud/DownloadPage.py:141 ../bcloud/IconWindow.py:560
 #: ../bcloud/PropertiesDialog.py:56 ../bcloud/TrashPage.py:103
 #: ../bcloud/UploadPage.py:131
@@ -156,46 +156,42 @@ msgstr ""
 msgid "Remove selected tasks"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:67
-msgid "Cancel"
-msgstr ""
-
-#: ../bcloud/CloudPage.py:68
-msgid "Cancel selected tasks"
-msgstr ""
-
-#: ../bcloud/CloudPage.py:110 ../bcloud/DownloadPage.py:134
+#: ../bcloud/CloudPage.py:105 ../bcloud/DownloadPage.py:134
 #: ../bcloud/UploadPage.py:124
 msgid "Progress"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:224 ../bcloud/CloudPage.py:274
+#: ../bcloud/CloudPage.py:219 ../bcloud/CloudPage.py:271
 #, python-brace-format
 msgid "Error: {0}"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:230 ../bcloud/CloudPage.py:326
+#: ../bcloud/CloudPage.py:225 ../bcloud/CloudPage.py:323
 #: ../bcloud/FolderBrowserDialog.py:22
 msgid "Save to.."
 msgstr ""
 
-#: ../bcloud/CloudPage.py:240
+#: ../bcloud/CloudPage.py:235
 msgid "Choose.."
 msgstr ""
 
-#: ../bcloud/CloudPage.py:281
+#: ../bcloud/CloudPage.py:254
+msgid "Failed to parse download link"
+msgstr ""
+
+#: ../bcloud/CloudPage.py:278
 msgid "Add new link tasks"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:293
+#: ../bcloud/CloudPage.py:290
 msgid "Paste links here, line by line"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:301
+#: ../bcloud/CloudPage.py:298
 msgid "Support http/https/ftp/thunder/qqdl/flashget/eMule/Magnet format"
 msgstr ""
 
-#: ../bcloud/Config.py:34
+#: ../bcloud/Config.py:36
 msgid "Baidu Pan client for GNU/Linux desktop users."
 msgstr ""
 
@@ -261,9 +257,14 @@ msgstr ""
 msgid "{0} downloaded"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:440
+#: ../bcloud/DownloadPage.py:445
 #, python-brace-format
 msgid "Error occurs will downloading {0}"
+msgstr ""
+
+#: ../bcloud/DownloadPage.py:451
+#, python-brace-format
+msgid "Disk Error: failed to read/write {0}"
 msgstr ""
 
 #: ../bcloud/FolderBrowserDialog.py:38
@@ -365,37 +366,61 @@ msgid "Save To:"
 msgstr ""
 
 #: ../bcloud/PreferencesDialog.py:47
-msgid "Concurrent downloads:"
-msgstr ""
-
-#: ../bcloud/PreferencesDialog.py:56
 msgid "Upload hidden files:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:62
+#: ../bcloud/PreferencesDialog.py:53
 msgid "Also upload hidden files and folders"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:69
+#: ../bcloud/PreferencesDialog.py:60
 msgid "Use notification:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:79
+#: ../bcloud/PreferencesDialog.py:70
 msgid "Use dark theme:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:89
+#: ../bcloud/PreferencesDialog.py:80
 msgid "Minimize to system tray:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:99
+#: ../bcloud/PreferencesDialog.py:90
 msgid "Use streaming mode:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:107
+#: ../bcloud/PreferencesDialog.py:98
 msgid ""
 "When opening a video file, try to download a m3u8 playlist, instread of "
 "getting its file source link"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:107
+msgid "Network"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:109
+msgid "Concurrent downloads:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:118
+msgid "Retries each:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:124
+msgid "0: disable retries"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:126
+msgid "minutes"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:130
+msgid "Download timeout:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:139
+msgid "seconds"
 msgstr ""
 
 #: ../bcloud/PropertiesDialog.py:27 ../bcloud/PropertiesDialog.py:99
@@ -447,35 +472,35 @@ msgstr ""
 msgid "Verification.."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:80
+#: ../bcloud/SigninDialog.py:79
 msgid "Sign in now"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:99
+#: ../bcloud/SigninDialog.py:98
 msgid "Username/Email/Phone..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:104
+#: ../bcloud/SigninDialog.py:103
 msgid "Password .."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:110
+#: ../bcloud/SigninDialog.py:109
 msgid "Remember Password"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:117
+#: ../bcloud/SigninDialog.py:116
 msgid "Signin Automatically"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:123 ../bcloud/SigninDialog.py:189
+#: ../bcloud/SigninDialog.py:122 ../bcloud/SigninDialog.py:188
 msgid "Sign in"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:133
+#: ../bcloud/SigninDialog.py:132
 msgid "Failed to sign in, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:214
+#: ../bcloud/SigninDialog.py:213
 msgid "In process..."
 msgstr ""
 
@@ -491,31 +516,31 @@ msgstr ""
 msgid "Get bdstoken..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:246
+#: ../bcloud/SigninDialog.py:245 ../bcloud/SigninDialog.py:250
 msgid "Failed to get WAP page, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:257
+#: ../bcloud/SigninDialog.py:264
 msgid "Signin..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:265
+#: ../bcloud/SigninDialog.py:272
 msgid "Failed to get tokens, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:269
+#: ../bcloud/SigninDialog.py:276
 msgid "Get WAP page..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:277
+#: ../bcloud/SigninDialog.py:284
 msgid "Failed to get BAIDUID cookie, please try agin."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:280
+#: ../bcloud/SigninDialog.py:287
 msgid "Get TOKEN..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:297
+#: ../bcloud/SigninDialog.py:304
 msgid "Get BAIDUID..."
 msgstr ""
 

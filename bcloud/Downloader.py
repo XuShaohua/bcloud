@@ -17,6 +17,7 @@ from bcloud.net import ForbiddenHandler
 from bcloud import pcs
 
 CHUNK_SIZE = 131072 # 128K
+RETRIES = 5
 THRESHOLD_TO_FLUSH = 100  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
 
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
@@ -64,7 +65,6 @@ class Downloader(threading.Thread, GObject.GObject):
         self.cookie = self.app.cookie
         self.tokens = self.app.tokens
         self.TIMEOUT = int(self.app.profile['download-timeout'])
-        self.RETRIES = int(self.app.profile['max-retries'])
         self.row = row[:]  # 复制一份
         self.fh = None
         self.red_url = ''
@@ -135,7 +135,7 @@ class Downloader(threading.Thread, GObject.GObject):
                 self.row[CURRSIZE_COL], self.row[SIZE_COL]-1)
         opener = request.build_opener(ForbiddenHandler)
         opener.addheaders = [('Range', content_range)]
-        for i in range(self.RETRIES):
+        for i in range(RETRIES):
             try:
                 req = opener.open(self.red_url, timeout=self.TIMEOUT)
                 break

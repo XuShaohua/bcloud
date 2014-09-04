@@ -448,7 +448,7 @@ class DownloadPage(Gtk.Box):
 
         def do_worker_disk_error(fs_id, tmp_filepath):
             self.app.toast(
-                    _('Dsiak Error: failed to read/write {0}').format(
+                    _('Disk Error: failed to read/write {0}').format(
                     tmp_filepath))
 
         def on_worker_disk_error(worker, fs_id, tmp_filepath):
