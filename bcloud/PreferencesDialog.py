@@ -87,18 +87,8 @@ class PreferencesDialog(Gtk.Dialog):
         status_switch.props.halign = Gtk.Align.START
         general_grid.attach(status_switch, 1, 4, 1, 1)
 
-        stream_label = Gtk.Label.new(_('Use streaming mode:'))
-        stream_label.props.xalign = 1
-        general_grid.attach(stream_label, 0, 5, 1, 1)
-        stream_switch = Gtk.Switch()
-        stream_switch.set_active(self.app.profile['use-streaming'])
-        stream_switch.connect(
-                'notify::active', self.on_stream_switch_activate)
-        stream_switch.props.halign = Gtk.Align.START
-        stream_switch.set_tooltip_text(_('When opening a video file, try to download a m3u8 playlist, instread of getting its file source link'))
-        general_grid.attach(stream_switch, 1, 5, 1, 1)
-
         # network tab
+
         network_grid = Gtk.Grid()
         network_grid.props.halign = Gtk.Align.CENTER
         network_grid.props.column_spacing = 12
@@ -106,39 +96,50 @@ class PreferencesDialog(Gtk.Dialog):
         network_grid.props.margin_top = 5
         notebook.append_page(network_grid, Gtk.Label.new(_('Network')))
 
+        stream_label = Gtk.Label.new(_('Use streaming mode:'))
+        stream_label.props.xalign = 1
+        network_grid.attach(stream_label, 0, 0, 1, 1)
+        stream_switch = Gtk.Switch()
+        stream_switch.set_active(self.app.profile['use-streaming'])
+        stream_switch.connect(
+                'notify::active', self.on_stream_switch_activate)
+        stream_switch.props.halign = Gtk.Align.START
+        stream_switch.set_tooltip_text(_('Open the compressed version of videos, useful for those whose network connection is slow.'))
+        network_grid.attach(stream_switch, 1, 0, 1, 1)
+
         concurr_label = Gtk.Label.new(_('Concurrent downloads:'))
         concurr_label.props.xalign = 1
-        network_grid.attach(concurr_label, 0, 0, 1, 1)
+        network_grid.attach(concurr_label, 0, 1, 1, 1)
         concurr_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
         concurr_spin.set_value(self.app.profile['concurr-tasks'])
         concurr_spin.props.halign = Gtk.Align.START
         concurr_spin.connect('value-changed', self.on_concurr_value_changed)
-        network_grid.attach(concurr_spin, 1, 0, 1, 1)
+        network_grid.attach(concurr_spin, 1, 1, 1, 1)
 
         retries_each = Gtk.Label.new(_('Retries each:'))
         retries_each.props.xalign = 1
-        network_grid.attach(retries_each, 0, 1, 1, 1)
+        network_grid.attach(retries_each, 0, 2, 1, 1)
         retries_spin = Gtk.SpinButton.new_with_range(0, 120, 1)
         retries_spin.set_value(self.app.profile['retries-each'])
         retries_spin.props.halign = Gtk.Align.START
         retries_spin.set_tooltip_text(_('0: disable retries'))
-        network_grid.attach(retries_spin, 1, 1, 1, 1)
+        network_grid.attach(retries_spin, 1, 2, 1, 1)
         retries_minute_label = Gtk.Label.new(_('minutes'))
         retries_minute_label.props.xalign = 0
-        network_grid.attach(retries_minute_label, 2, 1, 1, 1)
+        network_grid.attach(retries_minute_label, 2, 2, 1, 1)
 
         download_timeout = Gtk.Label.new(_('Download timeout:'))
         download_timeout.props.xalign = 1
-        network_grid.attach(download_timeout, 0, 2, 1, 1)
+        network_grid.attach(download_timeout, 0, 3, 1, 1)
         download_timeout_spin = Gtk.SpinButton.new_with_range(10, 240, 30)
         download_timeout_spin.set_value(self.app.profile['download-timeout'])
         download_timeout_spin.props.halign = Gtk.Align.START
         download_timeout_spin.connect('value-changed',
                 self.on_download_timeout_value_changed)
-        network_grid.attach(download_timeout_spin, 1, 2, 1, 1)
+        network_grid.attach(download_timeout_spin, 1, 3, 1, 1)
         download_timeout_second = Gtk.Label.new(_('seconds'))
         download_timeout_second.props.xalign = 0
-        network_grid.attach(download_timeout_second, 2, 2, 1, 1)
+        network_grid.attach(download_timeout_second, 2, 3, 1, 1)
 
         box.show_all()
 

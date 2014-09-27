@@ -217,7 +217,7 @@ class SigninDialog(Gtk.Dialog):
     def signin(self):
         def on_get_bdstoken(bdstoken, error=None):
             if error or not bdstoken:
-                print('Error in get bdstoken:', bdstoken, error)
+                print('Error in on_get_bdstoken():', bdstoken, error)
                 print('Please check your username and passowrd')
                 self.signin_failed(
                     _('Error: Failed to get bdstokens!'))
