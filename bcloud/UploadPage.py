@@ -492,6 +492,7 @@ class UploadPage(Gtk.Box):
             self.update_task_db(row)
             self.workers.pop(fid, None)
             self.app.toast(_('{0} uploaded').format(row[NAME_COL]))
+            self.app.home_page.reload()
             self.scan_tasks()
 
         def on_worker_disk_error(worker, fid):
