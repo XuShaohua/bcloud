@@ -36,6 +36,7 @@ DEFAULT_PROFILE = {
     'auto-signin': False,
     'upload-hidden-files': True,  # 同时上传隐藏文件.
     'concurr-tasks': 2,     # 下载/上传同时进行的任务数, 1~5
+    'download-segments': 3, # 下载单个任务的线程数 1~5
     'retries-each': 5,      # 隔5分钟后尝试重新下载
     'download-timeout': 30, # 30 秒后下载超时
     }
