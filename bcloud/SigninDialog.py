@@ -173,11 +173,14 @@ class SigninDialog(Gtk.Dialog):
                 break
         self.profile = gutil.load_profile(username)
         self.password_entry.set_text(self.profile['password'])
-        self.remember_check.set_active(self.profile['remember-password'])
-        if self.profile['remember-password']:
-            self.signin_check.set_active(self.profile['auto-signin'])
+        if gutil.keyring_available:
+            self.remember_check.set_active(self.profile['remember-password'])
+            if self.profile['remember-password']:
+                self.signin_check.set_active(self.profile['auto-signin'])
+            else:
+                self.signin_check.set_active(False)
         else:
-            self.signin_check.set_active(False)
+            self.remember_check.set_sensitive(False)
         self.password_changed = False
 
     def signin_failed(self, error=None):

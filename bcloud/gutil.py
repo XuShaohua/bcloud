@@ -15,8 +15,10 @@ from gi.repository import Gtk
 from gi.repository import GLib
 try:
     import keyring
+    keyring_available = True
 except (ImportError, ValueError) as e:
-    print(e, ', keyring will be disabled')
+    print(e, 'Warning: keyring module invalid!')
+    keyring_available = False
 
 from bcloud import Config
 from bcloud import net
@@ -40,7 +42,7 @@ DEFAULT_PROFILE = {
     'retries-each': 5,      # 隔5分钟后尝试重新下载
     'download-timeout': 30, # 30 秒后下载超时
     }
-RETRIES = 5   # 调用keyring模块与libgnome-keyring交互的尝试次数
+RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
 
 # calls f on another thread
 def async_call(func, *args, callback=None):
@@ -146,13 +148,15 @@ def load_profile(profile_name):
         if key not in profile:
             profile[key] = DEFAULT_PROFILE[key]
 
-    if globals().get('keyring'):
+    global keyring_available
+    if keyring_available:
         for i in range(RETRIES):
             try:
                 profile['password'] = keyring.get_password(
                         Config.DBUS_APP_NAME, profile['username'])
                 break
-            except dbus.exceptions.DBusException as e:
+            except (keyring.errors.InitError, dbus.exceptions.DBusException) as e:
+                keyring_available = False
                 print(e)
     return profile
 
