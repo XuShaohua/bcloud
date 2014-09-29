@@ -14,9 +14,8 @@ class PreferencesDialog(Gtk.Dialog):
 
     def __init__(self, app):
         self.app = app
-        super().__init__(
-                _('Preferences'), app.window, Gtk.DialogFlags.MODAL,
-                (Gtk.STOCK_CLOSE, Gtk.ResponseType.OK))
+        super().__init__(_('Preferences'), app.window, Gtk.DialogFlags.MODAL,
+                        (Gtk.STOCK_CLOSE, Gtk.ResponseType.OK))
         self.set_default_response(Gtk.ResponseType.OK)
 
         self.set_default_size(480, 360)
@@ -53,8 +52,8 @@ class PreferencesDialog(Gtk.Dialog):
                 _('Also upload hidden files and folders'))
         upload_hidden_switch.set_active(
                 self.app.profile['upload-hidden-files'])
-        upload_hidden_switch.connect(
-                'notify::active', self.on_upload_hidden_switch_activate)
+        upload_hidden_switch.connect('notify::active',
+                                     self.on_upload_hidden_switch_activate)
         general_grid.attach(upload_hidden_switch, 1, 1, 1, 1)
 
         notify_label = Gtk.Label.new(_('Use notification:'))
@@ -63,8 +62,7 @@ class PreferencesDialog(Gtk.Dialog):
         notify_switch = Gtk.Switch()
         notify_switch.props.halign = Gtk.Align.START
         notify_switch.set_active(self.app.profile['use-notify'])
-        notify_switch.connect(
-                'notify::active', self.on_notify_switch_activate)
+        notify_switch.connect('notify::active', self.on_notify_switch_activate)
         general_grid.attach(notify_switch, 1, 2, 1, 1)
 
         dark_theme_label = Gtk.Label.new(_('Use dark theme:'))
@@ -72,8 +70,8 @@ class PreferencesDialog(Gtk.Dialog):
         general_grid.attach(dark_theme_label, 0, 3, 1, 1)
         dark_theme_switch = Gtk.Switch()
         dark_theme_switch.set_active(self.app.profile['use-dark-theme'])
-        dark_theme_switch.connect(
-                'notify::active', self.on_dark_theme_switch_toggled)
+        dark_theme_switch.connect('notify::active',
+                                  self.on_dark_theme_switch_toggled)
         dark_theme_switch.props.halign = Gtk.Align.START
         general_grid.attach(dark_theme_switch, 1, 3, 1, 1)
 
@@ -82,13 +80,11 @@ class PreferencesDialog(Gtk.Dialog):
         general_grid.attach(status_label, 0, 4, 1, 1)
         status_switch = Gtk.Switch()
         status_switch.set_active(self.app.profile['use-status-icon'])
-        status_switch.connect(
-                'notify::active', self.on_status_switch_activate)
+        status_switch.connect('notify::active', self.on_status_switch_activate)
         status_switch.props.halign = Gtk.Align.START
         general_grid.attach(status_switch, 1, 4, 1, 1)
 
         # network tab
-
         network_grid = Gtk.Grid()
         network_grid.props.halign = Gtk.Align.CENTER
         network_grid.props.column_spacing = 12
@@ -101,8 +97,7 @@ class PreferencesDialog(Gtk.Dialog):
         network_grid.attach(stream_label, 0, 0, 1, 1)
         stream_switch = Gtk.Switch()
         stream_switch.set_active(self.app.profile['use-streaming'])
-        stream_switch.connect(
-                'notify::active', self.on_stream_switch_activate)
+        stream_switch.connect('notify::active', self.on_stream_switch_activate)
         stream_switch.props.halign = Gtk.Align.START
         stream_switch.set_tooltip_text(_('Open the compressed version of videos, useful for those whose network connection is slow.'))
         network_grid.attach(stream_switch, 1, 0, 1, 1)
@@ -116,30 +111,42 @@ class PreferencesDialog(Gtk.Dialog):
         concurr_spin.connect('value-changed', self.on_concurr_value_changed)
         network_grid.attach(concurr_spin, 1, 1, 1, 1)
 
+        segments_label = Gtk.Label.new(_('Per task:'))
+        segments_label.props.xalign = 1
+        network_grid.attach(segments_label, 0, 2, 1, 1)
+        segments_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
+        segments_spin.set_value(self.app.profile['download-segments'])
+        segments_spin.props.halign = Gtk.Align.START
+        segments_spin.connect('value-changed', self.on_segments_value_changed)
+        network_grid.attach(segments_spin, 1, 2, 1, 1)
+        segments_label2 = Gtk.Label.new(_('connections'))
+        segments_label2.props.xalign = 0
+        network_grid.attach(segments_label2, 2, 2, 1, 1)
+
         retries_each = Gtk.Label.new(_('Retries each:'))
         retries_each.props.xalign = 1
-        network_grid.attach(retries_each, 0, 2, 1, 1)
+        network_grid.attach(retries_each, 0, 3, 1, 1)
         retries_spin = Gtk.SpinButton.new_with_range(0, 120, 1)
         retries_spin.set_value(self.app.profile['retries-each'])
         retries_spin.props.halign = Gtk.Align.START
         retries_spin.set_tooltip_text(_('0: disable retries'))
-        network_grid.attach(retries_spin, 1, 2, 1, 1)
+        network_grid.attach(retries_spin, 1, 3, 1, 1)
         retries_minute_label = Gtk.Label.new(_('minutes'))
         retries_minute_label.props.xalign = 0
-        network_grid.attach(retries_minute_label, 2, 2, 1, 1)
+        network_grid.attach(retries_minute_label, 2, 3, 1, 1)
 
         download_timeout = Gtk.Label.new(_('Download timeout:'))
         download_timeout.props.xalign = 1
-        network_grid.attach(download_timeout, 0, 3, 1, 1)
+        network_grid.attach(download_timeout, 0, 4, 1, 1)
         download_timeout_spin = Gtk.SpinButton.new_with_range(10, 240, 30)
         download_timeout_spin.set_value(self.app.profile['download-timeout'])
         download_timeout_spin.props.halign = Gtk.Align.START
         download_timeout_spin.connect('value-changed',
-                self.on_download_timeout_value_changed)
-        network_grid.attach(download_timeout_spin, 1, 3, 1, 1)
+                                      self.on_download_timeout_value_changed)
+        network_grid.attach(download_timeout_spin, 1, 4, 1, 1)
         download_timeout_second = Gtk.Label.new(_('seconds'))
         download_timeout_second.props.xalign = 0
-        network_grid.attach(download_timeout_second, 2, 3, 1, 1)
+        network_grid.attach(download_timeout_second, 2, 4, 1, 1)
 
         box.show_all()
 
@@ -147,9 +154,6 @@ class PreferencesDialog(Gtk.Dialog):
         dir_name = file_button.get_filename()
         if dir_name:
             self.app.profile['save-dir'] = dir_name
-
-    def on_concurr_value_changed(self, concurr_spin):
-        self.app.profile['concurr-tasks'] = concurr_spin.get_value()
 
     def on_upload_hidden_switch_activate(self, switch, event):
         self.app.profile['upload-hidden-files'] = switch.get_active()
@@ -165,6 +169,12 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_stream_switch_activate(self, switch, event):
         self.app.profile['use-streaming'] = switch.get_active()
+
+    def on_concurr_value_changed(self, concurr_spin):
+        self.app.profile['concurr-tasks'] = concurr_spin.get_value()
+
+    def on_segments_value_changed(self, segments_spin):
+        self.app.profile['download-segments'] = segments_spin.get_value()
 
     def on_retries_value_changed(self, retries_spin):
         self.app.profile['retries-each'] = retries_spin.get_value()
