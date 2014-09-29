@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import const
 
 RETRIES = 3
+TIMEOUT = 30
 
 default_headers = {
     'User-agent': const.USER_AGENT,
@@ -73,7 +74,7 @@ def urlopen(url, headers={}, data=None, retries=RETRIES):
 
     for _ in range(retries):
         try:
-            req = opener.open(url, data=data)
+            req = opener.open(url, data=data, timeout=TIMEOUT)
             encoding = req.headers.get('Content-encoding')
             req.data = req.read()
             if encoding == 'gzip':
