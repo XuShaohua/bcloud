@@ -29,13 +29,10 @@ THRESHOLD_TO_FLUSH = 100  # 磁盘写入数据次数超过这个值时, 就进�
 
 BATCH_FINISISHED, BATCH_ERROR = -1, -2
 
-def get_tmp_filepath(dir_name, save_name, with_conf=False):
+def get_tmp_filepath(dir_name, save_name):
     '''返回最终路径名及临时路径名'''
     filepath = os.path.join(dir_name, save_name)
-    if with_conf:
-        return filepath, filepath + '.part', filepath + '.bcloud-stat'
-    else:
-        return filepath, filepath + '.part'
+    return filepath, filepath + '.part', filepath + '.bcloud-stat'
 
 
 class DownloadBatch(threading.Thread):
@@ -130,8 +127,7 @@ class Downloader(threading.Thread, GObject.GObject):
         if not os.path.exists(row[SAVEDIR_COL]):
             os.makedirs(row[SAVEDIR_COL], exist_ok=True)
         filepath, tmp_filepath, conf_filepath = get_tmp_filepath(
-                row[SAVEDIR_COL], row[SAVENAME_COL], with_conf=True) 
-        print(filepath, tmp_filepath, conf_filepath)
+                row[SAVEDIR_COL], row[SAVENAME_COL]) 
 
         if os.path.exists(filepath):
             print('file exists:', filepath)
@@ -152,7 +148,7 @@ class Downloader(threading.Thread, GObject.GObject):
                 status = json.load(conf_fh)
             threads = len(status)
             file_exists = True
-            fh = open(filepath, 'ab')
+            fh = open(tmp_filepath, 'ab')
         else:
             req = request.urlopen(url)
             if not req:
@@ -230,6 +226,8 @@ class Downloader(threading.Thread, GObject.GObject):
                 task.stop()
             row[STATE_COL] = State.ERROR
         fh.close()
+        with open(conf_filepath, 'w') as fh:
+            fh.write(json.dumps(status))
 
         for task in tasks:
             if not task.isAlive():
@@ -237,7 +235,8 @@ class Downloader(threading.Thread, GObject.GObject):
 
         if row[STATE_COL] == State.CANCELED:
             os.remove(tmp_filepah)
-            os.remove(conf_filepath)
+            if os.path.exists(conf_filepath):
+                os.remove(conf_filepath)
         elif row[STATE_COL] == State.FINISHED:
             self.emit('downloaded', row[FSID_COL])
             os.rename(tmp_filepath, filepath)

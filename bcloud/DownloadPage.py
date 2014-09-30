@@ -531,10 +531,12 @@ class DownloadPage(Gtk.Box):
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)
         elif row[CURRSIZE_COL] < row[SIZE_COL]:
-            tmp_filepath = get_tmp_filepath(row[SAVEDIR_COL],
-                    row[SAVENAME_COL])[1]
+            filepath, tmp_filepath, conf_filepath = get_tmp_filepath(
+                    row[SAVEDIR_COL], row[SAVENAME_COL])
             if os.path.exists(tmp_filepath):
                 os.remove(tmp_filepath)
+            if os.path.exists(conf_filepath):
+                os.remove(conf_filepath)
         self.app_infos.pop(row[FSID_COL], None)
         self.remove_task_db(row[FSID_COL])
         tree_iter = row.iter

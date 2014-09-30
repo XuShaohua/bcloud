@@ -644,13 +644,8 @@ def slice_upload(cookie, data):
         '&', cookie.sub_output('BDUSS'),
         ])
     fields = []
-    files = [
-        ('file', ' ', data),
-        ]
-    headers = {
-        'Accept': const.ACCEPT_HTML,
-        'Origin': const.PAN_URL,
-        }
+    files = [('file', ' ', data)]
+    headers = {'Accept': const.ACCEPT_HTML,'Origin': const.PAN_URL}
     req = net.post_multipart(url, headers, fields, files)
     if req:
         return json.loads(req.data.decode())
