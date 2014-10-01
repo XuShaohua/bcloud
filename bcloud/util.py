@@ -111,7 +111,6 @@ def natsort(string):
     '''
     return [int(s) if s.isdigit() else s for s in re.split('(\d+)', string)]
 
-
 def RSA_encrypt(public_key, message):
     '''用RSA加密字符串.
 
@@ -128,3 +127,16 @@ def RSA_encrypt(public_key, message):
     rsakey = PKCS1_OAEP.new(rsakey)
     encrypted = rsakey.encrypt(message.encode())
     return base64.encodestring(encrypted).decode().replace('\n', '')
+
+def m3u8_to_m3u(pls):
+    output = ['#EXTM3U']
+    srcs_set = set()
+    for line in pls.decode().split('\n'):
+        if line.startswith('#') or not line:
+            continue
+        src = line[line.find('src='):]
+        url = line[:line.find('start=')] + src
+        if src not in srcs_set:
+            srcs_set.add(src)
+            output.append(url)
+    return '\n'.join(output)

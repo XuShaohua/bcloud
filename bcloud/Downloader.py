@@ -190,7 +190,6 @@ class Downloader(threading.Thread, GObject.GObject):
                                  fh, self.timeout)
             tasks.append(task)
 
-        print(status)
         for task in tasks:
             task.start()
 

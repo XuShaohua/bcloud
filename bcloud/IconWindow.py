@@ -315,8 +315,8 @@ class IconWindow(Gtk.ScrolledWindow):
                         self.liststore[tree_paths[0]][PATH_COL],
                         callback=open_video_link)
             else:
-                pls_filepath = os.path.join(
-                        '/tmp', pcs_file['server_filename'] + '.m3u8')
+                pls_filepath = os.path.join('/tmp',
+                        pcs_file['server_filename'] + '.m3u8')
                 with open(pls_filepath, 'wb') as fh:
                     fh.write(pls)
                 pls_file_uri = 'file://' + pls_filepath
