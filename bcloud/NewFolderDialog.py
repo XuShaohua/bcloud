@@ -15,10 +15,9 @@ from bcloud import pcs
 class NewFolderDialog(Gtk.Dialog):
     
     def __init__(self, parent, app, path):
-        super().__init__(
-                _('New Folder'), app.window, Gtk.DialogFlags.MODAL,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        super().__init__(_('New Folder'), app.window, Gtk.DialogFlags.MODAL,
+                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                         Gtk.STOCK_OK, Gtk.ResponseType.OK))
         self.set_default_response(Gtk.ResponseType.OK)
         self.connect('show', self.on_show)
         self.set_default_size(550, 200)
@@ -55,6 +54,5 @@ class NewFolderDialog(Gtk.Dialog):
     def do_mkdir(self):
         abspath = self.entry.get_text()
         if abspath.startswith('/'):
-            gutil.async_call(
-                    pcs.mkdir, self.app.cookie, self.app.tokens, abspath,
-                    callback=self.app.reload_current_page)
+            gutil.async_call(pcs.mkdir, self.app.cookie, self.app.tokens,
+                             abspath, callback=self.app.reload_current_page)

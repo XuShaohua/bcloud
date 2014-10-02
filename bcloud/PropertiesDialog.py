@@ -15,18 +15,17 @@ from bcloud.Widgets import LeftLabel
 from bcloud.Widgets import SelectableLeftLabel
 
 (PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
-    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL
-    ) = list(range(11))
+    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL) = list(
+            range(11))
 
 
 class PropertiesDialog(Gtk.Dialog):
 
     def __init__(self, parent, app, pcs_file):
         file_path, file_name = os.path.split(pcs_file['path'])
-        super().__init__(
-                file_name + _(' Properties'),
-                app.window, Gtk.DialogFlags.MODAL,
-                (Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
+        super().__init__(file_name + _(' Properties'), app.window,
+                         Gtk.DialogFlags.MODAL,
+                         (Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
         self.set_default_response(Gtk.ResponseType.CLOSE)
 
         self.set_border_width(15)
@@ -57,8 +56,8 @@ class PropertiesDialog(Gtk.Dialog):
             grid.attach(size_label, 0, 1, 1, 1)
             size_human, size_comma = util.get_human_size(pcs_file['size'])
             if size_human:
-                size_text = ''.join([
-                    str(size_human), ' (', size_comma,  _(' bytes'), ')'])
+                size_text = ''.join(
+                        [str(size_human), ' (', size_comma,  _(' bytes'), ')'])
             else:
                 size_text = size_comma + _(' bytes')
             size_label2 = SelectableLeftLabel(size_text)
@@ -75,14 +74,12 @@ class PropertiesDialog(Gtk.Dialog):
 
         ctime_label = LeftLabel(_('Created:'))
         grid.attach(ctime_label, 0, 5, 1, 1)
-        ctime_label2 = SelectableLeftLabel(
-                time.ctime(pcs_file['server_ctime']))
+        ctime_label2 = SelectableLeftLabel(time.ctime(pcs_file['server_ctime']))
         grid.attach(ctime_label2, 1, 5, 1, 1)
 
         mtime_label = LeftLabel(_('Modified:'))
         grid.attach(mtime_label, 0, 6, 1, 1)
-        mtime_label2 = SelectableLeftLabel(
-                time.ctime(pcs_file['server_mtime']))
+        mtime_label2 = SelectableLeftLabel(time.ctime(pcs_file['server_mtime']))
         grid.attach(mtime_label2, 1, 6, 1, 1)
 
         box.show_all()
@@ -95,10 +92,9 @@ class FolderPropertyDialog(Gtk.Dialog):
         # modify file_name if path is '/'
         if not file_name:
             file_name = '/'
-        super().__init__(
-                file_name + _(' Properties'),
-                app.window, Gtk.DialogFlags.MODAL,
-                (Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
+        super().__init__(file_name + _(' Properties'), app.window,
+                         Gtk.DialogFlags.MODAL,
+                         (Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
         self.set_border_width(15)
 
         box = self.get_content_area()

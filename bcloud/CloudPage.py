@@ -74,9 +74,8 @@ class CloudPage(Gtk.Box):
 
         # task_id, name, path, source_url, size, finished_size,
         # status, percent, human_size, tooltip
-        self.liststore = Gtk.ListStore(
-                str, str, str, str, GObject.TYPE_INT64,
-                GObject.TYPE_INT64, int, int, str, str)
+        self.liststore = Gtk.ListStore(str, str, str, str, GObject.TYPE_INT64,
+                                       GObject.TYPE_INT64, int, int, str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_headers_clickable(True)
         self.treeview.set_reorderable(True)
@@ -85,8 +84,8 @@ class CloudPage(Gtk.Box):
         self.selection = self.treeview.get_selection()
         scrolled_win.add(self.treeview)
 
-        name_cell = Gtk.CellRendererText(
-                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
+        name_cell = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END,
+                                         ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
@@ -94,15 +93,14 @@ class CloudPage(Gtk.Box):
         self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(
-                _('Size'), size_cell, text=HUMANSIZE_COL)
+        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
         size_col.props.min_width = 145
         size_col.set_sort_column_id(SIZE_COL)
 
         percent_cell = Gtk.CellRendererProgress()
-        percent_col = Gtk.TreeViewColumn(
-                _('Progress'), percent_cell, value=PERCENT_COL)
+        percent_col = Gtk.TreeViewColumn(_('Progress'), percent_cell,
+                                         value=PERCENT_COL)
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
         percent_col.set_sort_column_id(PERCENT_COL)
@@ -134,22 +132,20 @@ class CloudPage(Gtk.Box):
                     0,
                     '0',
                     gutil.escape(task['save_path'])
-                    ])
+                ])
             self.scan_tasks()
 
             nonlocal start
             start = start + len(tasks)
             if info['total'] > start:
-                gutil.async_call(
-                    pcs.cloud_list_task, self.app.cookie, self.app.tokens,
-                    start, callback=on_list_task)
+                gutil.async_call(pcs.cloud_list_task, self.app.cookie,
+                                 self.app.tokens, start, callback=on_list_task)
 
         self.loading_spin.start()
         self.loading_spin.show_all()
         start = 0
-        gutil.async_call(
-            pcs.cloud_list_task, self.app.cookie, self.app.tokens,
-            start, callback=on_list_task)
+        gutil.async_call(pcs.cloud_list_task, self.app.cookie, self.app.tokens,
+                         start, callback=on_list_task)
 
     def reload(self, *args, **kwds):
         self.liststore.clear()
@@ -176,7 +172,8 @@ class CloudPage(Gtk.Box):
                 row[FINISHED_COL] = int(task['finished_size'])
                 row[STATUS_COL] = int(task['status'])
                 if row[SIZE_COL]:
-                    row[PERCENT_COL] = int(row[FINISHED_COL] / row[SIZE_COL] * 100)
+                    row[PERCENT_COL] = int(
+                            row[FINISHED_COL] / row[SIZE_COL] * 100)
                 size = util.get_human_size(row[SIZE_COL])[0]
                 finished_size = util.get_human_size(row[FINISHED_COL])[0]
                 if row[SIZE_COL] == row[FINISHED_COL]:
@@ -186,9 +183,9 @@ class CloudPage(Gtk.Box):
 
         task_ids = [row[TASKID_COL] for row in self.liststore]
         if task_ids:
-            gutil.async_call(
-                pcs.cloud_query_task, self.app.cookie, self.app.tokens,
-                task_ids, callback=update_task_status)
+            gutil.async_call(pcs.cloud_query_task, self.app.cookie,
+                             self.app.tokens, task_ids,
+                             callback=update_task_status)
 
 
     # Open API
@@ -210,19 +207,17 @@ class CloudPage(Gtk.Box):
                 vcode_dialog.destroy()
                 if response != Gtk.ResponseType.OK:
                     return
-                gutil.async_call(
-                    pcs.cloud_add_bt_task, self.app.cookie,
-                    self.app.tokens, source_url, save_path,
-                    selected_idx, file_sha1, info['vcode'], vcode_input,
-                    callback=check_vcode)
+                gutil.async_call(pcs.cloud_add_bt_task, self.app.cookie,
+                                 self.app.tokens, source_url, save_path,
+                                 selected_idx, file_sha1, info['vcode'],
+                                 vcode_input, callback=check_vcode)
             else:
                 self.app.toast(_('Error: {0}').format(info['error_msg']))
 
         self.check_first()
 
         if not save_path:
-            folder_browser = FolderBrowserDialog(
-                    self, self.app, _('Save to..'))
+            folder_browser = FolderBrowserDialog(self, self.app, _('Save to..'))
             response = folder_browser.run()
             save_path = folder_browser.get_path()
             folder_browser.destroy()
@@ -231,17 +226,16 @@ class CloudPage(Gtk.Box):
         if not save_path:
             return
 
-        bt_browser = BTBrowserDialog(
-                self, self.app, _('Choose..'), source_url, save_path)
+        bt_browser = BTBrowserDialog(self, self.app, _('Choose..'),
+                                     source_url, save_path)
         response = bt_browser.run()
         selected_idx, file_sha1 = bt_browser.get_selected()
         bt_browser.destroy()
         if response != Gtk.ResponseType.OK or not selected_idx:
             return
-        gutil.async_call(
-            pcs.cloud_add_bt_task, self.app.cookie, self.app.tokens,
-            source_url, save_path, selected_idx, file_sha1,
-            callback=check_vcode)
+        gutil.async_call(pcs.cloud_add_bt_task, self.app.cookie,
+                         self.app.tokens, source_url, save_path, selected_idx,
+                         file_sha1, callback=check_vcode)
         self.app.blink_page(self.app.cloud_page)
 
     # Open API
@@ -263,22 +257,21 @@ class CloudPage(Gtk.Box):
                     vcode_dialog.destroy()
                     if response != Gtk.ResponseType.OK:
                         return
-                    gutil.async_call(
-                        pcs.cloud_add_link_task, self.app.cookie,
-                        self.app.tokens, source_url, save_path, vcode,
-                        vcode_input, callback=on_link_task_added)
+                    gutil.async_call(pcs.cloud_add_link_task, self.app.cookie,
+                                     self.app.tokens, source_url, save_path,
+                                     vcode, vcode_input,
+                                     callback=on_link_task_added)
                 else:
                     self.app.toast(_('Error: {0}').format(info['error_msg']))
-            gutil.async_call(
-                pcs.cloud_add_link_task, self.app.cookie, self.app.tokens,
-                source_url, save_path, callback=on_link_task_added)
+            gutil.async_call(pcs.cloud_add_link_task, self.app.cookie,
+                             self.app.tokens, source_url, save_path,
+                             callback=on_link_task_added)
 
         self.check_first()
-        dialog = Gtk.Dialog(
-                _('Add new link tasks'), self.app.window,
-                Gtk.DialogFlags.MODAL,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        dialog = Gtk.Dialog(_('Add new link tasks'), self.app.window,
+                            Gtk.DialogFlags.MODAL,
+                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                            Gtk.STOCK_OK, Gtk.ResponseType.OK))
         dialog.set_border_width(10)
         dialog.set_default_size(480, 300)
         dialog.set_default_response(Gtk.ResponseType.OK)
@@ -319,8 +312,7 @@ class CloudPage(Gtk.Box):
                 else:
                     link_tasks.append(source_url)
 
-        folder_browser = FolderBrowserDialog(
-                self, self.app, _('Save to..'))
+        folder_browser = FolderBrowserDialog(self, self.app, _('Save to..'))
         response = folder_browser.run()
         save_path = folder_browser.get_path()
         folder_browser.destroy()
@@ -362,18 +354,15 @@ class CloudPage(Gtk.Box):
         self.loading_spin.start()
         self.loading_spin.show_all()
         if model[tree_path][STATUS_COL] == Status[0]:
-            gutil.async_call(
-                pcs.cloud_delete_task, self.app.cookie, self.app.tokens,
-                task_id, callback=on_task_removed)
+            gutil.async_call(pcs.cloud_delete_task, self.app.cookie,
+                             self.app.tokens, task_id, callback=on_task_removed)
         else:
-            gutil.async_call(
-                pcs.cloud_cancel_task, self.app.cookie, self.app.tokens,
-                task_id, callback=self.reload)
+            gutil.async_call(pcs.cloud_cancel_task, self.app.cookie,
+                             self.app.tokens, task_id, callback=self.reload)
 
     def on_clear_button_clicked(self, button):
         def on_clear_task(info, error=None):
             self.reload()
 
-        gutil.async_call(
-            pcs.cloud_clear_task, self.app.cookie, self.app.tokens,
-            callback=on_clear_task)
+        gutil.async_call(pcs.cloud_clear_task, self.app.cookie,
+                         self.app.tokens, callback=on_clear_task)

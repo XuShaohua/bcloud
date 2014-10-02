@@ -52,8 +52,8 @@ class MimeProvider:
 
         themed_icon = Gio.content_type_get_icon(file_type)
         icon_names = themed_icon.to_string().split(' ')[2:]
-        icon_info = self.app.icon_theme.choose_icon(
-                icon_names, icon_size, Gtk.IconLookupFlags.GENERIC_FALLBACK)
+        icon_info = self.app.icon_theme.choose_icon(icon_names, icon_size,
+                Gtk.IconLookupFlags.GENERIC_FALLBACK)
         if icon_info:
             pixbuf = icon_info.load_icon()
             self._data[key] = pixbuf
@@ -81,8 +81,7 @@ class MimeProvider:
             return None
         icon_names = themed_icon.get_names()
         if icon_names:
-            img = Gtk.Image.new_from_icon_name(
-                    icon_names[0], Gtk.IconSize.MENU)
+            img = Gtk.Image.new_from_icon_name(icon_names[0], Gtk.IconSize.MENU)
             return img
         else:
             return None

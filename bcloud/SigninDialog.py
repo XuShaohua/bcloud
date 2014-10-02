@@ -18,11 +18,11 @@ from bcloud.RequestCookie import RequestCookie
 
 DELTA = 1 * 24 * 60 * 60   # 1 days
 
+
 class SigninVcodeDialog(Gtk.Dialog):
 
     def __init__(self, parent, cookie, form):
-        super().__init__(
-            _('Verification..'), parent, Gtk.DialogFlags.MODAL)
+        super().__init__(_('Verification..'), parent, Gtk.DialogFlags.MODAL)
 
         self.set_default_size(280, 120)
         self.set_border_width(5)
@@ -44,9 +44,8 @@ class SigninVcodeDialog(Gtk.Dialog):
         vcode_confirm.connect('clicked', self.on_vcode_confirmed)
         button_box.pack_end(vcode_confirm, True, True, 0)
 
-        gutil.async_call(
-            auth.get_wap_signin_vcode, cookie, form['vcodestr'],
-            callback=self.update_img)
+        gutil.async_call(auth.get_wap_signin_vcode, cookie, form['vcodestr'],
+                         callback=self.update_img)
         self.img = Gtk.Image()
         box.pack_start(self.img, False, False, 0)
 
@@ -55,9 +54,8 @@ class SigninVcodeDialog(Gtk.Dialog):
     def update_img(self, req_data, error=None):
         if error or not req_data:
             return
-        vcode_path = os.path.join(
-                Config.get_tmp_path(self.form['username']),
-                'bcloud-signin-vcode')
+        vcode_path = os.path.join(Config.get_tmp_path(self.form['username']),
+                                  'bcloud-signin-vcode')
         with open(vcode_path, 'wb') as fh:
             fh.write(req_data)
         self.vcode_img.set_from_file(vcode_path)
@@ -75,8 +73,7 @@ class SigninDialog(Gtk.Dialog):
     password_changed = False
 
     def __init__(self, app, auto_signin=True):
-        super().__init__(
-                _('Sign in now'), app.window, Gtk.DialogFlags.MODAL)
+        super().__init__(_('Sign in now'), app.window, Gtk.DialogFlags.MODAL)
         self.app = app
         self.auto_signin = auto_signin
 
@@ -222,24 +219,22 @@ class SigninDialog(Gtk.Dialog):
             if error or not bdstoken:
                 print('Error in on_get_bdstoken():', bdstoken, error)
                 print('Please check your username and passowrd')
-                self.signin_failed(
-                    _('Error: Failed to get bdstokens!'))
+                self.signin_failed(_('Error: Failed to get bdstokens!'))
             else:
                 nonlocal tokens
                 tokens['bdstoken'] = bdstoken
-                self.update_profile(
-                        username, password, cookie, tokens, dump=True)
+                self.update_profile(username, password, cookie, tokens,
+                                    dump=True)
 
         def on_wap_signin(cookie_str, error):
             if not cookie_str or error:
                 print('Error in on_wap_signin():', cookie_str, error)
-                self.signin_failed(
-                        _('Failed to signin, please try again.'))
+                self.signin_failed(_('Failed to signin, please try again.'))
             else:
                 cookie.load_list(cookie_str)
                 self.signin_button.set_label(_('Get bdstoken...'))
                 gutil.async_call(auth.get_bdstoken, cookie,
-                        callback=on_get_bdstoken)
+                                 callback=on_get_bdstoken)
 
         def on_get_wap_passport(info, error=None):
             if error or not info:
@@ -266,19 +261,18 @@ class SigninDialog(Gtk.Dialog):
                         return
                 self.signin_button.set_label(_('Signin...'))
                 gutil.async_call(auth.wap_signin, cookie, form,
-                        callback=on_wap_signin)
+                                 callback=on_wap_signin)
 
         def on_get_token(token, error=None):
             if error or not token:
                 print('Error in get token():', token, error)
-                self.signin_failed(
-                        _('Failed to get tokens, please try again.'))
+                self.signin_failed(_('Failed to get tokens, please try again.'))
             else:
                 nonlocal tokens
                 tokens['token'] = token
                 self.signin_button.set_label(_('Get WAP page...'))
-                gutil.async_call(
-                        auth.get_wap_passport, callback=on_get_wap_passport)
+                gutil.async_call(auth.get_wap_passport,
+                                 callback=on_get_wap_passport)
 
         def on_get_BAIDUID(uid_cookie, error=None):
             if error or not uid_cookie:
@@ -288,8 +282,7 @@ class SigninDialog(Gtk.Dialog):
             else:
                 cookie.load_list(uid_cookie)
                 self.signin_button.set_label(_('Get TOKEN...'))
-                gutil.async_call(
-                        auth.get_token, cookie, callback=on_get_token)
+                gutil.async_call(auth.get_token, cookie, callback=on_get_token)
 
 
         username = self.username_combo.get_child().get_text()
@@ -305,8 +298,7 @@ class SigninDialog(Gtk.Dialog):
         tokens = {}
         form = {}
         self.signin_button.set_label(_('Get BAIDUID...'))
-        gutil.async_call(
-                auth.get_BAIDUID, callback=on_get_BAIDUID)
+        gutil.async_call(auth.get_BAIDUID, callback=on_get_BAIDUID)
 
     def load_auth(self, username):
         auth_file = os.path.join(Config.get_tmp_path(username), 'auth.json')

@@ -8,13 +8,11 @@ import http
 import http.client
 import mimetypes
 import os
-import sys
 import urllib.parse
 import urllib.request
 import zlib
 
-sys.path.insert(0, os.path.dirname(__file__))
-import const
+from bcloud import const
 
 RETRIES = 3
 TIMEOUT = 30
@@ -28,7 +26,7 @@ default_headers = {
     'Accept-encoding': 'gzip, deflate',
     'Pragma': 'no-cache',
     'Cache-control': 'no-cache',
-    }
+}
 
 def urloption(url, headers={}, retries=RETRIES):
     '''发送OPTION 请求'''
@@ -51,6 +49,7 @@ class ForbiddenHandler(urllib.request.HTTPErrorProcessor):
 
     def http_error_403(self, req, fp, code, msg, headers):
         return fp
+
     http_error_400 = http_error_403
     http_error_500 = http_error_403
 
@@ -144,8 +143,8 @@ def encode_multipart_formdata(fields, files):
     l = []
     for (key, value) in fields:
         l.append(S_BOUNDARY)
-        l.append(
-            'Content-Disposition: form-data; name="{0}"'.format(key).encode())
+        l.append('Content-Disposition: form-data; name="{0}"'.format(
+                key).encode())
         l.append(BLANK)
         l.append(value.encode())
     for (key, filename, content) in files:

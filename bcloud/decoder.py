@@ -32,7 +32,7 @@ _router = {
     'flashge': decode_flashget,
     'thunder': decode_thunder,
     'qqdl://': decode_qqdl,
-    }
+}
 
 def decode(link):
     if not isinstance(link, str) or len(link) < 10:

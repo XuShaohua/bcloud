@@ -4,8 +4,6 @@
 
 import os
 import random
-import sys
-sys.path.insert(0, os.path.dirname(__file__))
 import time
 
 from gi.repository import Gdk
@@ -15,24 +13,23 @@ from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Notify
 
-import Config
+from bcloud import Config
 Config.check_first()
 _ = Config._
-import gutil
-import util
-from MimeProvider import MimeProvider
-from PreferencesDialog import PreferencesDialog
+from bcloud import gutil
+from bcloud import util
+from bcloud.MimeProvider import MimeProvider
+from bcloud.PreferencesDialog import PreferencesDialog
+from bcloud.CategoryPage import *
+from bcloud.CloudPage import CloudPage
+from bcloud.DownloadPage import DownloadPage
+from bcloud.HomePage import HomePage
+from bcloud.PreferencesDialog import PreferencesDialog
+from bcloud.SigninDialog import SigninDialog
+from bcloud.TrashPage import TrashPage
+from bcloud.UploadPage import UploadPage
 
-from CategoryPage import *
-from CloudPage import CloudPage
-from DownloadPage import DownloadPage
-from HomePage import HomePage
-from PreferencesDialog import PreferencesDialog
-from SigninDialog import SigninDialog
-from TrashPage import TrashPage
-from UploadPage import UploadPage
-
-if Gtk.MAJOR_VERSION <= 3 and Gtk.MINOR_VERSION < 10:
+if Config.GTK_LE_36:
     GObject.threads_init()
 (ICON_COL, NAME_COL, TOOLTIP_COL, COLOR_COL) = list(range(4))
 BLINK_DELTA = 250    # 字体闪烁间隔, 250 miliseconds 
@@ -75,12 +72,13 @@ class App:
         # set drop action
         targets = [
             ['text/plain', Gtk.TargetFlags.OTHER_APP, 0],
-            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]]
+            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]
+        ]
         target_list =[Gtk.TargetEntry.new(*t) for t in targets]
-        self.window.drag_dest_set(
-            Gtk.DestDefaults.ALL, target_list, Gdk.DragAction.COPY)
-        self.window.connect(
-            'drag-data-received', self.on_main_window_drag_data_received)
+        self.window.drag_dest_set(Gtk.DestDefaults.ALL, target_list,
+                                  Gdk.DragAction.COPY)
+        self.window.connect('drag-data-received',
+                            self.on_main_window_drag_data_received)
 
         app_menu = Gio.Menu.new()
         app_menu.append(_('Preferences'), 'app.preferences')
@@ -90,8 +88,8 @@ class App:
         app.set_app_menu(app_menu)
 
         preferences_action = Gio.SimpleAction.new('preferences', None)
-        preferences_action.connect(
-            'activate', self.on_preferences_action_activated)
+        preferences_action.connect('activate',
+                                   self.on_preferences_action_activated)
         app.add_action(preferences_action)
         signout_action = Gio.SimpleAction.new('signout', None)
         signout_action.connect('activate', self.on_signout_action_activated)
@@ -127,8 +125,8 @@ class App:
         icon_col.props.fixed_width = 40
         nav_treeview.append_column(icon_col)
         name_cell = Gtk.CellRendererText()
-        name_col = Gtk.TreeViewColumn(
-                'Places', name_cell, text=NAME_COL, foreground_rgba=COLOR_COL)
+        name_col = Gtk.TreeViewColumn('Places', name_cell, text=NAME_COL,
+                                      foreground_rgba=COLOR_COL)
         nav_treeview.append_column(name_col)
         nav_selection = nav_treeview.get_selection()
         nav_selection.connect('changed', self.on_nav_selection_changed)
@@ -324,10 +322,10 @@ class App:
             page.load()
 
     def on_nav_selection_changed(self, nav_selection):
-        model, iter_ = nav_selection.get_selected()
-        if not iter_:
+        model, tree_iter = nav_selection.get_selected()
+        if not tree_iter:
             return
-        path = model.get_path(iter_)
+        path = model.get_path(tree_iter)
         index = path.get_indices()[0]
         self.switch_page_by_index(index)
 
@@ -337,11 +335,10 @@ class App:
             self.status_icon = Gtk.StatusIcon()
             self.status_icon.set_from_icon_name(Config.NAME)
             # left click
-            self.status_icon.connect(
-                    'activate', self.on_status_icon_activate)
+            self.status_icon.connect('activate', self.on_status_icon_activate)
             # right click
-            self.status_icon.connect(
-                    'popup_menu', self.on_status_icon_popup_menu)
+            self.status_icon.connect('popup_menu',
+                                     self.on_status_icon_popup_menu)
         else:
             self.status_icon = None
 
@@ -351,8 +348,7 @@ class App:
         else:
             self.window.present()
 
-    def on_status_icon_popup_menu(self, status_icon, event_button,
-                                event_time):
+    def on_status_icon_popup_menu(self, status_icon, event_button, event_time):
         menu = Gtk.Menu()
         show_item = Gtk.MenuItem.new_with_label(_('Show App'))
         show_item.connect('activate', self.on_status_icon_show_app_activate)
@@ -363,14 +359,14 @@ class App:
 
         pause_upload_item = Gtk.MenuItem.new_with_label(
                 _('Pause Uploading Tasks'))
-        pause_upload_item.connect(
-                'activate', lambda *args: self.upload_page.pause_tasks())
+        pause_upload_item.connect('activate',
+                                  lambda *args: self.upload_page.pause_tasks())
         menu.append(pause_upload_item)
 
         pause_download_item = Gtk.MenuItem.new_with_label(
                 _('Pause Downloading Tasks'))
-        pause_download_item.connect(
-                'activate', lambda *args: self.download_page.pause_tasks())
+        pause_download_item.connect('activate',
+                lambda *args: self.download_page.pause_tasks())
         menu.append(pause_download_item)
 
         sep_item = Gtk.SeparatorMenuItem()
@@ -424,8 +420,8 @@ class App:
             status = Notify.init(Config.APPNAME)
             if not status:
                 return
-            self.notify = Notify.Notification.new(
-                    Config.APPNAME, '', Config.NAME)
+            self.notify = Notify.Notification.new(Config.APPNAME, '',
+                                                  Config.NAME)
 
     # Open API
     def toast(self, text):

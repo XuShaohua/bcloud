@@ -11,19 +11,17 @@ import json
 import os
 import random
 import re
-import sys
 import urllib.request
 from urllib import parse
-sys.path.insert(0, os.path.dirname(__file__))
 
 from lxml import html
 from lxml.cssselect import CSSSelector as CSS
 
-import const
-import encoder
-from RequestCookie import RequestCookie
-import net
-import util
+from bcloud import const
+from bcloud import encoder
+from bcloud import net
+from bcloud.RequestCookie import RequestCookie
+from bcloud import util
 
 
 def get_BAIDUID():
@@ -100,7 +98,7 @@ def get_wap_signin_vcode(cookie, codeString):
     req = net.urlopen(url, headers={
         'Cookie': cookie.header_output(),
         'Referer': 'http://wappass.badu.com',
-        })
+    })
     if req:
         return req.data
     else:
@@ -119,7 +117,7 @@ def refresh_signin_vcode(cookie, token, vcodetype):
         '&tt=', util.timestamp(),
         '&fr=ligin',
         '&vcodetype=', vcodetype,
-        ])
+    ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     if req:
         try:

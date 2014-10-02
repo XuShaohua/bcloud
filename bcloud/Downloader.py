@@ -37,7 +37,8 @@ def get_tmp_filepath(dir_name, save_name):
 
 class DownloadBatch(threading.Thread):
 
-    def __init__(self, id_, queue, url, lock, start_size, end_size, fh, timeout):
+    def __init__(self, id_, queue, url, lock, start_size, end_size, fh,
+                 timeout):
         super().__init__()
         self.id_ = id_
         self.queue = queue
@@ -94,22 +95,13 @@ class Downloader(threading.Thread, GObject.GObject):
     '''
 
     __gsignals__ = {
-            'started': (GObject.SIGNAL_RUN_LAST,
-                # fs_id
-                GObject.TYPE_NONE, (str, )),
-            'received': (GObject.SIGNAL_RUN_LAST,
-                # fs-id, current-size
-                GObject.TYPE_NONE, (str, GObject.TYPE_INT64)),
-            'downloaded': (GObject.SIGNAL_RUN_LAST, 
-                # fs_id
-                GObject.TYPE_NONE, (str, )),
-            'disk-error': (GObject.SIGNAL_RUN_LAST,
-                # fs_id, tmp_filepath
-                GObject.TYPE_NONE, (str, str)),
-            'network-error': (GObject.SIGNAL_RUN_LAST,
-                # fs_id
-                GObject.TYPE_NONE, (str, )),
-            }
+        'started': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
+        'received': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                     (str, GObject.TYPE_INT64)),
+        'downloaded': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
+        'disk-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, str)),
+        'network-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
+    }
 
     def __init__(self, parent, row):
         threading.Thread.__init__(self)
@@ -218,7 +210,6 @@ class Downloader(threading.Thread, GObject.GObject):
                     conf_count = 0
                 received_total = sum(t[2] for t in status)
                 self.emit('received', row[FSID_COL], received_total)
-                #self.emit('received', row[FSID_COL], received)
         except Exception as e:
             print(e)
             for task in tasks:

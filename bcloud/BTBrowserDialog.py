@@ -27,10 +27,9 @@ class BTBrowserDialog(Gtk.Dialog):
         source_url - 如果是BT种子的话, 就是种子的绝对路径.
                       如果是磁链的话, 就是以magent:开头的磁链链接.
         '''
-        super().__init__(
-            title, app.window, Gtk.DialogFlags.MODAL,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        super().__init__(title, app.window, Gtk.DialogFlags.MODAL,
+                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                         Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
         self.app = app
         self.source_url = source_url
@@ -57,17 +56,15 @@ class BTBrowserDialog(Gtk.Dialog):
         scrolled_win.add(self.treeview)
         check_cell = Gtk.CellRendererToggle()
         check_cell.connect('toggled', self.on_check_cell_toggled)
-        check_col = Gtk.TreeViewColumn(
-            '', check_cell, active=CHECK_COL)
+        check_col = Gtk.TreeViewColumn('', check_cell, active=CHECK_COL)
         self.treeview.append_column(check_col)
-        name_cell = Gtk.CellRendererText(
-                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
+        name_cell = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END,
+                                         ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(
-            _('Size'), size_cell, text=HUMANSIZE_COL)
+        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
 
         box.show_all()
@@ -94,23 +91,22 @@ class BTBrowserDialog(Gtk.Dialog):
                 size = int(task['size'])
                 human_size = util.get_human_size(size)[0]
                 select = (size > MIN_SIZE_TO_CHECK or 
-                        task['file_name'].endswith(CHECK_EXT))
+                          task['file_name'].endswith(CHECK_EXT))
                 self.liststore.append([
                     select,
                     task['file_name'],
                     size,
                     human_size,
-                    ])
+                ])
 
         if self.source_url.startswith('magnet'):
-            gutil.async_call(
-                pcs.cloud_query_magnetinfo, self.app.cookie,
-                self.app.tokens, self.source_url, self.save_path,
-                callback=on_tasks_received)
+            gutil.async_call(pcs.cloud_query_magnetinfo, self.app.cookie,
+                             self.app.tokens, self.source_url, self.save_path,
+                             callback=on_tasks_received)
         else:
-            gutil.async_call(
-                pcs.cloud_query_sinfo, self.app.cookie, self.app.tokens,
-                self.source_url, callback=on_tasks_received)
+            gutil.async_call(pcs.cloud_query_sinfo, self.app.cookie,
+                             self.app.tokens, self.source_url,
+                             callback=on_tasks_received)
 
     def get_selected(self):
         '''返回选中要下载的文件的编号及sha1值, 从1开始计数.'''
@@ -126,4 +122,5 @@ class BTBrowserDialog(Gtk.Dialog):
             row[CHECK_COL] = status
 
     def on_check_cell_toggled(self, cell, tree_path):
-        self.liststore[tree_path][CHECK_COL] = not self.liststore[tree_path][CHECK_COL]
+        self.liststore[tree_path][CHECK_COL] = not \
+                self.liststore[tree_path][CHECK_COL]

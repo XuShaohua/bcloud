@@ -31,13 +31,13 @@ RUNNING_STATES = (State.FINISHED, State.DOWNLOADING, State.WAITING)
     HUMANSIZE_COL, PERCENT_COL, TOOLTIP_COL) = list(range(14))
 
 StateNames = (
-        _('DOWNLOADING'),
-        _('WAITING'),
-        _('PAUSED'),
-        _('FINISHED'),
-        _('CANCELED'),
-        _('ERROR'),
-        )
+    _('DOWNLOADING'),
+    _('WAITING'),
+    _('PAUSED'),
+    _('FINISHED'),
+    _('CANCELED'),
+    _('ERROR'),
+)
 
 
 class DownloadPage(Gtk.Box):
@@ -90,8 +90,8 @@ class DownloadPage(Gtk.Box):
         control_box.pack_start(pause_button, False, False, 0)
 
         open_folder_button = Gtk.Button.new_with_label(_('Open Directory'))
-        open_folder_button.connect(
-                'clicked', self.on_open_folder_button_clicked)
+        open_folder_button.connect('clicked',
+                                   self.on_open_folder_button_clicked)
         open_folder_button.props.margin_left = 40
         control_box.pack_start(open_folder_button, False, False, 0)
 
@@ -108,10 +108,11 @@ class DownloadPage(Gtk.Box):
         # name, path, fs_id, size, currsize, link,
         # isdir, saveDir, saveName, state, statename,
         # humansize, percent, tooltip
-        self.liststore = Gtk.ListStore(
-                str, str, str, GObject.TYPE_INT64, GObject.TYPE_INT64, str,
-                GObject.TYPE_INT, str, str, GObject.TYPE_INT, str,
-                str, GObject.TYPE_INT, str)
+        self.liststore = Gtk.ListStore(str, str, str, GObject.TYPE_INT64,
+                                       GObject.TYPE_INT64, str,
+                                       GObject.TYPE_INT, str, str,
+                                       GObject.TYPE_INT, str, str,
+                                       GObject.TYPE_INT, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_tooltip_column(TOOLTIP_COL)
         self.treeview.set_headers_clickable(True)
@@ -121,8 +122,8 @@ class DownloadPage(Gtk.Box):
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
         
-        name_cell = Gtk.CellRendererText(
-                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
+        name_cell = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END,
+                                         ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
@@ -130,22 +131,21 @@ class DownloadPage(Gtk.Box):
         self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         percent_cell = Gtk.CellRendererProgress()
-        percent_col = Gtk.TreeViewColumn(
-                _('Progress'), percent_cell, value=PERCENT_COL)
+        percent_col = Gtk.TreeViewColumn(_('Progress'), percent_cell,
+                                         value=PERCENT_COL)
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
         percent_col.set_sort_column_id(PERCENT_COL)
 
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(
-                _('Size'), size_cell, text=HUMANSIZE_COL)
+        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
         size_col.props.min_width = 100
         size_col.set_sort_column_id(SIZE_COL)
 
         state_cell = Gtk.CellRendererText()
-        state_col = Gtk.TreeViewColumn(
-                _('State'), state_cell, text=STATENAME_COL)
+        state_col = Gtk.TreeViewColumn(_('State'), state_cell,
+                                       text=STATENAME_COL)
         self.treeview.append_column(state_col)
         state_col.props.min_width = 100
         state_col.set_sort_column_id(PERCENT_COL)
@@ -160,8 +160,8 @@ class DownloadPage(Gtk.Box):
         因为Gtk没有像在Qt中那么方便的使用SQLite, 而必须将所有数据读入一个
         liststore中才行.
         '''
-        cache_path = os.path.join(
-                Config.CACHE_DIR, self.app.profile['username'])
+        cache_path = os.path.join(Config.CACHE_DIR,
+                                  self.app.profile['username'])
         if not os.path.exists(cache_path):
             os.makedirs(cache_path, exist_ok=True)
         db = os.path.join(cache_path, TASK_FILE)
@@ -255,7 +255,7 @@ class DownloadPage(Gtk.Box):
         self.cursor.execute(sql, [
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
             row[HUMANSIZE_COL], row[PERCENT_COL], row[FSID_COL]
-            ])
+        ])
         self.check_commit()
 
     def remove_task_db(self, fs_id):
@@ -298,8 +298,8 @@ class DownloadPage(Gtk.Box):
         def on_list_dir(info, error=None):
             path, pcs_files = info
             if error or not pcs_files:
-                dialog = Gtk.MessageDialog(
-                        self.app.window, Gtk.DialogFlags.MODAL,
+                dialog = Gtk.MessageDialog(self.app.window,
+                        Gtk.DialogFlags.MODAL,
                         Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE,
                         _('Failed to scan folder to download'))
                 dialog.format_secondary_text(
@@ -312,9 +312,9 @@ class DownloadPage(Gtk.Box):
         self.check_first()
         for pcs_file in pcs_files:
             if pcs_file['isdir']:
-                gutil.async_call(
-                        pcs.list_dir_all, self.app.cookie, self.app.tokens,
-                        pcs_file['path'], callback=on_list_dir)
+                gutil.async_call(pcs.list_dir_all, self.app.cookie,
+                                 self.app.tokens, pcs_file['path'],
+                                 callback=on_list_dir)
             else:
                 self.add_task(pcs_file)
 
@@ -332,12 +332,12 @@ class DownloadPage(Gtk.Box):
                 row[STATE_COL] = State.WAITING
             self.scan_tasks()
             return
-        saveDir = os.path.split(
-                self.app.profile['save-dir'] + pcs_file['path'])[0]
+        saveDir = os.path.split(self.app.profile['save-dir'] + 
+                                pcs_file['path'])[0]
         saveName = pcs_file['server_filename']
         human_size = util.get_human_size(pcs_file['size'])[0]
-        tooltip = gutil.escape(
-                _('From {0}\nTo {1}').format(pcs_file['path'], saveDir))
+        tooltip = gutil.escape(_('From {0}\nTo {1}').format(pcs_file['path'],
+                                                            saveDir))
         task = (
             pcs_file['server_filename'],
             pcs_file['path'],
@@ -353,7 +353,7 @@ class DownloadPage(Gtk.Box):
             human_size,
             0,
             tooltip,
-            )
+        )
         self.liststore.append(task)
         self.add_task_db(task)
         self.scan_tasks()
@@ -438,17 +438,15 @@ class DownloadPage(Gtk.Box):
             self.update_task_db(row)
             self.remove_worker(row[FSID_COL], stop=False)
             if self.app.profile['retries-each']:
-                GLib.timeout_add(self.app.profile['retries-each']*60000,
-                        self.restart_task, row)
+                GLib.timeout_add(self.app.profile['retries-each'] * 60000,
+                                 self.restart_task, row)
             else:
-                self.app.toast(
-                        _('Error occurs will downloading {0}').format(
-                            row[NAME_COL]))
+                self.app.toast(_('Error occurs will downloading {0}').format(
+                        row[NAME_COL]))
             self.scan_tasks()
 
         def do_worker_disk_error(fs_id, tmp_filepath):
-            self.app.toast(
-                    _('Disk Error: failed to read/write {0}').format(
+            self.app.toast(_('Disk Error: failed to read/write {0}').format(
                     tmp_filepath))
 
         def on_worker_disk_error(worker, fs_id, tmp_filepath):

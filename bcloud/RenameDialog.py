@@ -15,10 +15,9 @@ from bcloud import pcs
 class RenameDialog(Gtk.Dialog):
 
     def __init__(self, app, path_list):
-        super().__init__(
-                _('Rename files'), app.window, Gtk.DialogFlags.MODAL,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        super().__init__(_('Rename files'), app.window, Gtk.DialogFlags.MODAL,
+                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                         Gtk.STOCK_OK, Gtk.ResponseType.OK))
         self.set_border_width(10)
         self.set_default_size(640, 480)
         self.set_default_response(Gtk.ResponseType.OK)
@@ -68,13 +67,9 @@ class RenameDialog(Gtk.Dialog):
         for row in self.rows:
             if row[1].get_text() == row[2].get_text():
                 continue
-            filelist.append({
-                'path': row[0],
-                'newname': row[2].get_text(),
-                })
+            filelist.append({'path': row[0], 'newname': row[2].get_text()})
         if len(filelist) == 0:
             return
         pcs.rename(self.app.cookie, self.app.tokens, filelist)
-        gutil.async_call(
-                pcs.rename, self.app.cookie, self.app.tokens, filelist,
-                callback=self.app.reload_current_page)
+        gutil.async_call(pcs.rename, self.app.cookie, self.app.tokens,
+                         filelist, callback=self.app.reload_current_page)

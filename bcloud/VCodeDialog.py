@@ -16,10 +16,10 @@ from bcloud import net
 class VCodeDialog(Gtk.Dialog):
 
     def __init__(self, parent, app, info):
-        super().__init__(
-            _('Verification..'), app.window, Gtk.DialogFlags.MODAL,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        super().__init__(_('Verification..'), app.window,
+                         Gtk.DialogFlags.MODAL,
+                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                          Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
         self.set_default_response(Gtk.ResponseType.OK)
         self.set_default_size(320, 200)
@@ -29,16 +29,14 @@ class VCodeDialog(Gtk.Dialog):
         box = self.get_content_area()
         box.set_spacing(10)
 
-        gutil.async_call(
-            net.urlopen, info['img'], {
-                'Cookie': app.cookie.header_output(),
-            }, callback=self.update_img)
+        gutil.async_call(net.urlopen, info['img'],
+                         {'Cookie': app.cookie.header_output()},
+                         callback=self.update_img)
         self.img = Gtk.Image()
         box.pack_start(self.img, False, False, 0)
 
         self.entry = Gtk.Entry()
-        self.entry.connect(
-                'activate',
+        self.entry.connect('activate',
                 lambda *args: self.response(Gtk.ResponseType.OK))
         box.pack_start(self.entry, False, False, 0)
 

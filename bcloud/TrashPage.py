@@ -21,6 +21,7 @@ from bcloud import util
 MAX_DAYS = 10  # 10天后会自动从回收站中删除
 ICON_SIZE = 24
 
+
 class TrashPage(Gtk.Box):
 
     icon_name = 'trash-symbolic'
@@ -67,9 +68,8 @@ class TrashPage(Gtk.Box):
 
         # icon name, disname, path, fs_id, tooltip,
         # size, humansize, deleting time, remaining days
-        self.liststore = Gtk.ListStore(
-                str, str, str, str, str,
-                GObject.TYPE_INT64, str, str, str)
+        self.liststore = Gtk.ListStore(str, str, str, str, str,
+                                       GObject.TYPE_INT64, str, str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         selection = self.treeview.get_selection()
         selection.set_mode(Gtk.SelectionMode.MULTIPLE)
@@ -81,8 +81,8 @@ class TrashPage(Gtk.Box):
         scrolled_win.add(self.treeview)
 
         icon_cell = Gtk.CellRendererPixbuf()
-        name_cell = Gtk.CellRendererText(
-                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
+        name_cell = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END,
+                                         ellipsize_set=True)
         name_col = Gtk.TreeViewColumn()
         name_col.set_title(_('Name'))
         name_col.pack_start(icon_cell, False)
@@ -99,20 +99,18 @@ class TrashPage(Gtk.Box):
         self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(
-                _('Size'), size_cell, text=HUMANSIZE_COL)
+        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
         size_col.set_sort_column_id(SIZE_COL)
 
         time_cell = Gtk.CellRendererText()
-        time_col = Gtk.TreeViewColumn(
-                _('Time'), time_cell, text=DELETING_COL)
+        time_col = Gtk.TreeViewColumn(_('Time'), time_cell, text=DELETING_COL)
         self.treeview.append_column(time_col)
         time_col.set_sort_column_id(DELETING_COL)
 
         remaining_cell = Gtk.CellRendererText()
-        remaining_col = Gtk.TreeViewColumn(
-                _('Remaining'), remaining_cell, text=REMAINING_COL)
+        remaining_col = Gtk.TreeViewColumn(_('Remaining'), remaining_cell,
+                                           text=REMAINING_COL)
         self.treeview.append_column(remaining_col)
         remaining_col.set_sort_column_id(REMAINING_COL)
 
@@ -122,17 +120,15 @@ class TrashPage(Gtk.Box):
         self.loading_spin.show_all()
         self.page_num = 1
         self.liststore.clear()
-        gutil.async_call(
-                pcs.list_trash, self.app.cookie, self.app.tokens, '/',
-                self.page_num, callback=self.append_filelist)
+        gutil.async_call(pcs.list_trash, self.app.cookie, self.app.tokens, '/',
+                         self.page_num, callback=self.append_filelist)
 
     def load_next(self):
         self.loading_spin.start()
         self.loading_spin.show_all()
         self.page_num = self.page_num + 1
-        gutil.async_call(
-                pcs.list_trash, self.app.cookie, self.app.tokens, '/',
-                self.page_num, callback=self.append_filelist)
+        gutil.async_call(pcs.list_trash, self.app.cookie, self.app.tokens, '/',
+                         self.page_num, callback=self.append_filelist)
 
     def reload(self, *args, **kwds):
         self.load()
@@ -154,8 +150,8 @@ class TrashPage(Gtk.Box):
             else:
                 size = pcs_file['size']
                 humansize = util.get_human_size(size)[0]
-            remaining_days = util.get_delta_days(
-                    int(pcs_file['server_mtime']), time.time())
+            remaining_days = util.get_delta_days(int(pcs_file['server_mtime']),
+                                                 time.time())
             remaining_days = str(MAX_DAYS - remaining_days) + ' days'
             self.liststore.append([
                 icon_name,
@@ -167,7 +163,7 @@ class TrashPage(Gtk.Box):
                 humansize,
                 time.ctime(pcs_file['server_mtime']),
                 remaining_days,
-                ])
+            ])
 
     def on_restore_button_clicked(self, button):
         selection = self.treeview.get_selection()
@@ -177,9 +173,8 @@ class TrashPage(Gtk.Box):
         fidlist = []
         for tree_path in tree_paths:
             fidlist.append(model[tree_path][FSID_COL])
-        gutil.async_call(
-                pcs.restore_trash, self.app.cookie, self.app.tokens,
-                fidlist, callback=self.reload)
+        gutil.async_call(pcs.restore_trash, self.app.cookie, self.app.tokens,
+                         fidlist, callback=self.reload)
         self.app.blink_page(self.app.home_page)
 
     def on_delete_button_clicked(self, button):
@@ -190,14 +185,12 @@ class TrashPage(Gtk.Box):
         fidlist = []
         for tree_path in tree_paths:
             fidlist.append(model[tree_path][FSID_COL])
-        gutil.async_call(
-                pcs.delete_trash, self.app.cookie, self.app.tokens,
-                fidlist, callback=self.reload)
+        gutil.async_call(pcs.delete_trash, self.app.cookie, self.app.tokens,
+                         fidlist, callback=self.reload)
 
     def on_clear_button_clicked(self, button):
-        gutil.async_call(
-                pcs.clear_trash, self.app.cookie, self.app.tokens,
-                callback=self.reload)
+        gutil.async_call(pcs.clear_trash, self.app.cookie, self.app.tokens,
+                         callback=self.reload)
 
     def on_reload_button_clicked(self, button):
         self.load()

@@ -22,10 +22,9 @@ class FolderBrowserDialog(Gtk.Dialog):
     def __init__(self, parent, app, title=_('Save to..')):
         self.parent = parent
         self.app = app
-        super().__init__(
-                title, app.window, Gtk.DialogFlags.MODAL,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        super().__init__(title, app.window, Gtk.DialogFlags.MODAL,
+                         (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                         Gtk.STOCK_OK, Gtk.ResponseType.OK))
         self.set_default_size(440, 480)
         self.set_border_width(10)
         self.set_default_response(Gtk.ResponseType.OK)
@@ -84,9 +83,8 @@ class FolderBrowserDialog(Gtk.Dialog):
         has_next = True
         page_num = 1
         while has_next:
-            infos = pcs.list_dir(
-                    self.app.cookie, self.app.tokens, path,
-                    page=page_num, num=NUM)
+            infos = pcs.list_dir(self.app.cookie, self.app.tokens, path,
+                                 page=page_num, num=NUM)
             page_num = page_num + 1
             if not infos or infos['errno'] != 0:
                 has_next = False
@@ -105,11 +103,11 @@ class FolderBrowserDialog(Gtk.Dialog):
                     pcs_file['path'],
                     empty,
                     False,
-                    ])
+                ])
                 # 加入一个临时的占位点.
                 if not empty:
-                    self.treestore.append(item, [
-                        '', pcs_file['path'], True, False])
+                    self.treestore.append(item,
+                                          ['', pcs_file['path'], True, False])
         self.treestore[parent_iter][LOADED_COL] = True
 
     def get_path(self):

@@ -42,7 +42,7 @@ StateNames = [
     _('FINISHED'),
     _('CANCELED'),
     _('ERROR'),
-    ]
+]
 
 RUNNING_STATES = (State.FINISHED, State.UPLOADING, State.WAITING)
 
@@ -83,8 +83,8 @@ class UploadPage(Gtk.Box):
         control_box.pack_start(upload_button, False, False, 0)
 
         open_folder_button = Gtk.Button.new_with_label(_('Open Directory'))
-        open_folder_button.connect(
-                'clicked', self.on_open_folder_button_clicked)
+        open_folder_button.connect('clicked',
+                                   self.on_open_folder_button_clicked)
         open_folder_button.props.margin_left = 40
         control_box.pack_start(open_folder_button, False, False, 0)
 
@@ -98,10 +98,10 @@ class UploadPage(Gtk.Box):
         # fid, source_name, source_path, path, size,
         # currsize, state, statename, humansize, percent, tooltip
         # slice size
-        self.liststore = Gtk.ListStore(
-            GObject.TYPE_INT, str, str, str, GObject.TYPE_INT64,
-            GObject.TYPE_INT64, int, str, str, GObject.TYPE_INT, str,
-            GObject.TYPE_INT64)
+        self.liststore = Gtk.ListStore(GObject.TYPE_INT, str, str, str,
+                                       GObject.TYPE_INT64, GObject.TYPE_INT64,
+                                       int, str, str, GObject.TYPE_INT, str,
+                                       GObject.TYPE_INT64)
         self.treeview = Gtk.TreeView(model=self.liststore)
         self.treeview.set_headers_clickable(True)
         self.treeview.set_reorderable(True)
@@ -111,8 +111,8 @@ class UploadPage(Gtk.Box):
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
         scrolled_win.add(self.treeview)
 
-        name_cell = Gtk.CellRendererText(
-                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
+        name_cell = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END,
+                                         ellipsize_set=True)
         name_col = Gtk.TreeViewColumn(_('Name'), name_cell, text=NAME_COL)
         name_col.set_expand(True)
         self.treeview.append_column(name_col)
@@ -120,22 +120,21 @@ class UploadPage(Gtk.Box):
         self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         percent_cell = Gtk.CellRendererProgress()
-        percent_col = Gtk.TreeViewColumn(
-                _('Progress'), percent_cell, value=PERCENT_COL)
+        percent_col = Gtk.TreeViewColumn(_('Progress'), percent_cell,
+                                         value=PERCENT_COL)
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
         percent_col.set_sort_column_id(PERCENT_COL)
 
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(
-                _('Size'), size_cell, text=HUMANSIZE_COL)
+        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMANSIZE_COL)
         self.treeview.append_column(size_col)
         size_col.props.min_width = 100
         size_col.set_sort_column_id(SIZE_COL)
 
         state_cell = Gtk.CellRendererText()
-        state_col = Gtk.TreeViewColumn(
-                _('State'), state_cell, text=STATENAME_COL)
+        state_col = Gtk.TreeViewColumn(_('State'), state_cell,
+                                       text=STATENAME_COL)
         self.treeview.append_column(state_col)
         state_col.props.min_width = 100
         state_col.set_sort_column_id(PERCENT_COL)
@@ -145,8 +144,8 @@ class UploadPage(Gtk.Box):
         self.load_tasks_from_db()
 
     def init_db(self):
-        cache_path = os.path.join(
-                Config.CACHE_DIR, self.app.profile['username'])
+        cache_path = os.path.join(Config.CACHE_DIR,
+                                  self.app.profile['username'])
         if not os.path.exists(cache_path):
             os.makedirs(cache_path, exist_ok=True)
         db = os.path.join(cache_path, TASK_FILE)
@@ -259,7 +258,7 @@ class UploadPage(Gtk.Box):
         self.cursor.execute(sql, [
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
             row[HUMANSIZE_COL], row[PERCENT_COL], row[FID_COL]
-            ])
+        ])
         self.check_commit()
 
     def remove_task_db(self, fid):
@@ -284,11 +283,10 @@ class UploadPage(Gtk.Box):
             self.conn.close()
 
     def add_task(self, dir_name=None):
-        file_dialog = Gtk.FileChooserDialog(
-            _('Choose a file..'), self.app.window,
-            Gtk.FileChooserAction.OPEN,
-            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        file_dialog = Gtk.FileChooserDialog(_('Choose a file..'),
+                self.app.window, Gtk.FileChooserAction.OPEN,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
         file_dialog.set_modal(True)
         file_dialog.set_select_multiple(True)
         file_dialog.set_default_response(Gtk.ResponseType.OK)
@@ -312,8 +310,7 @@ class UploadPage(Gtk.Box):
         def scan_folders(folder_path):
             file_list = os.listdir(folder_path)
             source_paths = [os.path.join(folder_path, f) for f in file_list]
-            self.add_file_tasks(
-                    source_paths,
+            self.add_file_tasks(source_paths,
                     os.path.join(dir_name, os.path.split(folder_path)[1]))
 
         self.check_first()
@@ -346,8 +343,7 @@ class UploadPage(Gtk.Box):
         path = os.path.join(dir_name, filename)
         size = os.path.getsize(source_path)
         total_size = util.get_human_size(size)[0]
-        tooltip = gutil.escape(
-                _('From {0}\nTo {1}').format(source_path, path))
+        tooltip = gutil.escape(_('From {0}\nTo {1}').format(source_path, path))
         if size < 2 ** 27:           # 128M 
             threshold = 2 ** 17      # 128K
         elif size < 2 ** 29:         # 512M
@@ -355,8 +351,7 @@ class UploadPage(Gtk.Box):
         elif size < 10 * (2 ** 30):  # 10G
             threshold = math.ceil(size / 1000)
         else:
-            self.app.toast(
-                    _('{0} is too large to upload (>10G).').format(path))
+            self.app.toast(_('{0} is too large to upload (>10G).').format(path))
             return
         task = [
             filename,
@@ -370,7 +365,7 @@ class UploadPage(Gtk.Box):
             0,
             tooltip,
             threshold,
-            ]
+        ]
         row_id = self.add_task_db(task)
         task.insert(0, row_id)
         self.liststore.append(task)
@@ -471,9 +466,9 @@ class UploadPage(Gtk.Box):
                 # TODO
                 pass
             else:
-                gutil.async_call(
-                    pcs.create_superfile, self.app.cookie, row[PATH_COL],
-                    block_list, callback=on_create_superfile)
+                gutil.async_call(pcs.create_superfile, self.app.cookie,
+                                 row[PATH_COL], block_list,
+                                 callback=on_create_superfile)
 
         def on_worker_uploaded(worker, fid):
             GLib.idle_add(do_worker_uploaded, fid)

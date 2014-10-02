@@ -27,8 +27,8 @@ from bcloud import pcs
 from bcloud import util
 
 (PIXBUF_COL, NAME_COL, PATH_COL, TOOLTIP_COL, SIZE_COL, HUMAN_SIZE_COL,
-    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL
-    ) = list(range(11))
+    ISDIR_COL, MTIME_COL, HUMAN_MTIME_COL, TYPE_COL, PCS_FILE_COL) = list(
+            range(11))
 TYPE_TORRENT = 'application/x-bittorrent'
 
 class IconWindow(Gtk.ScrolledWindow):
@@ -47,9 +47,10 @@ class IconWindow(Gtk.ScrolledWindow):
 
         # pixbuf, name, path, tooltip, size, humansize,
         # isdir, mtime, human mtime, type, pcs_file
-        self.liststore = Gtk.ListStore(
-            GdkPixbuf.Pixbuf, str, str, str, GObject.TYPE_INT64, str,
-            GObject.TYPE_INT, GObject.TYPE_INT64, str, str, str)
+        self.liststore = Gtk.ListStore(GdkPixbuf.Pixbuf, str, str, str,
+                                       GObject.TYPE_INT64, str,
+                                       GObject.TYPE_INT, GObject.TYPE_INT64,
+                                       str, str, str)
         self.init_ui()
 
     def init_ui(self):
@@ -59,10 +60,9 @@ class IconWindow(Gtk.ScrolledWindow):
         self.iconview.set_tooltip_column(TOOLTIP_COL)
         self.iconview.set_item_width(84)
         self.iconview.set_selection_mode(Gtk.SelectionMode.MULTIPLE)
-        self.iconview.connect(
-                'item-activated', self.on_iconview_item_activated)
-        self.iconview.connect(
-                'button-press-event', self.on_iconview_button_pressed)
+        self.iconview.connect('item-activated', self.on_iconview_item_activated)
+        self.iconview.connect('button-press-event',
+                              self.on_iconview_button_pressed)
         self.add(self.iconview)
         self.get_vadjustment().connect('value-changed', self.on_scrolled)
         self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
@@ -96,10 +96,11 @@ class IconWindow(Gtk.ScrolledWindow):
             tree_iter = self.liststore.append([
                 pixbuf, name, path, tooltip, size, human_size,
                 pcs_file['isdir'], mtime, human_mtime, type_,
-                json.dumps(pcs_file), ])
-            gutil.update_liststore_image(
-                self.liststore, tree_iter, PIXBUF_COL, pcs_file,
-                cache_path, icon_size=self.ICON_SIZE)
+                json.dumps(pcs_file)
+            ])
+            gutil.update_liststore_image(self.liststore, tree_iter, PIXBUF_COL,
+                                         pcs_file, cache_path,
+                                         icon_size=self.ICON_SIZE)
 
     def get_pcs_file(self, tree_path):
         '''获取原始的pcs文件信息'''
@@ -175,8 +176,8 @@ class IconWindow(Gtk.ScrolledWindow):
             img = self.app.mime.get_app_img(app_info)
             if img:
                 menu_item.set_image(img)
-            menu_item.connect(
-                    'activate', self.on_launch_app_activated, app_info)
+            menu_item.connect('activate', self.on_launch_app_activated,
+                              app_info)
             menu.append(menu_item)
 
         tree_paths = self.iconview.get_selected_items()
@@ -189,21 +190,20 @@ class IconWindow(Gtk.ScrolledWindow):
             file_type = self.liststore[tree_path][TYPE_COL]
             if file_type == 'folder':
                 open_dir_item = Gtk.MenuItem.new_with_label(_('Open'))
-                open_dir_item.connect(
-                        'activate', self.on_open_dir_item_activated)
+                open_dir_item.connect('activate',
+                                      self.on_open_dir_item_activated)
                 menu.append(open_dir_item)
 
                 upload_dir_item = Gtk.MenuItem.new_with_label(_('Upload To…'))
-                upload_dir_item.connect(
-                        'activate', self.on_upload_dir_item_activated)
+                upload_dir_item.connect('activate',
+                                        self.on_upload_dir_item_activated)
                 menu.append(upload_dir_item)
             # 不是目录的话, 就显示出程序菜单
             else:
                 if file_type == TYPE_TORRENT:
                     cloud_download_item = Gtk.MenuItem.new_with_label(
                             _('Cloud Download'))
-                    cloud_download_item.connect(
-                            'activate',
+                    cloud_download_item.connect('activate',
                             self.on_cloud_download_item_activated)
                     menu.append(cloud_download_item)
                 app_infos = Gio.AppInfo.get_recommended_for_type(file_type)
@@ -211,12 +211,10 @@ class IconWindow(Gtk.ScrolledWindow):
                 if len(app_infos) > 2:
                     app_info = app_infos[0]
                     launch_item = Gtk.ImageMenuItem.new_with_label(
-                        _('Open With {0}').format(
-                            app_info.get_display_name()))
+                        _('Open With {0}').format(app_info.get_display_name()))
                     build_app_menu(menu, launch_item, app_info)
 
-                    more_app_item = Gtk.MenuItem.new_with_label(
-                            _('Open With'))
+                    more_app_item = Gtk.MenuItem.new_with_label(_('Open With'))
                     menu.append(more_app_item)
                     sub_menu = Gtk.Menu()
                     more_app_item.set_submenu(sub_menu)
@@ -229,8 +227,8 @@ class IconWindow(Gtk.ScrolledWindow):
                     sub_menu.append(sep_item)
                     choose_app_item = Gtk.MenuItem.new_with_label(
                             _('Other Application...'))
-                    choose_app_item.connect(
-                            'activate', self.on_choose_app_activated)
+                    choose_app_item.connect('activate',
+                                            self.on_choose_app_activated)
                     sub_menu.append(choose_app_item)
                 else:
                     for app_info in app_infos:
@@ -240,15 +238,14 @@ class IconWindow(Gtk.ScrolledWindow):
                         build_app_menu(menu, launch_item, app_info)
                     choose_app_item = Gtk.MenuItem.new_with_label(
                             _('Open With Other Application...'))
-                    choose_app_item.connect(
-                            'activate', self.on_choose_app_activated)
+                    choose_app_item.connect('activate',
+                            self.on_choose_app_activated)
                     menu.append(choose_app_item)
 
                 sep_item = Gtk.SeparatorMenuItem()
                 menu.append(sep_item)
                 copy_link_item = Gtk.MenuItem.new_with_label(_('Copy Link'))
-                copy_link_item.connect(
-                        'activate', self.on_copy_link_activated)
+                copy_link_item.connect('activate', self.on_copy_link_activated)
                 menu.append(copy_link_item)
 
             sep_item = Gtk.SeparatorMenuItem()
@@ -323,11 +320,10 @@ class IconWindow(Gtk.ScrolledWindow):
             法, 先得琶视频地址, 再用播放器去打开它.
             '''
             if error or not pls or b'error_code' in pls:
-                gutil.async_call(
-                        pcs.get_download_link, self.app.cookie,
-                        self.app.tokens,
-                        self.liststore[tree_paths[0]][PATH_COL],
-                        callback=open_video_link)
+                gutil.async_call(pcs.get_download_link, self.app.cookie,
+                                 self.app.tokens,
+                                 self.liststore[tree_paths[0]][PATH_COL],
+                                 callback=open_video_link)
             else:
                 pls_filepath = os.path.join('/tmp',
                         pcs_file['server_filename'] + '.m3u8')
@@ -348,15 +344,13 @@ class IconWindow(Gtk.ScrolledWindow):
         # 如果是视频等多媒体格式的话, 默认是直接调用播放器进行网络播放的
         if 'video' in file_type or 'media' in file_type:
             if self.app.profile['use-streaming']:
-                gutil.async_call(
-                        pcs.get_streaming_playlist, self.app.cookie,
-                        pcs_file['path'], callback=save_playlist)
+                gutil.async_call(pcs.get_streaming_playlist, self.app.cookie,
+                                 pcs_file['path'], callback=save_playlist)
             else:
-                gutil.async_call(
-                        pcs.get_download_link, self.app.cookie,
-                        self.app.tokens,
-                        self.liststore[tree_paths[0]][PATH_COL],
-                        callback=open_video_link)
+                gutil.async_call(pcs.get_download_link, self.app.cookie,
+                                 self.app.tokens,
+                                 self.liststore[tree_paths[0]][PATH_COL],
+                                 callback=open_video_link)
         else:
             self.app.blink_page(self.app.download_page)
             self.app.download_page.add_launch_task(pcs_file, app_info)
@@ -371,9 +365,8 @@ class IconWindow(Gtk.ScrolledWindow):
             return
         tree_path = tree_paths[0]
         type_ = self.liststore[tree_path][TYPE_COL]
-        dialog = Gtk.AppChooserDialog.new_for_content_type(
-                self.app.window, Gtk.DialogFlags.MODAL,
-                type_)
+        dialog = Gtk.AppChooserDialog.new_for_content_type(self.app.window,
+                Gtk.DialogFlags.MODAL, type_)
         response = dialog.run()
         app_info = dialog.get_app_info()
         dialog.destroy()
@@ -389,7 +382,8 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_upload_dir_item_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
         if tree_paths and len(tree_paths) == 1:
-            self.app.upload_page.add_task(self.liststore[tree_paths[0]][PATH_COL])
+            self.app.upload_page.add_task(
+                    self.liststore[tree_paths[0]][PATH_COL])
 
     def on_cloud_download_item_activated(self, menu_item):
         '''创建离线下载任务, 下载选中的BT种子.'''
@@ -397,7 +391,7 @@ class IconWindow(Gtk.ScrolledWindow):
         if not tree_paths:
             return
         self.app.cloud_page.add_cloud_bt_task(
-            self.liststore[tree_paths[0]][PATH_COL])
+                self.liststore[tree_paths[0]][PATH_COL])
 
     def on_copy_link_activated(self, menu_item):
         def copy_link_to_clipboard(url, error=None):
@@ -408,10 +402,10 @@ class IconWindow(Gtk.ScrolledWindow):
         tree_paths = self.iconview.get_selected_items()
         if not tree_paths:
             return
-        gutil.async_call(
-                pcs.get_download_link, self.app.cookie, self.app.tokens,
-                self.liststore[tree_paths[0]][PATH_COL],
-                callback=copy_link_to_clipboard)
+        gutil.async_call(pcs.get_download_link, self.app.cookie,
+                         self.app.tokens,
+                         self.liststore[tree_paths[0]][PATH_COL],
+                         callback=copy_link_to_clipboard)
 
     def on_download_activated(self, menu_item):
         # 下载文件与下载目录的操作是不相同的.
@@ -436,9 +430,8 @@ class IconWindow(Gtk.ScrolledWindow):
         for tree_path in tree_paths:
             pcs_file = self.get_pcs_file(tree_path)
             fid_list.append(pcs_file['fs_id'])
-            gutil.async_call(
-                    pcs.enable_share, self.app.cookie, self.app.tokens,
-                    fid_list, callback=on_share)
+            gutil.async_call(pcs.enable_share, self.app.cookie, self.app.tokens,
+                             fid_list, callback=on_share)
 
     def on_moveto_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
@@ -460,11 +453,9 @@ class IconWindow(Gtk.ScrolledWindow):
                 'path': self.liststore[tree_path][PATH_COL],
                 'dest': targ_path,
                 'newname': self.liststore[tree_path][NAME_COL],
-                })
-        gutil.async_call(
-                pcs.move,
-                self.app.cookie, self.app.tokens, filelist,
-                callback=self.parent.reload)
+            })
+        gutil.async_call(pcs.move, self.app.cookie, self.app.tokens, filelist,
+                         callback=self.parent.reload)
 
     def on_copyto_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
@@ -486,11 +477,9 @@ class IconWindow(Gtk.ScrolledWindow):
                 'path': self.liststore[tree_path][PATH_COL],
                 'dest': targ_path,
                 'newname': self.liststore[tree_path][NAME_COL],
-                })
-        gutil.async_call(
-                pcs.copy,
-                self.app.cookie, self.app.tokens, filelist,
-                callback=self.parent.reload)
+            })
+        gutil.async_call(pcs.copy, self.app.cookie, self.app.tokens, filelist,
+                         callback=self.parent.reload)
 
     def on_rename_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
@@ -510,9 +499,8 @@ class IconWindow(Gtk.ScrolledWindow):
         path_list = []
         for tree_path in tree_paths:
             path_list.append(self.liststore[tree_path][PATH_COL])
-        gutil.async_call(
-                pcs.delete_files, self.app.cookie, self.app.tokens,
-                path_list, callback=self.parent.reload)
+        gutil.async_call(pcs.delete_files, self.app.cookie, self.app.tokens,
+                         path_list, callback=self.parent.reload)
         self.app.blink_page(self.app.trash_page)
 
     def on_props_activated(self, menu_item):
@@ -541,12 +529,11 @@ class TreeWindow(IconWindow):
     def init_ui(self):
         self.iconview = Gtk.TreeView(model=self.liststore)
         self.iconview.set_tooltip_column(TOOLTIP_COL)
-        self.iconview.connect(
-                'row-activated',
+        self.iconview.connect('row-activated',
                 lambda view, path, column:
                     self.on_iconview_item_activated(view, path))
-        self.iconview.connect(
-                'button-press-event', self.on_iconview_button_pressed)
+        self.iconview.connect('button-press-event',
+                              self.on_iconview_button_pressed)
         self.get_vadjustment().connect('value-changed', self.on_scrolled)
         self.iconview.set_headers_clickable(True)
         self.iconview.set_rubber_banding(True)
@@ -556,8 +543,8 @@ class TreeWindow(IconWindow):
         self.add(self.iconview)
 
         icon_cell = Gtk.CellRendererPixbuf()
-        name_cell = Gtk.CellRendererText(
-                ellipsize=Pango.EllipsizeMode.END, ellipsize_set=True)
+        name_cell = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END,
+                                         ellipsize_set=True)
         name_col = Gtk.TreeViewColumn()
         name_col.set_title(_('Name'))
         name_col.pack_start(icon_cell, False)
@@ -575,16 +562,15 @@ class TreeWindow(IconWindow):
         self.liststore.set_sort_func(NAME_COL, gutil.tree_model_natsort)
 
         size_cell = Gtk.CellRendererText()
-        size_col = Gtk.TreeViewColumn(
-                _('Size'), size_cell, text=HUMAN_SIZE_COL)
+        size_col = Gtk.TreeViewColumn(_('Size'), size_cell, text=HUMAN_SIZE_COL)
         self.iconview.append_column(size_col)
         size_col.props.min_width = 100
         size_col.set_resizable(True)
         size_col.set_sort_column_id(SIZE_COL)
 
         mtime_cell = Gtk.CellRendererText()
-        mtime_col = Gtk.TreeViewColumn(
-                _('Modified'), mtime_cell, text=HUMAN_MTIME_COL)
+        mtime_col = Gtk.TreeViewColumn(_('Modified'), mtime_cell,
+                                       text=HUMAN_MTIME_COL)
         self.iconview.append_column(mtime_col)
         mtime_col.props.min_width = 100
         mtime_col.set_resizable(True)
@@ -594,7 +580,8 @@ class TreeWindow(IconWindow):
         self.iconview.unselect_all = self.selection.unselect_all
         self.iconview.select_path = self.selection.select_path
         # Gtk.TreeSelection.get_selected_rows() returns (model, tree_paths)
-        self.iconview.get_selected_items = lambda: self.selection.get_selected_rows()[1]
+        self.iconview.get_selected_items = \
+                lambda: self.selection.get_selected_rows()[1]
 
         # Gtk.TreeView.get_path_at_pos() returns (path, column)
         def get_path_at_pos(x, y):

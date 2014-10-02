@@ -15,7 +15,7 @@ from bcloud import pcs
 __all__ = [
     'CategoryPage', 'PicturePage', 'DocPage', 'VideoPage',
     'BTPage', 'MusicPage', 'OtherPage',
-    ]
+]
 
 
 class CategoryPage(Gtk.Box):
@@ -49,15 +49,13 @@ class CategoryPage(Gtk.Box):
         list_view_button = Gtk.ToolButton()
         list_view_button.set_label(_('ListView'))
         list_view_button.set_icon_name('list-view-symbolic')
-        list_view_button.connect(
-                'clicked', self.on_list_view_button_clicked)
+        list_view_button.connect('clicked', self.on_list_view_button_clicked)
         nav_bar.insert(list_view_button, 1)
 
         grid_view_button = Gtk.ToolButton()
         grid_view_button.set_label(_('ListView'))
         grid_view_button.set_icon_name('grid-view-symbolic')
-        grid_view_button.connect(
-                'clicked', self.on_grid_view_button_clicked)
+        grid_view_button.connect('clicked', self.on_grid_view_button_clicked)
         nav_bar.insert(grid_view_button, 2)
 
         self.icon_window = IconWindow(self, app)
@@ -75,9 +73,8 @@ class CategoryPage(Gtk.Box):
         self.page_num = 1
         self.loading_spin.start()
         self.loading_spin.show_all()
-        gutil.async_call(
-                pcs.get_category, self.app.cookie, self.app.tokens,
-                self.category, self.page_num, callback=on_load)
+        gutil.async_call(pcs.get_category, self.app.cookie, self.app.tokens,
+                         self.category, self.page_num, callback=on_load)
 
     def load_next(self):
         def on_load_next(info, error=None):
@@ -95,9 +92,8 @@ class CategoryPage(Gtk.Box):
         self.loading_spin.start()
         self.loading_spin.show_all()
         self.page_num = self.page_num + 1
-        gutil.async_call(
-                pcs.get_category, self.app.cookie, self.app.tokens,
-                self.category, self.page_num, callback=on_load_next)
+        gutil.async_call(pcs.get_category, self.app.cookie, self.app.tokens,
+                         self.category, self.page_num, callback=on_load_next)
 
     def reload(self, *args):
         self.load()

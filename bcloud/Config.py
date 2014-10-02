@@ -18,6 +18,7 @@ elif __file__.startswith('/usr/'):
     PREF = '/usr/share'
 else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
+
 NAME = 'bcloud'
 ICON_PATH = os.path.join(PREF, NAME, 'bcloud.png')
 COLOR_SCHEMA = os.path.join(PREF, NAME, 'color_schema.json')
@@ -40,6 +41,7 @@ CACHE_DIR = os.path.join(HOME_DIR, '.cache', NAME)
 
 # Check Gtk version <= 3.6
 GTK_LE_36 = (Gtk.MAJOR_VERSION == 3) and (Gtk.MINOR_VERSION <= 6)
+GTK_GE_314 = (Gtk.MAJOR_VERSION == 3) and (Gtk.MINOR_VERSION >= 14)
 
 CONF_DIR = os.path.join(HOME_DIR, '.config', NAME)
 _conf_file = os.path.join(CONF_DIR, 'conf.json')
@@ -47,7 +49,7 @@ _conf_file = os.path.join(CONF_DIR, 'conf.json')
 _base_conf = {
     'default': '',
     'profiles': [],
-    }
+}
 
 def check_first():
     '''这里, 要创建基本的目录结构'''

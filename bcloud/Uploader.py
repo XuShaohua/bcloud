@@ -16,6 +16,7 @@ from bcloud import pcs
     CURRSIZE_COL, STATE_COL, STATENAME_COL, HUMANSIZE_COL,
     PERCENT_COL, TOOLTIP_COL, THRESHOLD_COL) = list(range(12))
 
+
 class State:
     '''下载状态常量'''
     UPLOADING = 0
@@ -31,25 +32,21 @@ SLICE_THRESHOLD = 2 ** 18  # 256k, 小于这个值, 不允许使用分片上传
 class Uploader(threading.Thread, GObject.GObject):
 
     __gsignals__ = {
-            # 一个新的文件分片完成上传
-            'slice-sent': (GObject.SIGNAL_RUN_LAST,
-                # fid, slice_end, md5 
-                GObject.TYPE_NONE, (GObject.TYPE_INT, GObject.TYPE_INT64, str)),
-            # 请求UploadPage来合并文件分片
-            'merge-files': (GObject.SIGNAL_RUN_LAST,
-                # fid
-                GObject.TYPE_NONE, (GObject.TYPE_INT, )),
-            # 上传完成, 这个信号只有rapid_upload/upload_small_file才使用
-            'uploaded': (GObject.SIGNAL_RUN_LAST, 
-                # fid
-                GObject.TYPE_NONE, (GObject.TYPE_INT, )),
-            'disk-error': (GObject.SIGNAL_RUN_LAST,
-                # fid
-                GObject.TYPE_NONE, (GObject.TYPE_INT, )),
-            'network-error': (GObject.SIGNAL_RUN_LAST,
-                # fid
-                GObject.TYPE_NONE, (GObject.TYPE_INT, )),
-            }
+        # 一个新的文件分片完成上传
+        # fid, slice_end, md5 
+        'slice-sent': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                       (GObject.TYPE_INT, GObject.TYPE_INT64, str)),
+        # 请求UploadPage来合并文件分片
+        'merge-files': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                        (GObject.TYPE_INT, )),
+        # 上传完成, 这个信号只有rapid_upload/upload_small_file才使用
+        'uploaded': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                     (GObject.TYPE_INT, )),
+        'disk-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                       (GObject.TYPE_INT, )),
+        'network-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                          (GObject.TYPE_INT, )),
+    }
 
     is_slice_upload = False
 
@@ -82,7 +79,6 @@ class Uploader(threading.Thread, GObject.GObject):
     # Open API
     def pause(self):
         self.row[STATE_COL] = State.PAUSED
-        #if self.is_slice_upload:
 
     # Open API
     def stop(self):

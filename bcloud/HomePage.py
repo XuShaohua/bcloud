@@ -60,10 +60,11 @@ class HomePage(Gtk.Box):
         # set drop action
         targets = [
             ['text/plain', Gtk.TargetFlags.OTHER_APP, 0],
-            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]]
+            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]
+        ]
         target_list =[Gtk.TargetEntry.new(*t) for t in targets]
-        self.drag_dest_set(
-            Gtk.DestDefaults.ALL, target_list, Gdk.DragAction.COPY)
+        self.drag_dest_set(Gtk.DestDefaults.ALL, target_list,
+                           Gdk.DragAction.COPY)
 
         nav_bar = Gtk.Toolbar()
         nav_bar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR)
@@ -111,16 +112,14 @@ class HomePage(Gtk.Box):
         list_view_button = Gtk.ToolButton()
         list_view_button.set_label(_('ListView'))
         list_view_button.set_icon_name('list-view-symbolic')
-        list_view_button.connect(
-                'clicked', self.on_list_view_button_clicked)
+        list_view_button.connect('clicked', self.on_list_view_button_clicked)
         nav_bar.insert(list_view_button, 3)
         list_view_button.props.valign = Gtk.Align.START
 
         grid_view_button = Gtk.ToolButton()
         grid_view_button.set_label(_('ListView'))
         grid_view_button.set_icon_name('grid-view-symbolic')
-        grid_view_button.connect(
-                'clicked', self.on_grid_view_button_clicked)
+        grid_view_button.connect('clicked', self.on_grid_view_button_clicked)
         nav_bar.insert(grid_view_button, 4)
         grid_view_button.props.valign = Gtk.Align.START
 
@@ -134,8 +133,7 @@ class HomePage(Gtk.Box):
             self.search_entry = Gtk.SearchEntry()
         self.search_entry.props.no_show_all = True
         self.search_entry.props.visible = False
-        self.search_entry.connect(
-                'activate', self.on_search_entry_activated)
+        self.search_entry.connect('activate', self.on_search_entry_activated)
         self.pack_start(self.search_entry, False, False, 0)
 
         self.icon_window = IconWindow(self, app)
@@ -155,12 +153,10 @@ class HomePage(Gtk.Box):
         self.path_box.set_path(path)
         self.loading_spin.start()
         self.loading_spin.show_all()
-        gutil.async_call(
-                pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
-                self.page_num, callback=self.on_load)
-        gutil.async_call(
-                pcs.get_quota, self.app.cookie, self.app.tokens,
-                callback=self.app.update_quota)
+        gutil.async_call(pcs.list_dir, self.app.cookie, self.app.tokens,
+                         self.path, self.page_num, callback=self.on_load)
+        gutil.async_call(pcs.get_quota, self.app.cookie, self.app.tokens,
+                         callback=self.app.update_quota)
 
     def on_load(self, info, error=None):
         self.loading_spin.stop()
@@ -187,9 +183,8 @@ class HomePage(Gtk.Box):
         self.path_box.set_path(self.path)
         self.loading_spin.start()
         self.loading_spin.show_all()
-        gutil.async_call(
-                pcs.list_dir, self.app.cookie, self.app.tokens, self.path,
-                self.page_num, callback=on_load_next)
+        gutil.async_call(pcs.list_dir, self.app.cookie, self.app.tokens,
+                         self.path, self.page_num, callback=on_load_next)
 
     def reload(self, *args, **kwds):
         '''重新载入本页面'''
@@ -225,6 +220,5 @@ class HomePage(Gtk.Box):
             return
         self.loading_spin.start()
         self.loading_spin.show_all()
-        gutil.async_call(
-                pcs.search, self.app.cookie, self.app.tokens, text,
-                self.path, callback=self.on_load)
+        gutil.async_call(pcs.search, self.app.cookie, self.app.tokens, text,
+                         self.path, callback=self.on_load)

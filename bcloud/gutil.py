@@ -41,7 +41,7 @@ DEFAULT_PROFILE = {
     'download-segments': 3, # 下载单个任务的线程数 1~5
     'retries-each': 5,      # 隔5分钟后尝试重新下载
     'download-timeout': 30, # 30 秒后下载超时
-    }
+}
 RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
 
 # calls f on another thread
@@ -83,8 +83,8 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
     '''
     def _update_image():
         try:
-            pix = GdkPixbuf.Pixbuf.new_from_file_at_size(
-                    filepath, icon_size, icon_size)
+            pix = GdkPixbuf.Pixbuf.new_from_file_at_size(filepath, icon_size,
+                                                         icon_size)
             tree_path = liststore.get_path(tree_iter)
             if tree_path is None:
                 return
@@ -99,9 +99,8 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
             fh.write(req.data)
         # Now, check its mime type
         file_ = Gio.File.new_for_path(filepath)
-        file_info = file_.query_info(
-                Gio.FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
-                Gio.FileQueryInfoFlags.NONE)
+        file_info = file_.query_info(Gio.FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+                                     Gio.FileQueryInfoFlags.NONE)
         content_type = file_info.get_content_type()
         if 'image' in content_type:
             _update_image()
@@ -172,9 +171,8 @@ def dump_profile(profile):
     if profile['remember-password'] and profile['password']:
         for i in range(RETRIES):
             try:
-                keyring.set_password(
-                        Config.DBUS_APP_NAME, profile['username'],
-                        profile['password'])
+                keyring.set_password(Config.DBUS_APP_NAME, profile['username'],
+                                     profile['password'])
                 break
             except dbus.exceptions.DBusException as e:
                 print(e)

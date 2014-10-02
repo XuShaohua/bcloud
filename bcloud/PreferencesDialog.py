@@ -15,7 +15,7 @@ class PreferencesDialog(Gtk.Dialog):
     def __init__(self, app):
         self.app = app
         super().__init__(_('Preferences'), app.window, Gtk.DialogFlags.MODAL,
-                        (Gtk.STOCK_CLOSE, Gtk.ResponseType.OK))
+                         (Gtk.STOCK_CLOSE, Gtk.ResponseType.OK))
         self.set_default_response(Gtk.ResponseType.OK)
 
         self.set_default_size(480, 360)
@@ -50,8 +50,7 @@ class PreferencesDialog(Gtk.Dialog):
         upload_hidden_switch.props.halign = Gtk.Align.START
         upload_hidden_switch.set_tooltip_text(
                 _('Also upload hidden files and folders'))
-        upload_hidden_switch.set_active(
-                self.app.profile['upload-hidden-files'])
+        upload_hidden_switch.set_active(self.app.profile['upload-hidden-files'])
         upload_hidden_switch.connect('notify::active',
                                      self.on_upload_hidden_switch_activate)
         general_grid.attach(upload_hidden_switch, 1, 1, 1, 1)
@@ -99,7 +98,8 @@ class PreferencesDialog(Gtk.Dialog):
         stream_switch.set_active(self.app.profile['use-streaming'])
         stream_switch.connect('notify::active', self.on_stream_switch_activate)
         stream_switch.props.halign = Gtk.Align.START
-        stream_switch.set_tooltip_text(_('Open the compressed version of videos, useful for those whose network connection is slow.'))
+        stream_switch.set_tooltip_text(
+                _('Open the compressed version of videos, useful for those whose network connection is slow.'))
         network_grid.attach(stream_switch, 1, 0, 1, 1)
 
         concurr_label = Gtk.Label.new(_('Concurrent downloads:'))
