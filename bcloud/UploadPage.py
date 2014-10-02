@@ -283,7 +283,7 @@ class UploadPage(Gtk.Box):
             self.conn.commit()
             self.conn.close()
 
-    def add_task(self):
+    def add_task(self, dir_name=None):
         file_dialog = Gtk.FileChooserDialog(
             _('Choose a file..'), self.app.window,
             Gtk.FileChooserAction.OPEN,
@@ -299,7 +299,7 @@ class UploadPage(Gtk.Box):
         source_paths = file_dialog.get_filenames()
         file_dialog.destroy()
         if source_paths:
-            self.add_file_tasks(source_paths)
+            self.add_file_tasks(source_paths, dir_name)
 
     # Open API
     def add_file_tasks(self, source_paths, dir_name=None):
