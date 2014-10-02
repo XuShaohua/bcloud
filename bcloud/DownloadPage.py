@@ -322,16 +322,8 @@ class DownloadPage(Gtk.Box):
         '''加入新的下载任务'''
         if pcs_file['isdir']:
             return
-        # 如果已经存在于下载列表中, 就忽略.
         fs_id = str(pcs_file['fs_id'])
         row = self.get_row_by_fsid(fs_id)
-        if row:
-            if row[STATE_COL] == State.FINISHED:
-                self.launch_app(fs_id)
-            elif row[STATE_COL] not in RUNNING_STATES:
-                row[STATE_COL] = State.WAITING
-            self.scan_tasks()
-            return
         saveDir = os.path.split(self.app.profile['save-dir'] + 
                                 pcs_file['path'])[0]
         saveName = pcs_file['server_filename']

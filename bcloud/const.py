@@ -60,4 +60,6 @@ class UploadMode:
     OVERWRITE = 1
     NEWCOPY = 2
 
+DownloadMode = UploadMode
+
 UPLOAD_ONDUP = ('', 'overwrite', 'newcopy')

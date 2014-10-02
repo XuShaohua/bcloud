@@ -41,7 +41,8 @@ DEFAULT_PROFILE = {
     'download-segments': 3, # 下载单个任务的线程数 1~5
     'retries-each': 5,      # 隔5分钟后尝试重新下载
     'download-timeout': 30, # 30 秒后下载超时
-    'upload-mode': 1,       # 上传时如果服务器端已存在同名文件时的操作方式
+    'download-mode': 0,     # 下载时如果本地已存在同名文件时的操作方式
+    'upload-mode': 0,       # 上传时如果服务器端已存在同名文件时的操作方式
 }
 RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
 

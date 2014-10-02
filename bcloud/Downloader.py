@@ -14,9 +14,10 @@ from urllib import request
 from gi.repository import GLib
 from gi.repository import GObject
 
-from bcloud.const import State
+from bcloud.const import State, DownloadMode
 from bcloud.net import ForbiddenHandler
 from bcloud import pcs
+from bcloud import util
 
 CHUNK_SIZE = 131072 # 128K
 CHUNK_SIZE2 = 32768 # 32K
@@ -112,6 +113,7 @@ class Downloader(threading.Thread, GObject.GObject):
         self.tokens = parent.app.tokens
         self.default_threads = int(parent.app.profile['download-segments'])
         self.timeout = int(parent.app.profile['download-timeout'])
+        self.download_mode = parent.app.profile['download-mode']
         self.row = row[:]
 
     def download(self):
@@ -122,11 +124,12 @@ class Downloader(threading.Thread, GObject.GObject):
                 row[SAVEDIR_COL], row[SAVENAME_COL]) 
 
         if os.path.exists(filepath):
-            print('file exists:', filepath)
-            self.emit('downloaded', row[FSID_COL])
-            # TODO: ask to confirm overwriting
-            # File exists, do nothing
-            return
+            if self.download_mode == DownloadMode.IGNORE:
+                self.emit('downloaded', row[FSID_COL])
+                return
+            elif self.download_mode == DownloadMode.NEWCOPY:
+                name, ext = os.path.splitext(filepath)
+                filepath = '{0}_{1}{2}'.format(name, util.curr_time(), ext)
 
         url = pcs.get_download_link(self.cookie, self.tokens, row[PATH_COL])
         if not url:
