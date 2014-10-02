@@ -148,6 +148,17 @@ class PreferencesDialog(Gtk.Dialog):
         download_timeout_second.props.xalign = 0
         network_grid.attach(download_timeout_second, 2, 4, 1, 1)
 
+        upload_mode_label = Gtk.Label.new(_('File exists while uploading:'))
+        upload_mode_label.props.xalign = 1
+        network_grid.attach(upload_mode_label, 0, 5, 1, 1)
+        upload_mode_combo = Gtk.ComboBoxText()
+        upload_mode_combo.append_text(_('Do Nothing'))
+        upload_mode_combo.append_text(_('Overwrite'))
+        upload_mode_combo.append_text(_('Rename Automatically'))
+        upload_mode_combo.set_active(self.app.profile['upload-mode'])
+        upload_mode_combo.connect('changed', self.on_upload_mode_changed)
+        network_grid.attach(upload_mode_combo, 1, 5, 2, 1)
+
         box.show_all()
 
     def on_dir_update(self, file_button):
@@ -181,3 +192,6 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_download_timeout_value_changed(self, download_timeout_spin):
         self.app.profile['download-timeout'] = download_timeout_spin.get_value()
+
+    def on_upload_mode_changed(self, combo):
+        self.app.profile['upload-mode'] = combo.get_active()

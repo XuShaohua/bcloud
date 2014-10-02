@@ -53,3 +53,11 @@ class State:
     FINISHED = 3
     CANCELED = 4
     ERROR = 5
+
+class UploadMode:
+    '''上传时, 如果服务器端已存在同名文件时的操作方式'''
+    IGNORE = 0
+    OVERWRITE = 1
+    NEWCOPY = 2
+
+UPLOAD_ONDUP = ('', 'overwrite', 'newcopy')

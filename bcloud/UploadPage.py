@@ -336,8 +336,6 @@ class UploadPage(Gtk.Box):
     def add_file_task(self, source_path, dir_name):
         '''创建新的上传任务'''
         row = self.get_task_db(source_path)
-        if row:
-            return
         source_dir, filename = os.path.split(source_path)
         
         path = os.path.join(dir_name, filename)

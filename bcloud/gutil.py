@@ -41,6 +41,7 @@ DEFAULT_PROFILE = {
     'download-segments': 3, # 下载单个任务的线程数 1~5
     'retries-each': 5,      # 隔5分钟后尝试重新下载
     'download-timeout': 30, # 30 秒后下载超时
+    'upload-mode': 1,       # 上传时如果服务器端已存在同名文件时的操作方式
 }
 RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
 
@@ -100,7 +101,7 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
         # Now, check its mime type
         file_ = Gio.File.new_for_path(filepath)
         file_info = file_.query_info(Gio.FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
-                                     Gio.FileQueryInfoFlags.NONE)
+                                     Gio.FileQueryInfoFlags.NONE, None)
         content_type = file_info.get_content_type()
         if 'image' in content_type:
             _update_image()

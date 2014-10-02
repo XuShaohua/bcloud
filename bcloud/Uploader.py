@@ -9,22 +9,15 @@ import threading
 
 from gi.repository import GLib
 from gi.repository import GObject
+from gi.repository import Gtk
 
+from bcloud.const import State, UploadMode
 from bcloud import pcs
 
 (FID_COL, NAME_COL, SOURCEPATH_COL, PATH_COL, SIZE_COL,
     CURRSIZE_COL, STATE_COL, STATENAME_COL, HUMANSIZE_COL,
     PERCENT_COL, TOOLTIP_COL, THRESHOLD_COL) = list(range(12))
 
-
-class State:
-    '''下载状态常量'''
-    UPLOADING = 0
-    WAITING = 1
-    PAUSED = 2
-    FINISHED = 3
-    CANCELED = 4
-    ERROR = 5
 
 SLICE_THRESHOLD = 2 ** 18  # 256k, 小于这个值, 不允许使用分片上传
 
@@ -62,11 +55,14 @@ class Uploader(threading.Thread, GObject.GObject):
         self.parent = parent
         self.cookie = cookie
         self.tokens = tokens
+        self.upload_mode = self.parent.app.profile['upload-mode']
 
         self.row = row[:]
 
     def run(self):
-        #self.check_exists()
+        if self.check_exists and self.upload_mode == UploadMode.IGNORE:
+            self.emit('uploaded', self.row[FID_COL])
+            return
         # 如果文件大小小于4M, 就直接上传, 不支持断点续传(没必要).
         # 否则先尝试快速上传模式, 如果没有中的话, 就再进行分片上传.
         # 分片上传, 是最费事的, 也最占带宽.
@@ -74,7 +70,7 @@ class Uploader(threading.Thread, GObject.GObject):
         if self.row[SIZE_COL] > SLICE_THRESHOLD:
             self.rapid_upload()
         else:
-            self.slice_upload()
+            self.upload()
 
     # Open API
     def pause(self):
@@ -85,16 +81,29 @@ class Uploader(threading.Thread, GObject.GObject):
         self.row[STATE_COL] = State.CANCELED
 
     def check_exists(self):
-        meta = pcs.get_metas(self.row[PATH_COL])
+        meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
+        return meta and meta.get('errno', 12) == 0
+
+    def upload(self):
+        '''一般上传模式.
+
+        使用这种方式上传, 不可以中断上传过程, 但因为只用它来上传小的文件, 所以
+        最终的影响不会很大.'''
+        info = pcs.upload(self.cookie, self.row[SOURCEPATH_COL],
+                          self.row[PATH_COL], self.upload_mode)
+        if info:
+            self.emit('uploaded', self.row[FID_COL])
+        else:
+            self.emit('network-error', self.row[FID_COL])
 
     def rapid_upload(self):
         '''快速上传.
 
         如果失败, 就自动调用分片上传.
         '''
-        info = pcs.rapid_upload(
-            self.cookie, self.tokens,
-            self.row[SOURCEPATH_COL], self.row[PATH_COL])
+        info = pcs.rapid_upload(self.cookie, self.tokens,
+                                self.row[SOURCEPATH_COL], self.row[PATH_COL],
+                                self.upload_mode)
         if info and info['md5'] and info['fs_id']:
             self.emit('uploaded', self.row[FID_COL])
         else:

@@ -562,14 +562,17 @@ def upload_option(cookie, path):
     else:
         return None
 
-def upload(cookie, source_path, path, ondup='overwrite'):
+def upload(cookie, source_path, path, upload_mode):
     '''上传一个文件.
 
     这个是使用的网页中的上传接口.
+    upload_mode - 只能是1或者2.
     ondup - 如果文件已在服务器上存在, 该如何操作. 有两个选项:
             overwrite, 直接将其重写.
             newcopy, 保留原先的文件, 并在新上传的文件名尾部加上当前时间戳.
     '''
+    ondup = const.UPLOAD_ONDUP[upload_mode]
+    assert(ondup != '')
     dir_name, file_name = os.path.split(path)
     url = ''.join([
         const.PCS_URL_C,
@@ -590,8 +593,10 @@ def upload(cookie, source_path, path, ondup='overwrite'):
     else:
         return None
 
-def rapid_upload(cookie, tokens, source_path, path):
+def rapid_upload(cookie, tokens, source_path, path, upload_mode):
     '''快速上传'''
+    ondup = const.UPLOAD_ONDUP[upload_mode]
+    assert(ondup != '')
     content_length = os.path.getsize(source_path)
     assert content_length > RAPIDUPLOAD_THRESHOLD, 'file size is not satisfied!'
     dir_name, file_name = os.path.split(path)
