@@ -60,7 +60,7 @@ class Uploader(threading.Thread, GObject.GObject):
         self.row = row[:]
 
     def run(self):
-        if self.check_exists and self.upload_mode == UploadMode.IGNORE:
+        if self.check_exists() and self.upload_mode == UploadMode.IGNORE:
             self.emit('uploaded', self.row[FID_COL])
             return
         # 如果文件大小小于4M, 就直接上传, 不支持断点续传(没必要).

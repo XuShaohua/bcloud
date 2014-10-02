@@ -572,7 +572,8 @@ def upload(cookie, source_path, path, upload_mode):
             newcopy, 保留原先的文件, 并在新上传的文件名尾部加上当前时间戳.
     '''
     ondup = const.UPLOAD_ONDUP[upload_mode]
-    assert(ondup != '')
+    if not ondup:
+        ondup = 'newcopy'
     dir_name, file_name = os.path.split(path)
     url = ''.join([
         const.PCS_URL_C,
@@ -596,7 +597,8 @@ def upload(cookie, source_path, path, upload_mode):
 def rapid_upload(cookie, tokens, source_path, path, upload_mode):
     '''快速上传'''
     ondup = const.UPLOAD_ONDUP[upload_mode]
-    assert(ondup != '')
+    if not ondup:
+        ondup = 'newcopy'
     content_length = os.path.getsize(source_path)
     assert content_length > RAPIDUPLOAD_THRESHOLD, 'file size is not satisfied!'
     dir_name, file_name = os.path.split(path)
