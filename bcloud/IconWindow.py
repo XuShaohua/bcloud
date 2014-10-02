@@ -148,6 +148,12 @@ class IconWindow(Gtk.ScrolledWindow):
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
+        upload_item = Gtk.MenuItem.new_with_label(_('Upload To This Folder'))
+        upload_item.connect('activate', self.on_upload_activated)
+        menu.append(upload_item)
+
+        sep_item = Gtk.SeparatorMenuItem()
+        menu.append(sep_item)
         reload_item = Gtk.MenuItem.new_with_label(_('Reload'))
         reload_item.connect('activate', self.on_reload_activated)
         menu.append(reload_item)
@@ -186,6 +192,11 @@ class IconWindow(Gtk.ScrolledWindow):
                 open_dir_item.connect(
                         'activate', self.on_open_dir_item_activated)
                 menu.append(open_dir_item)
+
+                upload_dir_item = Gtk.MenuItem.new_with_label(_('Upload To…'))
+                upload_dir_item.connect(
+                        'activate', self.on_upload_dir_item_activated)
+                menu.append(upload_dir_item)
             # 不是目录的话, 就显示出程序菜单
             else:
                 if file_type == TYPE_TORRENT:
@@ -283,6 +294,9 @@ class IconWindow(Gtk.ScrolledWindow):
         dialog.run()
         dialog.destroy()
 
+    def on_upload_activated(self, menu_item):
+        self.app.upload_page.add_task(self.parent.path)
+
     def on_reload_activated(self, menu_item):
         self.parent.reload()
 
@@ -371,6 +385,11 @@ class IconWindow(Gtk.ScrolledWindow):
         tree_paths = self.iconview.get_selected_items()
         if tree_paths and len(tree_paths) == 1:
             self.parent.load(self.liststore[tree_paths[0]][PATH_COL])
+
+    def on_upload_dir_item_activated(self, menu_item):
+        tree_paths = self.iconview.get_selected_items()
+        if tree_paths and len(tree_paths) == 1:
+            self.app.upload_page.add_task(self.liststore[tree_paths[0]][PATH_COL])
 
     def on_cloud_download_item_activated(self, menu_item):
         '''创建离线下载任务, 下载选中的BT种子.'''
