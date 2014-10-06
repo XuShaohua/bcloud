@@ -133,7 +133,6 @@ class Downloader(threading.Thread, GObject.GObject):
 
         url = pcs.get_download_link(self.cookie, self.tokens, row[PATH_COL])
         if not url:
-            print('Error: Failed to get download link')
             row[STATE_COL] = State.ERROR
             self.emit('network-error', row[FSID_COL])
             return
@@ -145,7 +144,7 @@ class Downloader(threading.Thread, GObject.GObject):
             file_exists = True
             fh = open(tmp_filepath, 'ab')
         else:
-            req = request.urlopen(url)
+            req = net.urlopen(url)
             if not req:
                 self.emit('network-error', row[FSID_COL])
                 return

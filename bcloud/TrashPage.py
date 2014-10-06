@@ -176,6 +176,7 @@ class TrashPage(Gtk.Box):
         gutil.async_call(pcs.restore_trash, self.app.cookie, self.app.tokens,
                          fidlist, callback=self.reload)
         self.app.blink_page(self.app.home_page)
+        self.app.home_page.reload()
 
     def on_delete_button_clicked(self, button):
         selection = self.treeview.get_selection()
