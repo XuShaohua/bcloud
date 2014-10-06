@@ -15,7 +15,7 @@ from gi.repository import GLib
 from gi.repository import GObject
 
 from bcloud.const import State, DownloadMode
-from bcloud.net import ForbiddenHandler
+from bcloud import net
 from bcloud import pcs
 from bcloud import util
 
@@ -144,7 +144,7 @@ class Downloader(threading.Thread, GObject.GObject):
             file_exists = True
             fh = open(tmp_filepath, 'ab')
         else:
-            req = net.urlopen(url)
+            req = net.urlopen_simple(url)
             if not req:
                 self.emit('network-error', row[FSID_COL])
                 return
