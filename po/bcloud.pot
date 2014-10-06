@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-04 10:11+0800\n"
+"POT-Creation-Date: 2014-10-06 21:20+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,94 +17,94 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../bcloud/App.py:86 ../bcloud/PreferencesDialog.py:18
+#: ../bcloud/App.py:84 ../bcloud/PreferencesDialog.py:17
 msgid "Preferences"
 msgstr ""
 
-#: ../bcloud/App.py:87
+#: ../bcloud/App.py:85
 msgid "Sign out"
 msgstr ""
 
-#: ../bcloud/App.py:88
+#: ../bcloud/App.py:86
 msgid "About"
 msgstr ""
 
-#: ../bcloud/App.py:89 ../bcloud/App.py:379
+#: ../bcloud/App.py:87 ../bcloud/App.py:375
 msgid "Quit"
 msgstr ""
 
-#: ../bcloud/App.py:139
+#: ../bcloud/App.py:137
 msgid "Unknown"
 msgstr ""
 
-#: ../bcloud/App.py:357
+#: ../bcloud/App.py:353
 msgid "Show App"
 msgstr ""
 
-#: ../bcloud/App.py:365
+#: ../bcloud/App.py:361
 msgid "Pause Uploading Tasks"
 msgstr ""
 
-#: ../bcloud/App.py:371
+#: ../bcloud/App.py:367
 msgid "Pause Downloading Tasks"
 msgstr ""
 
-#: ../bcloud/App.py:419
+#: ../bcloud/App.py:415
 #, python-brace-format
 msgid "{0} copied to clipboard"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:44
+#: ../bcloud/BTBrowserDialog.py:43
 msgid "Select All"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:65 ../bcloud/CloudPage.py:90
-#: ../bcloud/DownloadPage.py:126 ../bcloud/IconWindow.py:543
+#: ../bcloud/BTBrowserDialog.py:63 ../bcloud/CloudPage.py:89
+#: ../bcloud/DownloadPage.py:127 ../bcloud/IconWindow.py:550
 #: ../bcloud/TrashPage.py:87 ../bcloud/UploadPage.py:116
 msgid "Name"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:70 ../bcloud/CloudPage.py:98
-#: ../bcloud/DownloadPage.py:141 ../bcloud/IconWindow.py:560
-#: ../bcloud/PropertiesDialog.py:56 ../bcloud/TrashPage.py:103
-#: ../bcloud/UploadPage.py:131
+#: ../bcloud/BTBrowserDialog.py:67 ../bcloud/CloudPage.py:96
+#: ../bcloud/DownloadPage.py:141 ../bcloud/IconWindow.py:566
+#: ../bcloud/PropertiesDialog.py:55 ../bcloud/TrashPage.py:102
+#: ../bcloud/UploadPage.py:130
 msgid "Size"
 msgstr ""
 
-#: ../bcloud/BTBrowserDialog.py:91
+#: ../bcloud/BTBrowserDialog.py:88
 msgid "Unknown error occured"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:50 ../bcloud/CategoryPage.py:57
-#: ../bcloud/HomePage.py:112 ../bcloud/HomePage.py:120
+#: ../bcloud/CategoryPage.py:50 ../bcloud/CategoryPage.py:56
+#: ../bcloud/HomePage.py:113 ../bcloud/HomePage.py:120
 msgid "ListView"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:125 ../bcloud/CategoryPage.py:126
+#: ../bcloud/CategoryPage.py:121 ../bcloud/CategoryPage.py:122
 msgid "Videos"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:133 ../bcloud/CategoryPage.py:134
+#: ../bcloud/CategoryPage.py:129 ../bcloud/CategoryPage.py:130
 msgid "Music"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:141 ../bcloud/CategoryPage.py:142
+#: ../bcloud/CategoryPage.py:137 ../bcloud/CategoryPage.py:138
 msgid "Pictures"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:149 ../bcloud/CategoryPage.py:150
+#: ../bcloud/CategoryPage.py:145 ../bcloud/CategoryPage.py:146
 msgid "Documents"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:157 ../bcloud/CategoryPage.py:158
+#: ../bcloud/CategoryPage.py:153 ../bcloud/CategoryPage.py:154
 msgid "Others"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:165
+#: ../bcloud/CategoryPage.py:161
 msgid "BT"
 msgstr ""
 
-#: ../bcloud/CategoryPage.py:166
+#: ../bcloud/CategoryPage.py:162
 msgid "BT seeds"
 msgstr ""
 
@@ -121,7 +121,7 @@ msgstr ""
 msgid "Cloud"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:34 ../bcloud/IconWindow.py:193
+#: ../bcloud/CloudPage.py:34 ../bcloud/IconWindow.py:205
 msgid "Cloud Download"
 msgstr ""
 
@@ -129,8 +129,8 @@ msgstr ""
 msgid "New Link Task"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:48 ../bcloud/FolderBrowserDialog.py:42
-#: ../bcloud/IconWindow.py:151 ../bcloud/TrashPage.py:46
+#: ../bcloud/CloudPage.py:48 ../bcloud/FolderBrowserDialog.py:41
+#: ../bcloud/IconWindow.py:158 ../bcloud/TrashPage.py:47
 msgid "Reload"
 msgstr ""
 
@@ -156,42 +156,42 @@ msgstr ""
 msgid "Remove selected tasks"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:105 ../bcloud/DownloadPage.py:134
-#: ../bcloud/UploadPage.py:124
+#: ../bcloud/CloudPage.py:102 ../bcloud/DownloadPage.py:134
+#: ../bcloud/UploadPage.py:123
 msgid "Progress"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:219 ../bcloud/CloudPage.py:271
+#: ../bcloud/CloudPage.py:215 ../bcloud/CloudPage.py:265
 #, python-brace-format
 msgid "Error: {0}"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:225 ../bcloud/CloudPage.py:323
+#: ../bcloud/CloudPage.py:220 ../bcloud/CloudPage.py:315
 #: ../bcloud/FolderBrowserDialog.py:22
 msgid "Save to.."
 msgstr ""
 
-#: ../bcloud/CloudPage.py:235
+#: ../bcloud/CloudPage.py:229
 msgid "Choose.."
 msgstr ""
 
-#: ../bcloud/CloudPage.py:254
+#: ../bcloud/CloudPage.py:248
 msgid "Failed to parse download link"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:278
+#: ../bcloud/CloudPage.py:271
 msgid "Add new link tasks"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:290
+#: ../bcloud/CloudPage.py:283
 msgid "Paste links here, line by line"
 msgstr ""
 
-#: ../bcloud/CloudPage.py:298
+#: ../bcloud/CloudPage.py:291
 msgid "Support http/https/ftp/thunder/qqdl/flashget/eMule/Magnet format"
 msgstr ""
 
-#: ../bcloud/Config.py:36
+#: ../bcloud/Config.py:37
 msgid "Baidu Pan client for GNU/Linux desktop users."
 msgstr ""
 
@@ -227,7 +227,7 @@ msgstr ""
 msgid "Pause"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:148 ../bcloud/UploadPage.py:138
+#: ../bcloud/DownloadPage.py:147 ../bcloud/UploadPage.py:136
 msgid "State"
 msgstr ""
 
@@ -240,38 +240,38 @@ msgstr ""
 msgid "Please download {0} again"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:340 ../bcloud/UploadPage.py:350
+#: ../bcloud/DownloadPage.py:331 ../bcloud/UploadPage.py:344
 #, python-brace-format
 msgid ""
 "From {0}\n"
 "To {1}"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:393
+#: ../bcloud/DownloadPage.py:385
 #, python-brace-format
 msgid "{0} kb/s"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:421
+#: ../bcloud/DownloadPage.py:413
 #, python-brace-format
 msgid "{0} downloaded"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:445
+#: ../bcloud/DownloadPage.py:436
 #, python-brace-format
 msgid "Error occurs will downloading {0}"
 msgstr ""
 
-#: ../bcloud/DownloadPage.py:451
+#: ../bcloud/DownloadPage.py:441
 #, python-brace-format
 msgid "Disk Error: failed to read/write {0}"
 msgstr ""
 
-#: ../bcloud/FolderBrowserDialog.py:38
+#: ../bcloud/FolderBrowserDialog.py:37
 msgid "Create Folder"
 msgstr ""
 
-#: ../bcloud/FolderBrowserDialog.py:56
+#: ../bcloud/FolderBrowserDialog.py:55
 msgid "Folder"
 msgstr ""
 
@@ -283,220 +283,264 @@ msgstr ""
 msgid "Show all of your files on Cloud"
 msgstr ""
 
-#: ../bcloud/HomePage.py:101
+#: ../bcloud/HomePage.py:102
 msgid "Search"
 msgstr ""
 
-#: ../bcloud/HomePage.py:104
+#: ../bcloud/HomePage.py:105
 msgid "Search documents and folders by name"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:145 ../bcloud/NewFolderDialog.py:19
-#: ../bcloud/NewFolderDialog.py:32
+#: ../bcloud/IconWindow.py:146 ../bcloud/NewFolderDialog.py:18
+#: ../bcloud/NewFolderDialog.py:31
 msgid "New Folder"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:157 ../bcloud/IconWindow.py:273
+#: ../bcloud/IconWindow.py:152
+msgid "Upload To This Folder"
+msgstr ""
+
+#: ../bcloud/IconWindow.py:164 ../bcloud/IconWindow.py:281
 msgid "Properties"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:185
+#: ../bcloud/IconWindow.py:192
 msgid "Open"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:203 ../bcloud/IconWindow.py:227
+#: ../bcloud/IconWindow.py:197
+msgid "Upload To.."
+msgstr ""
+
+#: ../bcloud/IconWindow.py:214 ../bcloud/IconWindow.py:236
 #, python-brace-format
 msgid "Open With {0}"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:208
+#: ../bcloud/IconWindow.py:217
 msgid "Open With"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:220
+#: ../bcloud/IconWindow.py:229
 msgid "Other Application..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:231
+#: ../bcloud/IconWindow.py:240
 msgid "Open With Other Application..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:238
+#: ../bcloud/IconWindow.py:247
 msgid "Copy Link"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:246
+#: ../bcloud/IconWindow.py:254
 msgid "Download..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:249
+#: ../bcloud/IconWindow.py:257
 msgid "Share..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:255 ../bcloud/IconWindow.py:429
+#: ../bcloud/IconWindow.py:263 ../bcloud/IconWindow.py:441
 msgid "Move To..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:258 ../bcloud/IconWindow.py:455
+#: ../bcloud/IconWindow.py:266 ../bcloud/IconWindow.py:465
 msgid "Copy To..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:261
+#: ../bcloud/IconWindow.py:269
 msgid "Rename..."
 msgstr ""
 
-#: ../bcloud/IconWindow.py:267
+#: ../bcloud/IconWindow.py:275
 msgid "Move to Trash"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:409
+#: ../bcloud/IconWindow.py:422
 msgid "Failed to share selected files"
 msgstr ""
 
-#: ../bcloud/IconWindow.py:568
+#: ../bcloud/IconWindow.py:573
 msgid "Modified"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:36
+#: ../bcloud/PreferencesDialog.py:35
 msgid "General"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:38
+#: ../bcloud/PreferencesDialog.py:37
 msgid "Save To:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:47
+#: ../bcloud/PreferencesDialog.py:46
 msgid "Upload hidden files:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:53
+#: ../bcloud/PreferencesDialog.py:52
 msgid "Also upload hidden files and folders"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:60
+#: ../bcloud/PreferencesDialog.py:58
 msgid "Use notification:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:70
+#: ../bcloud/PreferencesDialog.py:67
 msgid "Use dark theme:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:80
+#: ../bcloud/PreferencesDialog.py:77
 msgid "Minimize to system tray:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:90
-msgid "Use streaming mode:"
-msgstr ""
-
-#: ../bcloud/PreferencesDialog.py:98
-msgid ""
-"When opening a video file, try to download a m3u8 playlist, instread of "
-"getting its file source link"
-msgstr ""
-
-#: ../bcloud/PreferencesDialog.py:107
+#: ../bcloud/PreferencesDialog.py:92
 msgid "Network"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:109
+#: ../bcloud/PreferencesDialog.py:94
+msgid "Use streaming mode:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:102
+msgid ""
+"Open the compressed version of videos, useful for those whose network "
+"connection is slow."
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:105
 msgid "Concurrent downloads:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:118
-msgid "Retries each:"
+#: ../bcloud/PreferencesDialog.py:114
+msgid "Per task:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:124
-msgid "0: disable retries"
+#: ../bcloud/PreferencesDialog.py:122
+msgid "connections"
 msgstr ""
 
 #: ../bcloud/PreferencesDialog.py:126
+msgid "Retries each:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:132
+msgid "0: disable retries"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:134
 msgid "minutes"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:130
+#: ../bcloud/PreferencesDialog.py:138
 msgid "Download timeout:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:139
+#: ../bcloud/PreferencesDialog.py:147
 msgid "seconds"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:27 ../bcloud/PropertiesDialog.py:99
+#: ../bcloud/PreferencesDialog.py:151
+msgid "File exists while downloading:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:155 ../bcloud/PreferencesDialog.py:168
+msgid "Do Nothing"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:156 ../bcloud/PreferencesDialog.py:169
+msgid "Overwrite"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:157 ../bcloud/PreferencesDialog.py:170
+msgid "Rename Automatically"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:161
+msgid "What to do when downloading a file which already exists on local disk"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:164
+msgid "File exists while uploading:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:173
+msgid "What to do when uploading a file which already exists on server"
+msgstr ""
+
+#: ../bcloud/PropertiesDialog.py:26 ../bcloud/PropertiesDialog.py:95
 msgid " Properties"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:43 ../bcloud/PropertiesDialog.py:112
+#: ../bcloud/PropertiesDialog.py:42 ../bcloud/PropertiesDialog.py:108
 msgid "Name:"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:48 ../bcloud/PropertiesDialog.py:117
+#: ../bcloud/PropertiesDialog.py:47 ../bcloud/PropertiesDialog.py:113
 msgid "Location:"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:61 ../bcloud/PropertiesDialog.py:63
+#: ../bcloud/PropertiesDialog.py:60 ../bcloud/PropertiesDialog.py:62
 msgid " bytes"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:76
+#: ../bcloud/PropertiesDialog.py:75
 msgid "Created:"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:82
+#: ../bcloud/PropertiesDialog.py:80
 msgid "Modified:"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:129
+#: ../bcloud/PropertiesDialog.py:125
 #, python-brace-format
 msgid "{0} folders, {1} files"
 msgstr ""
 
-#: ../bcloud/PropertiesDialog.py:130
+#: ../bcloud/PropertiesDialog.py:126
 msgid "Contents:"
 msgstr ""
 
-#: ../bcloud/RenameDialog.py:19
+#: ../bcloud/RenameDialog.py:18
 msgid "Rename files"
 msgstr ""
 
-#: ../bcloud/RenameDialog.py:39
+#: ../bcloud/RenameDialog.py:38
 msgid "Old Name:"
 msgstr ""
 
-#: ../bcloud/RenameDialog.py:40
+#: ../bcloud/RenameDialog.py:39
 msgid "New Name:"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:25 ../bcloud/VCodeDialog.py:20
+#: ../bcloud/SigninDialog.py:25 ../bcloud/VCodeDialog.py:19
 msgid "Verification.."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:79
+#: ../bcloud/SigninDialog.py:76
 msgid "Sign in now"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:98
+#: ../bcloud/SigninDialog.py:95
 msgid "Username/Email/Phone..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:103
+#: ../bcloud/SigninDialog.py:100
 msgid "Password .."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:109
+#: ../bcloud/SigninDialog.py:106
 msgid "Remember Password"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:116
+#: ../bcloud/SigninDialog.py:113
 msgid "Signin Automatically"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:122 ../bcloud/SigninDialog.py:188
+#: ../bcloud/SigninDialog.py:119 ../bcloud/SigninDialog.py:188
 msgid "Sign in"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:132
+#: ../bcloud/SigninDialog.py:129
 msgid "Failed to sign in, please try again."
 msgstr ""
 
@@ -504,79 +548,79 @@ msgstr ""
 msgid "In process..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:223
+#: ../bcloud/SigninDialog.py:222
 msgid "Error: Failed to get bdstokens!"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:234
+#: ../bcloud/SigninDialog.py:232
 msgid "Failed to signin, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:237
+#: ../bcloud/SigninDialog.py:235
 msgid "Get bdstoken..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:245 ../bcloud/SigninDialog.py:250
+#: ../bcloud/SigninDialog.py:243 ../bcloud/SigninDialog.py:248
 msgid "Failed to get WAP page, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:264
+#: ../bcloud/SigninDialog.py:262
 msgid "Signin..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:272
+#: ../bcloud/SigninDialog.py:269
 msgid "Failed to get tokens, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:276
+#: ../bcloud/SigninDialog.py:273
 msgid "Get WAP page..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:284
+#: ../bcloud/SigninDialog.py:281
 msgid "Failed to get BAIDUID cookie, please try agin."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:287
+#: ../bcloud/SigninDialog.py:284
 msgid "Get TOKEN..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:304
+#: ../bcloud/SigninDialog.py:300
 msgid "Get BAIDUID..."
 msgstr ""
 
-#: ../bcloud/TrashPage.py:27
+#: ../bcloud/TrashPage.py:28
 msgid "Trash"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:28
+#: ../bcloud/TrashPage.py:29
 msgid "Files deleted."
 msgstr ""
 
-#: ../bcloud/TrashPage.py:42
+#: ../bcloud/TrashPage.py:43
 msgid "Restore"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:50
+#: ../bcloud/TrashPage.py:51
 msgid "Clear Trash"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:51
+#: ../bcloud/TrashPage.py:52
 msgid "Will delete all files in trash"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:55
+#: ../bcloud/TrashPage.py:56
 msgid "Delete"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:56
+#: ../bcloud/TrashPage.py:57
 msgid "Delete selected files permanently"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:109
+#: ../bcloud/TrashPage.py:107
 msgid "Time"
 msgstr ""
 
-#: ../bcloud/TrashPage.py:115
+#: ../bcloud/TrashPage.py:112
 msgid "Remaining"
 msgstr ""
 
@@ -600,16 +644,16 @@ msgstr ""
 msgid "Upload files and folders"
 msgstr ""
 
-#: ../bcloud/UploadPage.py:288
+#: ../bcloud/UploadPage.py:286
 msgid "Choose a file.."
 msgstr ""
 
-#: ../bcloud/UploadPage.py:359
+#: ../bcloud/UploadPage.py:352
 #, python-brace-format
 msgid "{0} is too large to upload (>10G)."
 msgstr ""
 
-#: ../bcloud/UploadPage.py:494
+#: ../bcloud/UploadPage.py:487
 #, python-brace-format
 msgid "{0} uploaded"
 msgstr ""

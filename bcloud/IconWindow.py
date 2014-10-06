@@ -194,7 +194,7 @@ class IconWindow(Gtk.ScrolledWindow):
                                       self.on_open_dir_item_activated)
                 menu.append(open_dir_item)
 
-                upload_dir_item = Gtk.MenuItem.new_with_label(_('Upload To…'))
+                upload_dir_item = Gtk.MenuItem.new_with_label(_('Upload To..'))
                 upload_dir_item.connect('activate',
                                         self.on_upload_dir_item_activated)
                 menu.append(upload_dir_item)
