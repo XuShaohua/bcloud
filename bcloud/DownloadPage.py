@@ -367,10 +367,10 @@ class DownloadPage(Gtk.Box):
             self.downloading_size = 0
             self.downloading_timestamp = time.time()
 
-        def on_worker_received(worker, fs_id, current_size):
-            GLib.idle_add(do_worker_received, fs_id, current_size)
+        def on_worker_received(worker, fs_id, received, received_total):
+            GLib.idle_add(do_worker_received, fs_id, received, received_total)
 
-        def do_worker_received(fs_id, current_size):
+        def do_worker_received(fs_id, received, received_total):
             row = None
             if fs_id in self.workers:
                 row = self.workers[fs_id][1]
@@ -378,13 +378,12 @@ class DownloadPage(Gtk.Box):
                 row = self.get_row_by_fsid(fs_id)
             if not row:
                 return
-            # update downloading speed
-            self.downloading_size += current_size - row[CURRSIZE_COL]
+            self.downloading_size += received
             speed = (self.downloading_size /
                         (time.time() - self.downloading_timestamp) / 1000)
             self.speed_label.set_text(_('{0} kb/s').format(int(speed)))
 
-            row[CURRSIZE_COL] = current_size
+            row[CURRSIZE_COL] = received_total
             curr_size = util.get_human_size(row[CURRSIZE_COL], False)[0]
             total_size = util.get_human_size(row[SIZE_COL])[0]
             row[PERCENT_COL] = int(row[CURRSIZE_COL] / row[SIZE_COL] * 100)
