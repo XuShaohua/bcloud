@@ -1,4 +1,4 @@
-ABOUT
+关于
 =====
 bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 
@@ -33,7 +33,7 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 
 如果不想安装安装, 请至少把blcoud/share目录合并到~/.local/share, 不然图标会显示不全.
 
-DEPENDENCIES
+依赖的软件包
 ===========
 
 * python3-gi  Gtk3 的python3 绑定. 这个包需要手动安装gir1.2-gtk-3.0, 但它并

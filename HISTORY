@@ -1,3 +1,7 @@
+v3.5.3 - 2014.10.7
+* Fixed: modify file handler mode from `ab` to `rb+`. That's a serious problem!
+* Fixed: average download speed is incorrect; see https://github.com/LiuLang/bcloud/issues/15
+
 v3.5.2 - 2014.10.6
 * Feature: add download-mode option
 * Feature: add upload-mode option
