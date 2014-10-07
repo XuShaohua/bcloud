@@ -70,7 +70,7 @@ class DownloadBatch(threading.Thread):
         offset = self.start_size
         while not self.stop_flag:
             try:
-                block = req.read(CHUNK_SIZE2)
+                block = req.read(CHUNK_SIZE)
             except OSError:
                 self.queue.put((self.id_, BATCH_ERROR))
                 return
@@ -98,7 +98,7 @@ class Downloader(threading.Thread, GObject.GObject):
     __gsignals__ = {
         'started': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
         'received': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
-                     (str, GObject.TYPE_INT64)),
+                     (str, GObject.TYPE_INT64, GObject.TYPE_INT64)),
         'downloaded': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
         'disk-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, str)),
         'network-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
@@ -142,7 +142,8 @@ class Downloader(threading.Thread, GObject.GObject):
                 status = json.load(conf_fh)
             threads = len(status)
             file_exists = True
-            fh = open(tmp_filepath, 'ab')
+            fh = open(tmp_filepath, 'rb+')
+            fh.seek(0)
         else:
             req = net.urlopen_simple(url)
             if not req:
@@ -211,19 +212,17 @@ class Downloader(threading.Thread, GObject.GObject):
                         fh.write(json.dumps(status))
                     conf_count = 0
                 received_total = sum(t[2] for t in status)
-                self.emit('received', row[FSID_COL], received_total)
+                self.emit('received', row[FSID_COL], received, received_total)
         except Exception as e:
             print(e)
-            for task in tasks:
-                task.stop()
             row[STATE_COL] = State.ERROR
-        fh.close()
+        with lock:
+            fh.close()
+        for task in tasks:
+            if task.isAlive():
+                task.stop()
         with open(conf_filepath, 'w') as fh:
             fh.write(json.dumps(status))
-
-        for task in tasks:
-            if not task.isAlive():
-                task.stop()
 
         if row[STATE_COL] == State.CANCELED:
             os.remove(tmp_filepah)
