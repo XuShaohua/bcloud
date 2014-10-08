@@ -16,6 +16,7 @@ from bcloud.BTBrowserDialog import BTBrowserDialog
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.VCodeDialog import VCodeDialog
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
 
@@ -116,8 +117,10 @@ class CloudPage(Gtk.Box):
             self.loading_spin.stop()
             self.loading_spin.hide()
             if error or not info:
+                logger.error('info: %s, error: %s' % (info, error))
                 return
             if 'error_code' in info and info['error_code'] != 0:
+                logger.error('info: %s' % info)
                 return
             tasks = info['task_info']
             for task in tasks:
@@ -154,7 +157,7 @@ class CloudPage(Gtk.Box):
     def get_row_by_task_id(self, task_id):
         '''返回这个任务的TreeModelRow, 如果不存在, 就返回None.'''
         for row in self.liststore:
-            if row[TASKID_COL] == task_id:
+            if row and row[TASKID_COL] == task_id:
                 return row
         return None
 
@@ -162,10 +165,11 @@ class CloudPage(Gtk.Box):
         '''定期获取离线下载任务的信息, 比如10秒钟'''
         def update_task_status(info, error=None):
             if error or not info:
+                logger.error('info: %s, error: %s' % (info, error))
                 return
             tasks = info['task_info']
             for row in self.liststore:
-                if row[TASKID_COL] not in tasks:
+                if not row or row[TASKID_COL] not in tasks:
                     continue
                 task = tasks[row[TASKID_COL]]
                 row[SIZE_COL] = int(task['file_size'])
@@ -197,7 +201,11 @@ class CloudPage(Gtk.Box):
         '''
         def check_vcode(info, error=None):
             if error or not info:
+                logger.error('info: %s, error: %s' % (info, error))
                 return
+            if info.get('error_code', -1) != 0:
+                logger.error('info: %s' % info)
+
             if 'task_id' in info or info['error_code'] == 0:
                 self.reload()
             elif info['error_code'] == -19:
@@ -244,9 +252,12 @@ class CloudPage(Gtk.Box):
         def do_add_link_task(source_url):
             def on_link_task_added(info, error=None):
                 if error or not info:
-                    print('Error: on_link_task_added:', error, info)
+                    logger.error('info: %s, error: %s' % (info, error))
                     self.app.toast(_('Failed to parse download link'))
                     return
+                if info.get('error_code', -1) != 0:
+                    logger.error('info: %s' % info)
+
                 if 'task_id' in info or info['error_code'] == 0:
                     self.reload()
                 elif info['error_code'] == -19:
@@ -335,6 +346,7 @@ class CloudPage(Gtk.Box):
 
     def on_open_button_clicked(self, button):
         model, tree_paths = self.selection.get_selected_rows()
+        # tree_paths might be None or a list
         if not tree_paths or len(tree_paths) != 1:
             return
         tree_path = tree_paths[0]

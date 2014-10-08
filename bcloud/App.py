@@ -262,10 +262,8 @@ class App:
     def init_notebook(self):
         def append_page(page):
             self.notebook.append_page(page, Gtk.Label.new(page.disname))
-            self.nav_liststore.append([
-                page.icon_name, page.disname,
-                page.tooltip, self.default_color,
-                ])
+            self.nav_liststore.append([page.icon_name, page.disname,
+                                       page.tooltip, self.default_color])
 
         self.default_color = self.get_default_color()
         self.nav_liststore.clear()

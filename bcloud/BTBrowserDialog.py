@@ -10,6 +10,7 @@ from gi.repository import Pango
 from bcloud import Config
 _ = Config._
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
 
@@ -74,6 +75,7 @@ class BTBrowserDialog(Gtk.Dialog):
         '''在调用dialog.run()之前先调用这个函数来获取数据'''
         def on_tasks_received(info, error=None):
             if error or not info:
+                logger.error('info: %s, error: %s.' % (info, error))
                 return
             if 'magnet_info' in info:
                 tasks = info['magnet_info']
@@ -81,11 +83,12 @@ class BTBrowserDialog(Gtk.Dialog):
                 tasks = info['torrent_info']['file_info']
                 self.file_sha1 = info['torrent_info']['sha1']
             elif 'error_code' in info:
+                logger.error('error occured: %s' % info)
                 self.app.toast(info.get('error_msg', ''))
                 return
             else:
-                print('unknown error:', info)
-                self.app.toast(_('Unknown error occured'))
+                logger.error('unknown error: %s.' % info)
+                self.app.toast(_('Unknown error occured: %s') % info)
                 return
             for task in tasks:
                 size = int(task['size'])

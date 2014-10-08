@@ -10,6 +10,7 @@ _ = Config._
 from bcloud.IconWindow import IconWindow
 from bcloud.IconWindow import TreeWindow
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import pcs
 
 __all__ = [
@@ -66,6 +67,7 @@ class CategoryPage(Gtk.Box):
             self.loading_spin.stop()
             self.loading_spin.hide()
             if error or not info or info['errno'] != 0:
+                logger.error('info: %s, error: %s' % (info, error))
                 return
             self.icon_window.load(info['info'])
 
@@ -81,6 +83,7 @@ class CategoryPage(Gtk.Box):
             self.loading_spin.stop()
             self.loading_spin.hide()
             if error or not info or info['errno'] != 0:
+                logger.error('info: %s, error: %s' % (info, error))
                 return
             if info['info']:
                 self.icon_window.load_next(info['info'])

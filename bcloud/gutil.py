@@ -46,8 +46,12 @@ DEFAULT_PROFILE = {
 }
 RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
 
-# calls f on another thread
 def async_call(func, *args, callback=None):
+    '''Call `func` in background thread, and then call `callback` in Gtk main thread.
+
+    If error occurs in `func`, error will keep the traceback and passed to
+    `callback` as second parameter. Always check `error` is not None.
+    '''
     def do_call():
         result = None
         error = None

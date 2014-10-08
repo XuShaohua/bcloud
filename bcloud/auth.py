@@ -4,13 +4,14 @@
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
 '''
-这个模块主要是用于从百度服务器取得cookie授权.
+这个模块主要是用于从百度服务器取得cookie/token授权.
 '''
 
 import json
 import os
 import random
 import re
+import traceback
 import urllib.request
 from urllib import parse
 
@@ -19,6 +20,7 @@ from lxml.cssselect import CSSSelector as CSS
 
 from bcloud import const
 from bcloud import encoder
+from bcloud.log import logger
 from bcloud import net
 from bcloud.RequestCookie import RequestCookie
 from bcloud import util
@@ -86,7 +88,7 @@ def wap_signin(cookie, form):
         'Cookie': cookie.header_output(),
         'Content-Type': const.CONTENT_FORM,
         'Referer': url,
-        }, data=parse.urlencode(form).encode())
+    }, data=parse.urlencode(form).encode())
     if req:
         return req.headers.get_all('Set-Cookie')
     else:
@@ -122,8 +124,8 @@ def refresh_signin_vcode(cookie, token, vcodetype):
     if req:
         try:
             return json.loads(req.data.decode('gbk'))
-        except ValueError as e:
-            print('Error occurs in refresh_signin_vcode()', e)
+        except ValueError:
+            logger.error(traceback.format_exc())
     return None
 
 def parse_bdstoken(content):
