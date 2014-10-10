@@ -7,22 +7,24 @@ import json
 import os
 import subprocess
 import threading
+import traceback
 
 import dbus
 from gi.repository import GdkPixbuf
 from gi.repository import Gio
 from gi.repository import Gtk
 from gi.repository import GLib
+
+from bcloud import Config
+from bcloud.log import logger
+from bcloud import net
+from bcloud import util
 try:
     import keyring
     keyring_available = True
-except (ImportError, ValueError) as e:
-    print(e, 'Warning: keyring module invalid!')
+except (ImportError, ValueError):
+    logger.warn(traceback.format_exc())
     keyring_available = False
-
-from bcloud import Config
-from bcloud import net
-from bcloud import util
 
 DEFAULT_PROFILE = {
     'window-size': (960, 680),
@@ -58,8 +60,9 @@ def async_call(func, *args, callback=None):
 
         try:
             result = func(*args)
-        except Exception as e:
-            error = e
+        except Exception:
+            error = traceback.format_exc()
+            logger.error(error)
         if callback:
             GLib.idle_add(callback, result, error)
 
@@ -76,8 +79,8 @@ def xdg_open(uri):
     '''
     try:
         subprocess.call(['xdg-open', uri, ])
-    except FileNotFoundError as e:
-        print(e)
+    except FileNotFoundError:
+        logger.error(traceback.format_exc())
 
 def update_liststore_image(liststore, tree_iter, col, pcs_file,
                            dir_name, icon_size=96):
@@ -95,11 +98,13 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
             if tree_path is None:
                 return
             liststore[tree_path][col] = pix
-        except GLib.GError as e:
-            pass
+        except GLib.GError:
+            logger.error(traceback.format_exc())
 
-    def _dump_image(req, error=None):
-        if error or not req:
+    def _dump_image():
+        req = net.urlopen(url)
+        if not req:
+            logger.warn('update_liststore_image(), failed to request %s' % url)
             return
         with open(filepath, 'wb') as fh:
             fh.write(req.data)
@@ -109,7 +114,7 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
                                      Gio.FileQueryInfoFlags.NONE, None)
         content_type = file_info.get_content_type()
         if 'image' in content_type:
-            _update_image()
+            GLib.idle_add(_update_image)
 
     if 'thumbs' not in pcs_file:
         return
@@ -125,10 +130,10 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
     filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
     if os.path.exists(filepath) and os.path.getsize(filepath):
         _update_image()
+    elif not url or len(url) < 10:
+        logger.warn('update_liststore_image(), failed to get url')
     else:
-        if not url or len(url) < 10:
-            return
-        async_call(net.urlopen, url, callback=_dump_image)
+        async_call(_dump_image)
 
 def ellipse_text(text, length=10):
     if len(text) < length:
@@ -160,9 +165,10 @@ def load_profile(profile_name):
                 profile['password'] = keyring.get_password(
                         Config.DBUS_APP_NAME, profile['username'])
                 break
-            except (keyring.errors.InitError, dbus.exceptions.DBusException) as e:
-                keyring_available = False
-                print(e)
+            except (keyring.errors.InitError, dbus.exceptions.DBusException):
+                logger.error(traceback.format_exc())
+        else:
+            keyring_available = False
     return profile
 
 def dump_profile(profile):
@@ -180,8 +186,8 @@ def dump_profile(profile):
                 keyring.set_password(Config.DBUS_APP_NAME, profile['username'],
                                      profile['password'])
                 break
-            except dbus.exceptions.DBusException as e:
-                print(e)
+            except dbus.exceptions.DBusException:
+                logger.error(traceback.format_exc())
     profile['password'] = ''
     with open(path, 'w') as fh:
         json.dump(profile, fh)

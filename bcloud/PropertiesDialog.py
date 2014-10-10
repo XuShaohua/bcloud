@@ -56,8 +56,8 @@ class PropertiesDialog(Gtk.Dialog):
             grid.attach(size_label, 0, 1, 1, 1)
             size_human, size_comma = util.get_human_size(pcs_file['size'])
             if size_human:
-                size_text = ''.join(
-                        [str(size_human), ' (', size_comma,  _(' bytes'), ')'])
+                size_text = ''.join([str(size_human), ' (', size_comma,
+                                     _(' bytes'), ')'])
             else:
                 size_text = size_comma + _(' bytes')
             size_label2 = SelectableLeftLabel(size_text)

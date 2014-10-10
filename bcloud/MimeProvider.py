@@ -85,4 +85,3 @@ class MimeProvider:
             return img
         else:
             return None
-

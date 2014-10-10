@@ -8,11 +8,13 @@ import http
 import http.client
 import mimetypes
 import os
+import traceback
 import urllib.parse
 import urllib.request
 import zlib
 
 from bcloud import const
+from bcloud.log import logger
 
 RETRIES = 3
 TIMEOUT = 30
@@ -34,14 +36,14 @@ def urloption(url, headers={}, retries=RETRIES):
     for key in headers.keys():
         headers_merged[key] = headers[key]
     schema = urllib.parse.urlparse(url)
-    for _ in range(retries):
+    for i in range(retries):
         try:
             conn = http.client.HTTPConnection(schema.netloc)
             conn.request('OPTIONS', url, headers=headers_merged)
             resp = conn.getresponse()
             return resp
-        except OSError as e:
-            print(e)
+        except OSError:
+            logger.error(traceback.format_exc())
     return None
 
 
@@ -59,7 +61,7 @@ def urlopen_simple(url, retries=RETRIES, timeout=TIMEOUT):
         try:
             return urllib.request.urlopen(url, timeout=timeout)
         except OSError:
-            pass
+            logger.error(traceback.format_exc())
     return None
 
 def urlopen(url, headers={}, data=None, retries=RETRIES, timeout=TIMEOUT):
@@ -90,7 +92,7 @@ def urlopen(url, headers={}, data=None, retries=RETRIES, timeout=TIMEOUT):
                 req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
             return req
         except OSError:
-            pass
+            logger.error(traceback.format_exc())
     return None
 
 def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
@@ -113,7 +115,7 @@ def urlopen_without_redirect(url, headers={}, data=None, retries=RETRIES):
                 conn.request('GET', url, body=data, headers=headers_merged)
             return conn.getresponse()
         except OSError:
-            pass
+            logger.error(traceback.format_exc())
     return None
 
 def post_multipart(url, headers, fields, files, retries=RETRIES):
@@ -139,7 +141,7 @@ def post_multipart(url, headers, fields, files, retries=RETRIES):
                 req.data = zlib.decompress(req.data, -zlib.MAX_WBITS)
             return req
         except OSError:
-            pass
+            logger.error(traceback.format_exc())
     return None
 
 def encode_multipart_formdata(fields, files):

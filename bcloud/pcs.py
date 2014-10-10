@@ -15,6 +15,7 @@ from bcloud import auth
 from bcloud import const
 from bcloud import encoder
 from bcloud import hasher
+from bcloud.log import logger
 from bcloud import net
 from bcloud.RequestCookie import RequestCookie
 from bcloud import util
@@ -46,6 +47,8 @@ def get_user_uk(cookie, tokens):
         match = re.findall('/share/home\?uk=(\d+)" target=', content)
         if len(match) == 1:
             return match[0]
+        else:
+            logger.warn('get_user_uk(), failed to parse uk, %s' % url)
     return None
 
 def list_share(cookie, tokens, uk, page=1):
@@ -118,6 +121,7 @@ def get_share_page(url):
         if not match:
             match = re.findall('viewShareData=(.+");FileUtils.spublic', content)
             if not match:
+                logger.error('get_share_page(): %s, %s' % (url, match))
                 return None
             list_ = json.loads(json.loads(match[0]))
         else:
@@ -490,8 +494,9 @@ def get_download_link(cookie, tokens, path):
             就返回原来的dlink;
     '''
     metas = get_metas(cookie, tokens, path)
-    if (not metas or metas.get('errno', 1) != 0 or
+    if (not metas or metas.get('errno', -1) != 0 or
             'info' not in metas or len(metas['info']) != 1):
+        logger.error('get_download_link(): %s' % metas)
         return None
     dlink = metas['info'][0]['dlink']
     url = '{0}&cflg={1}'.format(dlink, cookie.get('cflag').value)

@@ -13,6 +13,7 @@ from gi.repository import Pango
 from bcloud import Config
 _ = Config._
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
 
@@ -197,7 +198,8 @@ class TrashPage(Gtk.Box):
     def append_filelist(self, infos, error=None):
         self.loading_spin.stop()
         self.loading_spin.hide()
-        if error or not infos or infos['errno'] != 0:
+        if error or not infos or infos.get('errno', -1) != 0:
+            logger.error('TrashPage.append_filelist: %s, %s' % (infos, error))
             return
         for pcs_file in infos['list']:
             self.filelist.append(pcs_file)

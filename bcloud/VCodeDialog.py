@@ -10,6 +10,7 @@ from gi.repository import Gtk
 from bcloud import Config
 _ = Config._
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import net
 
 
@@ -48,6 +49,7 @@ class VCodeDialog(Gtk.Dialog):
     def update_img(self, request, error=None):
         if error or not request:
             # TODO: add a refresh button
+            logger.error('VCodeDialog.update_img: %s, %s' % (request, error))
             return
         vcode_path = os.path.join(
                 Config.get_tmp_path(self.app.profile['username']),

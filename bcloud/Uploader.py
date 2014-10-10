@@ -12,6 +12,7 @@ from gi.repository import GObject
 from gi.repository import Gtk
 
 from bcloud.const import State, UploadMode
+from bcloud.log import logger
 from bcloud import pcs
 
 (FID_COL, NAME_COL, SOURCEPATH_COL, PATH_COL, SIZE_COL,

@@ -9,6 +9,7 @@ from queue import Queue
 import re
 import threading
 import time
+import traceback
 
 from urllib import request
 from gi.repository import GLib
@@ -18,6 +19,7 @@ from bcloud.const import State, DownloadMode
 from bcloud import net
 from bcloud import pcs
 from bcloud import util
+from bcloud.log import logger
 
 CHUNK_SIZE = 131072 # 128K
 CHUNK_SIZE2 = 32768 # 32K
@@ -127,6 +129,7 @@ class Downloader(threading.Thread, GObject.GObject):
         if os.path.exists(filepath):
             if self.download_mode == DownloadMode.IGNORE:
                 self.emit('downloaded', row[FSID_COL])
+                logge.debug('File exists, ignored!')
                 return
             elif self.download_mode == DownloadMode.NEWCOPY:
                 name, ext = os.path.splitext(filepath)
@@ -136,6 +139,7 @@ class Downloader(threading.Thread, GObject.GObject):
         if not url:
             row[STATE_COL] = State.ERROR
             self.emit('network-error', row[FSID_COL])
+            logge.warn('Failed to get url to download')
             return
 
         if os.path.exists(conf_filepath) and os.path.exists(tmp_filepath):
@@ -148,6 +152,7 @@ class Downloader(threading.Thread, GObject.GObject):
         else:
             req = net.urlopen_simple(url)
             if not req:
+                logge.warn('Failed to get url to download')
                 self.emit('network-error', row[FSID_COL])
                 return
             content_length = req.getheader('Content-Length')
@@ -155,6 +160,7 @@ class Downloader(threading.Thread, GObject.GObject):
             if not content_length:
                 match = re.search('\sContent-Length:\s*(\d+)', str(req.headers))
                 if not match:
+                    logge.warn('Failed to get url to download')
                     self.emit('network-error', row[FSID_COL])
                     return
                 content_length = match.group(1)
@@ -169,7 +175,7 @@ class Downloader(threading.Thread, GObject.GObject):
             except (OSError, IOError):
                 e = truncate.format_exc()
                 logger.error(e)
-                self.emit(row[FSID_COL], tmp_filepath)
+                self.emit('disk-error', row[FSID_COL], tmp_filepath)
                 return
 
         # task list
@@ -223,8 +229,8 @@ class Downloader(threading.Thread, GObject.GObject):
                     conf_count = 0
                 received_total = sum(t[2] for t in status)
                 self.emit('received', row[FSID_COL], received, received_total)
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.error(traceback.format_exc())
             row[STATE_COL] = State.ERROR
         with lock:
             fh.close()

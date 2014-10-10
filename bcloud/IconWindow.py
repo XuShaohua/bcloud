@@ -7,6 +7,7 @@ import mimetypes
 import json
 import os
 import time
+import traceback
 
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
@@ -23,6 +24,7 @@ from bcloud.PropertiesDialog import PropertiesDialog
 from bcloud.PropertiesDialog import FolderPropertyDialog
 from bcloud.RenameDialog import RenameDialog
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
 
@@ -310,6 +312,8 @@ class IconWindow(Gtk.ScrolledWindow):
         def open_video_link(red_url, error=None):
             '''得到视频最后地址后, 调用播放器直接播放'''
             if error or not red_url:
+                logger.error('IconWindow.launch_app_with_app_info: %s, %s' %
+                             (red_url, error))
                 return
             gutil.async_call(app_info.launch_uris, [red_url, ], None)
 
@@ -396,6 +400,9 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_copy_link_activated(self, menu_item):
         def copy_link_to_clipboard(url, error=None):
             if error or not url:
+                logger.error('IconWindow.on_copy_link_activated: %s, %s' %
+                             (url, error))
+                self.app.toast(_('Failed to copy link'))
                 return
             self.app.update_clipboard(url)
 
@@ -419,6 +426,8 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_share_activated(self, menu_item):
         def on_share(info, error=None):
             if error or not info or info['errno'] != 0:
+                logger.error('IconWindow.on_share_activated: %s, %s' %
+                             (info, error))
                 self.app.toast(_('Failed to share selected files'))
                 return
             self.app.update_clipboard(info['shorturl'])

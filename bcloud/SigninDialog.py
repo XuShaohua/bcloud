@@ -14,6 +14,7 @@ from bcloud import auth
 from bcloud import Config
 _ = Config._
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud.RequestCookie import RequestCookie
 
 DELTA = 1 * 24 * 60 * 60   # 1 days
@@ -53,6 +54,7 @@ class SigninVcodeDialog(Gtk.Dialog):
 
     def update_img(self, req_data, error=None):
         if error or not req_data:
+            logger.error('SigninDialog.update_img: %s, %s' % (req_data, error))
             return
         vcode_path = os.path.join(Config.get_tmp_path(self.form['username']),
                                   'bcloud-signin-vcode')
@@ -217,18 +219,19 @@ class SigninDialog(Gtk.Dialog):
     def signin(self):
         def on_get_bdstoken(bdstoken, error=None):
             if error or not bdstoken:
-                print('Error in on_get_bdstoken():', bdstoken, error)
-                print('Please check your username and passowrd')
-                self.signin_failed(_('Error: Failed to get bdstokens!'))
+                logger.error('SigninDialog.on_get_bdstoken: %s, %s' %
+                             (bdstoken, error))
+                self.signin_failed(_('Error: Username or password error!'))
             else:
                 nonlocal tokens
                 tokens['bdstoken'] = bdstoken
                 self.update_profile(username, password, cookie, tokens,
                                     dump=True)
 
-        def on_wap_signin(cookie_str, error):
+        def on_wap_signin(cookie_str, error=None):
             if not cookie_str or error:
-                print('Error in on_wap_signin():', cookie_str, error)
+                logger.error('SigninDialog.on_wap_signin: %s, %s' %
+                             (cookie_str, error))
                 self.signin_failed(_('Failed to signin, please try again.'))
             else:
                 cookie.load_list(cookie_str)
@@ -237,16 +240,13 @@ class SigninDialog(Gtk.Dialog):
                                  callback=on_get_bdstoken)
 
         def on_get_wap_passport(info, error=None):
-            if error or not info:
-                print('Error occurs in on_get_wap_passport:', info, error)
-                self.signin_failed(
-                        _('Failed to get WAP page, please try again.'))
-            cookie_str, _form = info
-            if not cookie_str or not _form:
-                print('Error occurs in on_get_wap_passport:', info, error)
+            if error or not info or not info[0] or not info[1]:
+                logger.error('SigninDialog.on_get_wap_passport: %s, %s' %
+                             (info, error))
                 self.signin_failed(
                         _('Failed to get WAP page, please try again.'))
             else:
+                cookie_str, _form = info
                 nonlocal form
                 form = _form
                 form['username'] = username
@@ -257,7 +257,8 @@ class SigninDialog(Gtk.Dialog):
                     dialog.run()
                     dialog.destroy()
                     if len(form.get('verifycode', '')) != 4:
-                        print('verifycode length is not 4!')
+                        self.toast(
+                                _('Error: verifycode length is not 4 chars!'))
                         return
                 self.signin_button.set_label(_('Signin...'))
                 gutil.async_call(auth.wap_signin, cookie, form,
@@ -265,7 +266,8 @@ class SigninDialog(Gtk.Dialog):
 
         def on_get_token(token, error=None):
             if error or not token:
-                print('Error in get token():', token, error)
+                logger.error('SigninDialog.on_get_token: %s, %s' %
+                             (token, error))
                 self.signin_failed(_('Failed to get tokens, please try again.'))
             else:
                 nonlocal tokens
@@ -276,7 +278,8 @@ class SigninDialog(Gtk.Dialog):
 
         def on_get_BAIDUID(uid_cookie, error=None):
             if error or not uid_cookie:
-                print('Error in get BAIDUID():', uid_cookie, error)
+                logger.error('SigninDialog.on_get_BAIDUID: %s, %s' %
+                             (uid_cookie, error))
                 self.signin_failed(
                         _('Failed to get BAIDUID cookie, please try agin.'))
             else:

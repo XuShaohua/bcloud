@@ -3,6 +3,8 @@
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
+import traceback
+
 from gi.repository import Gdk
 from gi.repository import Gtk
 
@@ -11,6 +13,7 @@ _ = Config._
 from bcloud.IconWindow import IconWindow
 from bcloud.IconWindow import TreeWindow
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
 
@@ -238,7 +241,8 @@ class HomePage(Gtk.Box):
     def on_load(self, info, error=None):
         self.loading_spin.stop()
         self.loading_spin.hide()
-        if error or not info or info['errno'] != 0:
+        if error or not info or info.get('errno', -1) != 0:
+            logger.error('HomePage.on_load: %s, %s' % (info, error))
             return
         self.icon_window.load(info['list'])
 
@@ -247,7 +251,8 @@ class HomePage(Gtk.Box):
         def on_load_next(info, error=None):
             self.loading_spin.stop()
             self.loading_spin.hide()
-            if error or not info or info['errno'] != 0:
+            if error or not info or info.get('errno', -1) != 0:
+                logger.error('HomePage.load_next: %s, %s' % (info, error))
                 return
             if info['list']:
                 self.icon_window.load_next(info['list'])

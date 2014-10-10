@@ -86,7 +86,7 @@ class FolderBrowserDialog(Gtk.Dialog):
             infos = pcs.list_dir(self.app.cookie, self.app.tokens, path,
                                  page=page_num, num=NUM)
             page_num = page_num + 1
-            if not infos or infos['errno'] != 0:
+            if not infos or infos.get('errno', -1) != 0:
                 has_next = False
                 return
             if len(infos['list']) < NUM:
