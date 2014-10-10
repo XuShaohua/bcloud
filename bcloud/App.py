@@ -110,6 +110,7 @@ class App:
         paned.child_set_property(left_box, 'resize', False)
 
         nav_window = Gtk.ScrolledWindow()
+        nav_window.get_style_context().add_class(Gtk.STYLE_CLASS_SIDEBAR)
         nav_window.props.hscrollbar_policy = Gtk.PolicyType.NEVER
         left_box.pack_start(nav_window, True, True, 0)
 
