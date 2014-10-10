@@ -100,6 +100,7 @@ class Downloader(threading.Thread, GObject.GObject):
         'received': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
                      (str, GObject.TYPE_INT64, GObject.TYPE_INT64)),
         'downloaded': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
+        # FSID, tmp-filepath
         'disk-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, str)),
         'network-error': (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE, (str, )),
     }
@@ -163,7 +164,13 @@ class Downloader(threading.Thread, GObject.GObject):
             file_exists = False
             status = []
             fh = open(tmp_filepath, 'wb')
-            fh.truncate(size)
+            try:
+                fh.truncate(size)
+            except (OSError, IOError):
+                e = truncate.format_exc()
+                logger.error(e)
+                self.emit(row[FSID_COL], tmp_filepath)
+                return
 
         # task list
         tasks = []
