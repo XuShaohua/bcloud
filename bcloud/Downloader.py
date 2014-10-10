@@ -181,6 +181,9 @@ class Downloader(threading.Thread, GObject.GObject):
                 if id_ == threads - 1:
                     end_size = end_size + pad_size + 1
                 status.append([start_size, end_size, 0])
+            if start_size > end_size:
+                # part of file has been downloaded
+                continue
             task = DownloadBatch(id_, queue, url, lock, start_size, end_size,
                                  fh, self.timeout)
             tasks.append(task)
