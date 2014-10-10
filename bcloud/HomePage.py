@@ -66,84 +66,161 @@ class HomePage(Gtk.Box):
         self.drag_dest_set(Gtk.DestDefaults.ALL, target_list,
                            Gdk.DragAction.COPY)
 
-        nav_bar = Gtk.Toolbar()
-        nav_bar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR)
-        nav_bar.props.show_arrow = False
-        nav_bar.props.toolbar_style = Gtk.ToolbarStyle.ICONS
-        nav_bar.props.icon_size = Gtk.IconSize.LARGE_TOOLBAR
-        self.pack_start(nav_bar, False, False, 0)
-        nav_bar.props.valign = Gtk.Align.START
+        if Config.GTK_GE_312:
+            self.headerbar = Gtk.HeaderBar()
+            self.headerbar.props.show_close_button = True
+            self.headerbar.props.has_subtitle = False
 
-        path_item = Gtk.ToolItem()
-        nav_bar.insert(path_item, 0)
-        nav_bar.child_set_property(path_item, 'expand', True)
-        path_item.props.valign = Gtk.Align.START
-        path_win = Gtk.ScrolledWindow()
-        path_item.add(path_win)
-        path_win.props.valign = Gtk.Align.START
-        path_win.props.vscrollbar_policy = Gtk.PolicyType.NEVER
-        path_viewport = Gtk.Viewport()
-        path_viewport.props.valign = Gtk.Align.START
-        path_win.add(path_viewport)
-        self.path_box = PathBox(self)
-        self.path_box.props.valign = Gtk.Align.START
-        path_viewport.add(self.path_box)
+            path_win = Gtk.ScrolledWindow()
+            self.headerbar.pack_start(path_win)
+            # FIXME: add arrows
+            path_win.props.hscrollbar_policy = Gtk.PolicyType.NEVER
+            path_win.props.vscrollbar_policy = Gtk.PolicyType.NEVER
+            path_viewport = Gtk.Viewport()
+            path_win.add(path_viewport)
+            self.path_box = PathBox(self)
+            path_viewport.add(self.path_box)
 
-        # show loading process
-        loading_button = Gtk.ToolItem()
-        nav_bar.insert(loading_button, 1)
-        loading_button.props.margin_right = 10
-        self.loading_spin = Gtk.Spinner()
-        loading_button.add(self.loading_spin)
-        self.loading_spin.props.valign = Gtk.Align.CENTER
+            # right box
+            right_box = Gtk.Box()
+            right_box_context = right_box.get_style_context()
+            right_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            self.headerbar.pack_end(right_box)
 
-        # search button
-        search_button = Gtk.ToggleToolButton()
-        search_button.set_label(_('Search'))
-        search_button.set_icon_name('search-symbolic')
-        search_button.set_tooltip_text(
-                _('Search documents and folders by name'))
-        search_button.connect('toggled', self.on_search_button_toggled)
-        nav_bar.insert(search_button, 2)
-        search_button.props.valign = Gtk.Align.START
-        search_button.props.margin_right = 10
+            # toggle view mode
+            list_view_button = Gtk.RadioButton()
+            list_view_button.set_mode(False)
+            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_button.set_image(list_view_img)
+            right_box.pack_start(list_view_button, False, False, 0)
 
-        # toggle view mode
-        list_view_button = Gtk.ToolButton()
-        list_view_button.set_label(_('ListView'))
-        list_view_button.set_icon_name('list-view-symbolic')
-        list_view_button.connect('clicked', self.on_list_view_button_clicked)
-        nav_bar.insert(list_view_button, 3)
-        list_view_button.props.valign = Gtk.Align.START
+            grid_view_button = Gtk.RadioButton()
+            grid_view_button.set_mode(False)
+            grid_view_button.join_group(list_view_button)
+            grid_view_button.set_active(True)
+            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            grid_view_button.set_image(grid_view_img)
+            list_view_button.connect('clicked',
+                                     self.on_list_view_button_clicked)
+            grid_view_button.connect('clicked',
+                                     self.on_grid_view_button_clicked)
+            right_box.pack_start(grid_view_button, False, False, 0)
 
-        grid_view_button = Gtk.ToolButton()
-        grid_view_button.set_label(_('ListView'))
-        grid_view_button.set_icon_name('grid-view-symbolic')
-        grid_view_button.connect('clicked', self.on_grid_view_button_clicked)
-        nav_bar.insert(grid_view_button, 4)
-        grid_view_button.props.valign = Gtk.Align.START
+            # reload button
+            reload_button = Gtk.Button()
+            reload_img = Gtk.Image.new_from_icon_name('view-refresh-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            reload_button.set_image(reload_img)
+            reload_button.set_tooltip_text(_('Reload'))
+            reload_button.connect('clicked', self.reload)
+            self.headerbar.pack_end(reload_button)
 
-        # serch entry
-        if Config.GTK_LE_36:
+            # search button
+            search_button = Gtk.ToggleButton()
+            search_img = Gtk.Image.new_from_icon_name('search-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            search_button.set_image(search_img)
+            search_button.set_tooltip_text(
+                    _('Search documents and folders by name'))
+            search_button.connect('toggled', self.on_search_button_toggled)
+            self.headerbar.pack_end(search_button)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.loading_spin.props.valign = Gtk.Align.CENTER
+            self.headerbar.pack_end(self.loading_spin)
+
+            # TODO: use gtk search bar
+            self.search_entry = Gtk.SearchEntry()
+            self.search_entry.set_icon_from_icon_name(
+                    Gtk.EntryIconPosition.PRIMARY,
+                    'folder-saved-search-symbolic')
+            self.search_entry.props.no_show_all = True
+            self.search_entry.props.visible = False
+            self.search_entry.connect('activate',
+                                      self.on_search_entry_activated)
+            self.pack_start(self.search_entry, False, False, 0)
+        else:
+            nav_bar = Gtk.Box(spacing=5)
+            self.pack_start(nav_bar, False, False, 0)
+
+            path_win = Gtk.ScrolledWindow()
+            nav_bar.pack_start(path_win, True, True, 0)
+            path_win.props.hscrollbar_policy = Gtk.PolicyType.NEVER
+            path_win.props.vscrollbar_policy = Gtk.PolicyType.NEVER
+            path_viewport = Gtk.Viewport()
+            path_win.add(path_viewport)
+            self.path_box = PathBox(self)
+            path_viewport.add(self.path_box)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.loading_spin.props.valign = Gtk.Align.CENTER
+            nav_bar.pack_start(self.loading_spin, False, False, 0)
+
+            # search button
+            search_button = Gtk.ToggleButton()
+            search_img = Gtk.Image.new_from_icon_name('search-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            search_button.set_image(search_img)
+            search_button.set_tooltip_text(
+                    _('Search documents and folders by name'))
+            search_button.connect('toggled', self.on_search_button_toggled)
+            nav_bar.pack_start(search_button, False, False, 0)
+
+            # right box
+            right_box = Gtk.Box()
+            right_box_context = right_box.get_style_context()
+            right_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            nav_bar.pack_start(right_box, False, False, 0)
+
+            # toggle view mode
+            list_view_button = Gtk.RadioButton()
+            list_view_button.set_mode(False)
+            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_button.set_image(list_view_img)
+            right_box.pack_start(list_view_button, False, False, 0)
+
+            grid_view_button = Gtk.RadioButton()
+            grid_view_button.set_mode(False)
+            grid_view_button.join_group(list_view_button)
+            grid_view_button.set_active(True)
+            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            grid_view_button.set_image(grid_view_img)
+            list_view_button.connect('clicked',
+                                     self.on_list_view_button_clicked)
+            grid_view_button.connect('clicked',
+                                     self.on_grid_view_button_clicked)
+            right_box.pack_start(grid_view_button, False, False, 0)
+
             self.search_entry = Gtk.Entry()
             self.search_entry.set_icon_from_icon_name(
                     Gtk.EntryIconPosition.PRIMARY,
                     'folder-saved-search-symbolic')
-        else:
-            self.search_entry = Gtk.SearchEntry()
-        self.search_entry.props.no_show_all = True
-        self.search_entry.props.visible = False
-        self.search_entry.connect('activate', self.on_search_entry_activated)
-        self.pack_start(self.search_entry, False, False, 0)
+            self.search_entry.props.no_show_all = True
+            self.search_entry.props.visible = False
+            self.search_entry.connect('activate',
+                                      self.on_search_entry_activated)
+            self.pack_start(self.search_entry, False, False, 0)
 
         self.icon_window = IconWindow(self, app)
         self.pack_end(self.icon_window, True, True, 0)
 
-    def do_drag_data_received(self, drag_context, x, y, data, info, time):
-        uris = data.get_text()
-        source_paths = util.uris_to_paths(uris)
-        if source_paths and self.app.profile:
-            self.app.upload_page.add_file_tasks(source_paths, self.path)
+    def on_page_show(self):
+        if Config.GTK_GE_312:
+            self.app.window.set_titlebar(self.headerbar)
+            self.headerbar.show_all()
+
+    def check_first(self):
+        if self.first_run:
+            self.first_run = False
+            self.load()
 
     # Open API
     def load(self, path='/'):
@@ -190,6 +267,12 @@ class HomePage(Gtk.Box):
         '''重新载入本页面'''
         self.load(self.path)
 
+    def do_drag_data_received(self, drag_context, x, y, data, info, time):
+        uris = data.get_text()
+        source_paths = util.uris_to_paths(uris)
+        if source_paths and self.app.profile:
+            self.app.upload_page.add_file_tasks(source_paths, self.path)
+
     def on_search_button_toggled(self, search_button):
         status = search_button.get_active()
         self.search_entry.props.visible = status
@@ -198,7 +281,7 @@ class HomePage(Gtk.Box):
         else:
             self.reload()
 
-    def on_list_view_button_clicked(self, button):
+    def on_list_view_button_clicked(self, list_view_button):
         if not isinstance(self.icon_window, TreeWindow):
             self.remove(self.icon_window)
             self.icon_window = TreeWindow(self, self.app)
@@ -206,7 +289,7 @@ class HomePage(Gtk.Box):
             self.icon_window.show_all()
             self.reload()
 
-    def on_grid_view_button_clicked(self, button):
+    def on_grid_view_button_clicked(self, grid_view_button):
         if isinstance(self.icon_window, TreeWindow):
             self.remove(self.icon_window)
             self.icon_window = IconWindow(self, self.app)

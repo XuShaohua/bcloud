@@ -41,7 +41,7 @@ CACHE_DIR = os.path.join(HOME_DIR, '.cache', NAME)
 
 # Check Gtk version <= 3.6
 GTK_LE_36 = (Gtk.MAJOR_VERSION == 3) and (Gtk.MINOR_VERSION <= 6)
-GTK_GE_314 = (Gtk.MAJOR_VERSION == 3) and (Gtk.MINOR_VERSION >= 14)
+GTK_GE_312 = (Gtk.MAJOR_VERSION == 3) and (Gtk.MINOR_VERSION >= 12)
 
 CONF_DIR = os.path.join(HOME_DIR, '.config', NAME)
 _conf_file = os.path.join(CONF_DIR, 'conf.json')

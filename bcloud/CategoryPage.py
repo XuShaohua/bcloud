@@ -29,38 +29,101 @@ class CategoryPage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
 
-        nav_bar = Gtk.Toolbar()
-        nav_bar.get_style_context().add_class(Gtk.STYLE_CLASS_MENUBAR)
-        nav_bar.props.show_arrow = False
-        nav_bar.props.toolbar_style = Gtk.ToolbarStyle.ICONS
-        nav_bar.props.icon_size = Gtk.IconSize.LARGE_TOOLBAR
-        nav_bar.props.halign = Gtk.Align.END
-        self.pack_start(nav_bar, False, False, 0)
+        if Config.GTK_GE_312:
+            self.headerbar = Gtk.HeaderBar()
+            self.headerbar.props.show_close_button = True
+            self.headerbar.props.has_subtitle = False
+            self.headerbar.set_title(self.disname)
 
-        # show loading process
-        loading_button = Gtk.ToolItem()
-        nav_bar.insert(loading_button, 0)
-        loading_button.props.margin_right = 10
-        self.loading_spin = Gtk.Spinner()
-        loading_button.add(self.loading_spin)
-        self.loading_spin.props.valign = Gtk.Align.CENTER
-        nav_bar.child_set_property(loading_button, 'expand', True)
+            # right box
+            right_box = Gtk.Box()
+            right_box_context = right_box.get_style_context()
+            right_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            self.headerbar.pack_end(right_box)
 
-        # toggle view mode
-        list_view_button = Gtk.ToolButton()
-        list_view_button.set_label(_('ListView'))
-        list_view_button.set_icon_name('list-view-symbolic')
-        list_view_button.connect('clicked', self.on_list_view_button_clicked)
-        nav_bar.insert(list_view_button, 1)
+            # toggle view mode
+            list_view_button = Gtk.RadioButton()
+            list_view_button.set_mode(False)
+            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_button.set_image(list_view_img)
+            right_box.pack_start(list_view_button, False, False, 0)
 
-        grid_view_button = Gtk.ToolButton()
-        grid_view_button.set_label(_('ListView'))
-        grid_view_button.set_icon_name('grid-view-symbolic')
-        grid_view_button.connect('clicked', self.on_grid_view_button_clicked)
-        nav_bar.insert(grid_view_button, 2)
+            grid_view_button = Gtk.RadioButton()
+            grid_view_button.set_mode(False)
+            grid_view_button.join_group(list_view_button)
+            grid_view_button.set_active(True)
+            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            grid_view_button.set_image(grid_view_img)
+            list_view_button.connect('clicked',
+                    self.on_list_view_button_clicked)
+            grid_view_button.connect('clicked',
+                    self.on_grid_view_button_clicked)
+            right_box.pack_start(grid_view_button, False, False, 0)
+
+            # reload button
+            reload_button = Gtk.Button()
+            reload_img = Gtk.Image.new_from_icon_name('view-refresh-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            reload_button.set_image(reload_img)
+            reload_button.set_tooltip_text(_('Reload'))
+            reload_button.connect('clicked', self.reload)
+            self.headerbar.pack_end(reload_button)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.loading_spin.props.valign = Gtk.Align.CENTER
+            self.headerbar.pack_end(self.loading_spin)
+
+        else:
+            nav_bar = Gtk.Box()
+            nav_bar_context = nav_bar.get_style_context()
+            nav_bar_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            nav_bar_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            nav_bar.props.halign = Gtk.Align.END
+            self.pack_start(nav_bar, False, False, 0)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.loading_spin.props.valign = Gtk.Align.CENTER
+            nav_bar.pack_start(self.loading_spin, False, False, 0)
+
+            # toggle view mode
+            list_view_button = Gtk.RadioButton()
+            list_view_button.set_mode(False)
+            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            list_view_button.set_image(list_view_img)
+            nav_bar.pack_start(list_view_button, False, False, 0)
+
+            grid_view_button = Gtk.RadioButton()
+            grid_view_button.props.margin_right = 10
+            grid_view_button.set_mode(False)
+            grid_view_button.join_group(list_view_button)
+            grid_view_button.set_active(True)
+            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            grid_view_button.set_image(grid_view_img)
+            list_view_button.connect('clicked',
+                    self.on_list_view_button_clicked)
+            grid_view_button.connect('clicked',
+                    self.on_grid_view_button_clicked)
+            nav_bar.pack_start(grid_view_button, False, False, 0)
 
         self.icon_window = IconWindow(self, app)
         self.pack_end(self.icon_window, True, True, 0)
+
+    def on_page_show(self):
+        if Config.GTK_GE_312:
+            self.app.window.set_titlebar(self.headerbar)
+            self.headerbar.show_all()
+
+    def check_first(self):
+        if self.first_run:
+            self.first_run = False
+            self.load()
 
     def load(self):
         def on_load(info, error=None):

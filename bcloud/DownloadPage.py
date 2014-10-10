@@ -75,32 +75,79 @@ class DownloadPage(Gtk.Box):
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
+        if Config.GTK_GE_312:
+            self.headerbar = Gtk.HeaderBar()
+            self.headerbar.props.show_close_button = True
+            self.headerbar.props.has_subtitle = False
+            self.headerbar.set_title(self.disname)
 
-    def load(self):
-        app = self.app
-        control_box = Gtk.Box()
-        self.pack_start(control_box, False, False, 0)
+            control_box = Gtk.Box()
+            control_box_context = control_box.get_style_context()
+            control_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            control_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            self.headerbar.pack_start(control_box)
 
-        start_button = Gtk.Button.new_with_label(_('Start'))
-        start_button.connect('clicked', self.on_start_button_clicked)
-        control_box.pack_start(start_button, False, False, 0)
+            start_button = Gtk.Button()
+            start_img = Gtk.Image.new_from_icon_name(
+                    'media-playback-start-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            start_button.set_image(start_img)
+            start_button.set_tooltip_text(_('Start'))
+            start_button.connect('clicked', self.on_start_button_clicked)
+            control_box.pack_start(start_button, False, False, 0)
 
-        pause_button = Gtk.Button.new_with_label(_('Pause'))
-        pause_button.connect('clicked', self.on_pause_button_clicked)
-        control_box.pack_start(pause_button, False, False, 0)
+            pause_button = Gtk.Button()
+            pause_img = Gtk.Image.new_from_icon_name(
+                    'media-playback-pause-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            pause_button.set_image(pause_img)
+            pause_button.set_tooltip_text(_('Pause'))
+            pause_button.connect('clicked', self.on_pause_button_clicked)
+            control_box.pack_start(pause_button, False, False, 0)
 
-        open_folder_button = Gtk.Button.new_with_label(_('Open Directory'))
-        open_folder_button.connect('clicked',
-                                   self.on_open_folder_button_clicked)
-        open_folder_button.props.margin_left = 40
-        control_box.pack_start(open_folder_button, False, False, 0)
+            open_folder_button = Gtk.Button()
+            open_folder_img = Gtk.Image.new_from_icon_name(
+                    'document-open-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
+            open_folder_button.set_image(open_folder_img)
+            open_folder_button.set_tooltip_text(_('Open target directory'))
+            open_folder_button.connect('clicked',
+                                       self.on_open_folder_button_clicked)
+            self.headerbar.pack_start(open_folder_button)
 
-        remove_button = Gtk.Button.new_with_label(_('Remove'))
-        remove_button.connect('clicked', self.on_remove_button_clicked)
-        control_box.pack_end(remove_button, False, False, 0)
+            remove_button = Gtk.Button()
+            remove_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            remove_button.set_image(remove_img)
+            remove_button.set_tooltip_text(_('Remove'))
+            remove_button.connect('clicked', self.on_remove_button_clicked)
+            self.headerbar.pack_end(remove_button)
 
-        self.speed_label = Gtk.Label()
-        control_box.pack_end(self.speed_label, False, False, 5)
+            self.speed_label = Gtk.Label()
+            self.headerbar.pack_end(self.speed_label)
+        else:
+            control_box = Gtk.Box()
+            self.pack_start(control_box, False, False, 0)
+
+            start_button = Gtk.Button.new_with_label(_('Start'))
+            start_button.connect('clicked', self.on_start_button_clicked)
+            control_box.pack_start(start_button, False, False, 0)
+
+            pause_button = Gtk.Button.new_with_label(_('Pause'))
+            pause_button.connect('clicked', self.on_pause_button_clicked)
+            control_box.pack_start(pause_button, False, False, 0)
+
+            open_folder_button = Gtk.Button.new_with_label(_('Open Directory'))
+            open_folder_button.connect('clicked',
+                                       self.on_open_folder_button_clicked)
+            open_folder_button.props.margin_left = 40
+            control_box.pack_start(open_folder_button, False, False, 0)
+
+            remove_button = Gtk.Button.new_with_label(_('Remove'))
+            remove_button.connect('clicked', self.on_remove_button_clicked)
+            control_box.pack_end(remove_button, False, False, 0)
+
+            self.speed_label = Gtk.Label()
+            control_box.pack_end(self.speed_label, False, False, 5)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
@@ -150,6 +197,17 @@ class DownloadPage(Gtk.Box):
         state_col.props.min_width = 100
         state_col.set_sort_column_id(PERCENT_COL)
 
+    def on_page_show(self):
+        if Config.GTK_GE_312:
+            self.app.window.set_titlebar(self.headerbar)
+            self.headerbar.show_all()
+
+    def check_first(self):
+        if self.first_run:
+            self.first_run = False
+            self.load()
+
+    def load(self):
         self.init_db()
         self.load_tasks_from_db()
         self.show_all()
@@ -200,11 +258,6 @@ class DownloadPage(Gtk.Box):
             self.check_commit()
         except sqlite3.OperationalError:
             pass
-
-    def check_first(self):
-        if self.first_run:
-            self.first_run = False
-            self.load()
 
     def on_destroy(self, *args):
         if not self.first_run:

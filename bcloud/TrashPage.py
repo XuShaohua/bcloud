@@ -36,32 +36,84 @@ class TrashPage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
 
-        control_box = Gtk.Box(spacing=0)
-        control_box.props.margin_bottom = 10
-        self.pack_start(control_box, False, False, 0)
+        if Config.GTK_GE_312:
+            self.headerbar = Gtk.HeaderBar()
+            self.headerbar.props.show_close_button = True
+            self.headerbar.props.has_subtitle = False
+            self.headerbar.set_title(self.disname)
 
-        restore_button = Gtk.Button.new_with_label(_('Restore'))
-        restore_button.connect('clicked', self.on_restore_button_clicked)
-        control_box.pack_start(restore_button, False, False, 0)
+            restore_button = Gtk.Button()
+            restore_img = Gtk.Image.new_from_icon_name('edit-undo-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            restore_button.set_image(restore_img)
+            restore_button.set_tooltip_text(_('Restore'))
+            restore_button.connect('clicked', self.on_restore_button_clicked)
+            self.headerbar.pack_start(restore_button)
 
-        reload_button = Gtk.Button.new_with_label(_('Reload'))
-        reload_button.connect('clicked', self.on_reload_button_clicked)
-        control_box.pack_start(reload_button, False, False, 0)
+            # remove box
+            right_box = Gtk.Box()
+            right_box_context = right_box.get_style_context()
+            right_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            self.headerbar.pack_end(right_box)
 
-        clear_button = Gtk.Button.new_with_label(_('Clear Trash'))
-        clear_button.set_tooltip_text(_('Will delete all files in trash'))
-        clear_button.connect('clicked', self.on_clear_button_clicked)
-        control_box.pack_end(clear_button, False, False, 0)
+            delete_button = Gtk.Button()
+            delete_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            delete_button.set_image(delete_img)
+            delete_button.set_tooltip_text(_('Remove'))
+            delete_button.set_tooltip_text(
+                    _('Delete selected files in trash permanently'))
+            delete_button.connect('clicked', self.on_delete_button_clicked)
+            right_box.pack_start(delete_button, False, False, 0)
 
-        delete_button = Gtk.Button.new_with_label(_('Delete'))
-        delete_button.set_tooltip_text(_('Delete selected files permanently'))
-        delete_button.connect('clicked', self.on_delete_button_clicked)
-        control_box.pack_end(delete_button, False, False, 0)
+            clear_button = Gtk.Button()
+            clear_img = Gtk.Image.new_from_icon_name('list-remove-all-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            clear_button.set_image(clear_img)
+            clear_button.set_tooltip_text(_('Delete all files in trash'))
+            clear_button.connect('clicked', self.on_clear_button_clicked)
+            right_box.pack_start(clear_button, False, False, 0)
 
-        # show loading process
-        self.loading_spin = Gtk.Spinner()
-        self.loading_spin.props.margin_right = 5
-        control_box.pack_end(self.loading_spin, False, False, 0)
+            reload_button = Gtk.Button()
+            reload_img = Gtk.Image.new_from_icon_name('view-refresh-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            reload_button.set_image(reload_img)
+            reload_button.set_tooltip_text(_('Reload'))
+            reload_button.connect('clicked', self.on_reload_button_clicked)
+            self.headerbar.pack_end(reload_button)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.headerbar.pack_end(self.loading_spin)
+        else:
+            control_box = Gtk.Box(spacing=0)
+            control_box.props.margin_bottom = 10
+            self.pack_start(control_box, False, False, 0)
+
+            restore_button = Gtk.Button.new_with_label(_('Restore'))
+            restore_button.connect('clicked', self.on_restore_button_clicked)
+            control_box.pack_start(restore_button, False, False, 0)
+
+            reload_button = Gtk.Button.new_with_label(_('Reload'))
+            reload_button.connect('clicked', self.on_reload_button_clicked)
+            control_box.pack_start(reload_button, False, False, 0)
+
+            clear_button = Gtk.Button.new_with_label(_('Clear Trash'))
+            clear_button.set_tooltip_text(_('Will delete all files in trash'))
+            clear_button.connect('clicked', self.on_clear_button_clicked)
+            control_box.pack_end(clear_button, False, False, 0)
+
+            delete_button = Gtk.Button.new_with_label(_('Delete'))
+            delete_button.set_tooltip_text(
+                    _('Delete selected files permanently'))
+            delete_button.connect('clicked', self.on_delete_button_clicked)
+            control_box.pack_end(delete_button, False, False, 0)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.loading_spin.props.margin_right = 5
+            control_box.pack_end(self.loading_spin, False, False, 0)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
@@ -114,6 +166,15 @@ class TrashPage(Gtk.Box):
         self.treeview.append_column(remaining_col)
         remaining_col.set_sort_column_id(REMAINING_COL)
 
+    def on_page_show(self):
+        if Config.GTK_GE_312:
+            self.app.window.set_titlebar(self.headerbar)
+            self.headerbar.show_all()
+
+    def check_first(self):
+        if self.first_run:
+            self.first_run = False
+            self.load()
 
     def load(self):
         self.loading_spin.start()

@@ -39,36 +39,96 @@ class CloudPage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
 
-        control_box = Gtk.Box()
-        self.pack_start(control_box, False, False, 0)
+        if Config.GTK_GE_312:
+            self.headerbar = Gtk.HeaderBar()
+            self.headerbar.props.show_close_button = True
+            self.headerbar.props.has_subtitle = False
+            self.headerbar.set_title(self.disname)
 
-        link_button = Gtk.Button.new_with_label(_('New Link Task'))
-        link_button.connect('clicked', self.on_link_button_clicked)
-        control_box.pack_start(link_button, False, False, 0)
+            # link button
+            link_button = Gtk.Button()
+            link_img = Gtk.Image.new_from_icon_name('document-new-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            link_button.set_image(link_img)
+            link_button.set_tooltip_text(_('Create new cloud task'))
+            link_button.connect('clicked', self.on_link_button_clicked)
+            self.headerbar.pack_start(link_button)
 
-        reload_button = Gtk.Button.new_with_label(_('Reload'))
-        reload_button.props.margin_left = 40
-        reload_button.connect('clicked', self.on_reload_button_clicked)
-        control_box.pack_start(reload_button, False, False, 0)
+            # open button
+            open_button = Gtk.Button()
+            open_img = Gtk.Image.new_from_icon_name('document-open-symbolic',
+                Gtk.IconSize.SMALL_TOOLBAR)
+            open_button.set_image(open_img)
+            open_button.set_tooltip_text(_('Open target directory'))
+            open_button.connect('clicked', self.on_open_button_clicked)
+            self.headerbar.pack_start(open_button)
 
-        open_button = Gtk.Button.new_with_label(_('Open Directory'))
-        open_button.connect('clicked', self.on_open_button_clicked)
-        control_box.pack_start(open_button, False, False, 0)
+            # remove box
+            right_box = Gtk.Box()
+            right_box_context = right_box.get_style_context()
+            right_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            self.headerbar.pack_end(right_box)
 
-        clear_button = Gtk.Button.new_with_label(_('Clear'))
-        clear_button.set_tooltip_text(_('Clear finished or canceled tasks'))
-        clear_button.connect('clicked', self.on_clear_button_clicked)
-        control_box.pack_end(clear_button, False, False, 0)
+            delete_button = Gtk.Button()
+            delete_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            delete_button.set_image(delete_img)
+            delete_button.set_tooltip_text(_('Remove'))
+            delete_button.set_tooltip_text(_('Delete selected tasks'))
+            delete_button.connect('clicked', self.on_delete_button_clicked)
+            right_box.pack_start(delete_button, False, False, 0)
 
-        remove_button = Gtk.Button.new_with_label(_('Remove'))
-        remove_button.set_tooltip_text(_('Remove selected tasks'))
-        remove_button.connect('clicked', self.on_remove_button_clicked)
-        control_box.pack_end(remove_button, False, False, 0)
+            clear_button = Gtk.Button()
+            clear_img = Gtk.Image.new_from_icon_name('list-remove-all-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            clear_button.set_image(clear_img)
+            clear_button.set_tooltip_text(_('Delete all cloud tasks'))
+            clear_button.connect('clicked', self.on_clear_button_clicked)
+            right_box.pack_start(clear_button, False, False, 0)
 
-        # show loading process
-        self.loading_spin = Gtk.Spinner()
-        self.loading_spin.props.margin_right = 5
-        control_box.pack_end(self.loading_spin, False, False, 0)
+            reload_button = Gtk.Button()
+            reload_img = Gtk.Image.new_from_icon_name('view-refresh-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            reload_button.set_image(reload_img)
+            reload_button.set_tooltip_text(_('Reload'))
+            reload_button.connect('clicked', self.on_reload_button_clicked)
+            self.headerbar.pack_end(reload_button)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.headerbar.pack_end(self.loading_spin)
+        else:
+            control_box = Gtk.Box()
+            self.pack_start(control_box, False, False, 0)
+
+            link_button = Gtk.Button.new_with_label(_('New Link Task'))
+            link_button.connect('clicked', self.on_link_button_clicked)
+            control_box.pack_start(link_button, False, False, 0)
+
+            reload_button = Gtk.Button.new_with_label(_('Reload'))
+            reload_button.props.margin_left = 40
+            reload_button.connect('clicked', self.on_reload_button_clicked)
+            control_box.pack_start(reload_button, False, False, 0)
+
+            open_button = Gtk.Button.new_with_label(_('Open Directory'))
+            open_button.connect('clicked', self.on_open_button_clicked)
+            control_box.pack_start(open_button, False, False, 0)
+
+            clear_button = Gtk.Button.new_with_label(_('Clear'))
+            clear_button.set_tooltip_text(_('Clear finished or canceled tasks'))
+            clear_button.connect('clicked', self.on_clear_button_clicked)
+            control_box.pack_end(clear_button, False, False, 0)
+
+            remove_button = Gtk.Button.new_with_label(_('Remove'))
+            remove_button.set_tooltip_text(_('Remove selected tasks'))
+            remove_button.connect('clicked', self.on_remove_button_clicked)
+            control_box.pack_end(remove_button, False, False, 0)
+
+            # show loading process
+            self.loading_spin = Gtk.Spinner()
+            self.loading_spin.props.margin_right = 5
+            control_box.pack_end(self.loading_spin, False, False, 0)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
@@ -105,6 +165,11 @@ class CloudPage(Gtk.Box):
         self.treeview.append_column(percent_col)
         percent_col.props.min_width = 145
         percent_col.set_sort_column_id(PERCENT_COL)
+
+    def on_page_show(self):
+        if Config.GTK_GE_312:
+            self.app.window.set_titlebar(self.headerbar)
+            self.headerbar.show_all()
 
     def check_first(self):
         if self.first_run:
@@ -355,7 +420,7 @@ class CloudPage(Gtk.Box):
         self.app.home_page.load(dir_name)
         self.app.switch_page(self.app.home_page)
 
-    def on_remove_button_clicked(self, button):
+    def on_delete_button_clicked(self, button):
         def on_task_removed(resp, error=None):
             self.reload()
         model, tree_paths = self.selection.get_selected_rows()

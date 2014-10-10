@@ -143,9 +143,10 @@ class App:
         paned.add2(self.notebook)
 
     def on_app_activate(self, app):
-        self.window.show_all()
         if not self.profile:
             self.show_signin_dialog()
+        self.window.show_all()
+        self.switch_page(self.home_page)
 
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
@@ -190,10 +191,11 @@ class App:
                 preferences.destroy()
                 gutil.dump_profile(self.profile)
 
-            self.home_page.load()
+            for index, page in enumerate(self.notebook):
+                page.first_run = True
             self.switch_page(self.home_page)
-            return
-        self.quit()
+        else:
+            self.quit()
 
     def on_main_window_resized(self, window):
         if self.profile:
@@ -312,13 +314,11 @@ class App:
         for index, p in enumerate(self.notebook):
             if p == page:
                 self.nav_selection.select_iter(self.nav_liststore[index].iter)
-                #self.notebook.set_current_page(index)
                 break
 
     def on_notebook_switched(self, notebook, page, index):
-        if page.first_run:
-            page.first_run = False
-            page.load()
+        page.check_first()
+        page.on_page_show()
 
     def on_nav_selection_changed(self, nav_selection):
         model, tree_iter = nav_selection.get_selected()
