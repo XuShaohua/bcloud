@@ -14,7 +14,6 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 * OpenSuse 13
 * Ubuntu 14.04
 * Ubuntu 13.10
-* Ubuntu 12.04
 * Linux Mint 17
 
 类似项目
@@ -42,11 +41,14 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 没有把这个依赖关系写清楚, 详细情况请看 [issue 5](https://github.com/LiuLang/bcloud/issues/5)
 * gnome-icon-theme-symbolic Gnome3 提供的一套按纽.
 * python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到
+gnome-keyring或kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
+* gnome-keyring-daemon, 并且要保证它在用户登录桌面后自动启动, 对于xfce等
+轻量级桌面, 请将这个daemon加入到开机启动列表中; 当然也可以用KDE的kwallet
+代替gnome-keyring.
 * python3-dbus  dbus的python3绑定, 如果在密码时超时, 会产生一个dbus.exceptions.Exception异常.
 * python3-lxml 强大的XML解析器, 可以在[这里](https://pypi.python.org/pypi/lxml)下载.
 * python3-cssselect CSS3 属性选择器, 在[这里](https://pypi.python.org/pypi/cssselect).
 * python3-crypto  使用RSA算法加密用户密码.
-gnome-keyring或kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
 * gir1.2-notify 这个是GtkNotification的接口, 显示桌面消息通知
 
 Q&A
