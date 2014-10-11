@@ -181,11 +181,12 @@ class CloudPage(Gtk.Box):
         def on_list_task(info, error=None):
             self.loading_spin.stop()
             self.loading_spin.hide()
-            if error or not info:
-                logger.error('info: %s, error: %s' % (info, error))
-                return
-            if 'error_code' in info and info['error_code'] != 0:
-                logger.error('info: %s' % info)
+            if not info:
+                self.app.toast(_('Network error, info is empty'))
+            elif info.get('errno', -1) != 0 and 'total' not in info:
+                self.app.toast(info.get('error_msg', _('Network error')))
+            if error or not info or info.get('error_code', -1) != 0:
+                logger.error('CloudPage.load: %s, %s' % (info, error))
                 return
             tasks = info['task_info']
             for task in tasks:

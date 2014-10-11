@@ -18,6 +18,7 @@ _ = Config._
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.Uploader import Uploader
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
 
@@ -506,7 +507,9 @@ class UploadPage(Gtk.Box):
         def do_worker_merge_files(fid):
             def on_create_superfile(pcs_file, error=None):
                 if error or not pcs_file:
-                    print('on create superfile:', pcs_file, error)
+                    self.app.toast(_('Failed to upload, please try again'))
+                    logger.error('UploadPage.do_worker_merge_files: %s, %s' %
+                                 (pcs_file, error))
                     do_worker_error(fid)
                     return
                 else:
@@ -520,7 +523,7 @@ class UploadPage(Gtk.Box):
             if not row:
                 return
             if not block_list:
-                # TODO
+                # TODO:
                 pass
             else:
                 gutil.async_call(pcs.create_superfile, self.app.cookie,

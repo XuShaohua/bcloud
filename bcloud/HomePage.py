@@ -241,6 +241,10 @@ class HomePage(Gtk.Box):
     def on_load(self, info, error=None):
         self.loading_spin.stop()
         self.loading_spin.hide()
+        if not info:
+            self.app.toast(_('Network error'))
+        elif info.get('errno', -1) != 0:
+            self.app.toast(info.get('error_msg', _('Network error')))
         if error or not info or info.get('errno', -1) != 0:
             logger.error('HomePage.on_load: %s, %s' % (info, error))
             return
@@ -251,6 +255,10 @@ class HomePage(Gtk.Box):
         def on_load_next(info, error=None):
             self.loading_spin.stop()
             self.loading_spin.hide()
+            if not info:
+                self.app.toast(_('Network error'))
+            elif info.get('errno', -1) != 0:
+                self.app.toast(info.get('error_msg', _('Network error')))
             if error or not info or info.get('errno', -1) != 0:
                 logger.error('HomePage.load_next: %s, %s' % (info, error))
                 return
