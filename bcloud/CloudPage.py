@@ -70,14 +70,14 @@ class CloudPage(Gtk.Box):
             right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
             self.headerbar.pack_end(right_box)
 
-            delete_button = Gtk.Button()
+            remove_button = Gtk.Button()
             delete_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
-            delete_button.set_image(delete_img)
-            delete_button.set_tooltip_text(_('Remove'))
-            delete_button.set_tooltip_text(_('Delete selected tasks'))
-            delete_button.connect('clicked', self.on_delete_button_clicked)
-            right_box.pack_start(delete_button, False, False, 0)
+            remove_button.set_image(delete_img)
+            remove_button.set_tooltip_text(_('Remove'))
+            remove_button.set_tooltip_text(_('Delete selected tasks'))
+            remove_button.connect('clicked', self.on_remove_button_clicked)
+            right_box.pack_start(remove_button, False, False, 0)
 
             clear_button = Gtk.Button()
             clear_img = Gtk.Image.new_from_icon_name('list-remove-all-symbolic',
@@ -419,7 +419,7 @@ class CloudPage(Gtk.Box):
         self.app.home_page.load(dir_name)
         self.app.switch_page(self.app.home_page)
 
-    def on_delete_button_clicked(self, button):
+    def on_remove_button_clicked(self, button):
         def on_task_removed(resp, error=None):
             self.reload()
         model, tree_paths = self.selection.get_selected_rows()
