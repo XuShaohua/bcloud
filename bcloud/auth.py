@@ -25,13 +25,16 @@ from bcloud import net
 from bcloud.RequestCookie import RequestCookie
 from bcloud import util
 
+def get_ppui_logintime():
+    '''ppui_ligintime 这个字段, 是一个随机数.'''
+    return str(random.randint(25000, 28535))
 
 def get_BAIDUID():
     '''获取一个cookie - BAIDUID.
 
     这里, 我们访问百度首页, 返回的response header里面有我们需要的cookie
     '''
-    req = net.urlopen(const.BAIDU_URL)
+    req = net.urlopen(const.REFERER)
     if req:
         return req.headers.get_all('Set-Cookie')
     else:
@@ -41,66 +44,102 @@ def get_token(cookie):
     '''获取一个页面访问的token, 这里需要之前得到的BAIDUID 这个cookie值
 
     这个token的有效期还不确定.
+    返回的数据如下:
+    {"errInfo":{"no": "0"},
+     "data": {
+         "rememberedUserName" : "",
+         "codeString" : "",
+         "token" : "xxxxx",
+         "cookie" : "1",
+         "usernametype":"2",
+         "spLogin" : "rate",
+         "disable":"",
+         "loginrecord":{ 'email':[ ], 'phone':[]}
+    }}
     '''
     url = ''.join([
         const.PASSPORT_URL,
         '?getapi&tpl=mn&apiver=v3',
         '&tt=', util.timestamp(),
         '&class=login&logintype=dialogLogin',
-        #'&callback=bd__cbs__d1ypgy',
-        ])
-    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    if req:
-        content = req.data
-        content = content.decode().replace("'", '"')
-        content_obj = json.loads(content)
-        return content_obj['data']['token']
-    else:
-        return None
-
-def parse_wap_passport(content):
-    form = {}
-    tree = html.document_fromstring(content.encode('utf-8'))
-    input_sel = CSS('form input')
-    input_elems = input_sel(tree)
-    for item in input_elems:
-        name = item.attrib.get('name')
-        if name and name not in ('changevcode', ):
-            form[name] = item.attrib.get('value', '')
-    return form
-
-def get_wap_passport():
-    '''WAP登录.
-
-    返回cookie和登录form'''
-    url = 'http://wappass.baidu.com/passport'
-    req = net.urlopen(url)
-    if req:
-        return (req.headers.get_all('Set-Cookie'),
-                parse_wap_passport(req.data.decode()))
-    else:
-        return None, None
-
-def wap_signin(cookie, form):
-    '''进行WAP登录认证'''
-    url = 'http://wappass.baidu.com/passport/login'
-    req = net.urlopen_without_redirect(url, headers={
+    ])
+    headers={
         'Cookie': cookie.header_output(),
-        'Content-Type': const.CONTENT_FORM,
-        'Referer': url,
-    }, data=parse.urlencode(form).encode())
+        'Referer': const.REFERER,
+    }
+    req = net.urlopen(url, headers=headers)
+    if req:
+        cookie = req.headers.get_all('Set-Cookie')
+        content_obj = util.json_loads_single(req.data.decode())
+        if content_obj:
+            return cookie, content_obj['data']['token']
+    return None
+
+def get_UBI(cookie, token):
+    '''检查登录历史, 可以获得一个Cookie - UBI.
+    返回的信息类似于: 
+    {"errInfo":{ "no": "0" }, "data": {'displayname':['xxx@163.com']}}
+    '''
+    url = ''.join([
+        const.PASSPORT_URL,
+        '?loginhistory',
+        '&token=', token,
+        '&tpl=pp&apiver=v3',
+        '&tt=', util.timestamp(),
+    ])
+    headers={
+        'Cookie': cookie.header_output(),
+        'Referer': const.REFERER,
+    }
+    req = net.urlopen(url, headers=headers)
     if req:
         return req.headers.get_all('Set-Cookie')
     else:
         return None
 
-def get_wap_signin_vcode(cookie, codeString):
-    '''获取wap登录时的验证码'''
-    url = 'http://wappass.baidu.com/cgi-bin/genimage?' + codeString
-    req = net.urlopen(url, headers={
+def check_login(cookie, token, username):
+    '''进行登录验证, 主要是在服务器上验证这个帐户的状态.
+
+    如果帐户不存在, 或者帐户异常, 就不需要再进行最后一步的登录操作了.
+    这一步有可能需要输入验证码.
+    返回的信息如下:
+    {"errInfo":{ "no": "0" }, "data": { "codeString" : "", "vcodetype" : "" }}
+    '''
+    url = ''.join([
+        const.PASSPORT_URL,
+        '?logincheck',
+        '&token=', token,
+        '&tpl=mm&apiver=v3',
+        '&tt=', util.timestamp(),
+        '&username=', encoder.encode_uri_component(username),
+        '&isphone=false',
+    ])
+    headers={
         'Cookie': cookie.header_output(),
-        'Referer': 'http://wappass.badu.com',
-    })
+        'Referer': const.REFERER,
+    }
+    req = net.urlopen(url, headers=headers)
+    if req:
+        ubi = req.headers.get_all('Set-Cookie')
+        return ubi, json.loads(req.data.decode())
+    else:
+        return None
+
+def get_signin_vcode(cookie, codeString):
+    '''获取登录时的验证码图片.
+
+    codeString - 调用check_login()时返回的codeString.
+    '''
+    url = ''.join([
+        const.PASSPORT_BASE,
+        'cgi-bin/genimage?',
+        codeString,
+    ])
+    headers={
+        'Cookie': cookie.header_output(),
+        'Referer': const.REFERER,
+    }
+    req = net.urlopen(url, headers=headers)
     if req:
         return req.data
     else:
@@ -118,15 +157,105 @@ def refresh_signin_vcode(cookie, token, vcodetype):
         '&tpl=pp&apiver=v3',
         '&tt=', util.timestamp(),
         '&fr=ligin',
-        '&vcodetype=', vcodetype,
+        '&vcodetype=', encoder.encode_uri(vcodetype),
     ])
-    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    headers={
+        'Cookie': cookie.header_output(),
+        'Referer': const.REFERER,
+    }
+    logger.debug('refresh vcode url: %s' % url)
+    req = net.urlopen(url, headers=headers)
     if req:
         try:
-            return json.loads(req.data.decode('gbk'))
+            data = req.data.decode('gbk')
+            logger.debug('refresh vcode: %s' % data)
+            return json.loads(data)
         except ValueError:
             logger.error(traceback.format_exc())
     return None
+
+def get_public_key(cookie, token):
+    '''获取RSA公钥, 这个用于加密用户的密码
+    
+    返回的数据如下:
+    {"errno":'0',"msg":'',"pubkey":'-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDk\/ufXg3IBW8+h5i8L8NoXUzcN\nMeKrh4zEupGBkyrURIPUXKDFLWjrv4n2j3RpMZ8GQn\/ETcfoIHGBoCUKJWcfcvmi\nG+OkYeqT6zyJasF0OlKesKfz0fGogMtdCQ6Kqq7X2vrzBPL+4SNU2wgU31g\/tVZl\n3zy5qAsBFkC70vs5FQIDAQAB\n-----END PUBLIC KEY-----\n',"key":'lwCISJnvs7HRNCTxpX7vi25bV9YslF2J'}
+    '''
+    url = ''.join([
+        const.PASSPORT_BASE, 'v2/getpublickey',
+        '?token=', token,
+        '&tpl=pp&apiver=v3&tt=', util.timestamp(),
+    ])
+    headers={
+        'Cookie': cookie.header_output(),
+        'Referer': const.REFERER,
+    }
+    req = net.urlopen(url, headers=headers)
+    if req:
+        data = req.data
+        return util.json_loads_single(req.data.decode())
+    return None
+
+def post_login(cookie, token, username, password, rsakey, verifycode='',
+               codestring=''):
+    '''登录验证.
+    password   - 使用RSA加密后的base64字符串
+    rsakey     - 与public_key相匹配的rsakey
+    verifycode - 验证码, 默认为空
+
+    @return (status, info). 其中, status表示返回的状态:
+      0 - 正常, 这里, info里面存放的是auth_cookie
+     -1 - 未知异常
+      4 - 密码错误
+    257 - 需要输入验证码, 此时info里面存放着(vcodetype, codeString))
+    '''
+    url = const.PASSPORT_LOGIN
+    data = ''.join([
+        'staticpage=https%3A%2F%2Fpassport.baidu.com%2Fstatic%2Fpasspc-account%2Fhtml%2Fv3Jump.html&charset=UTF-8',
+        '&token=', token,
+        '&tpl=pp&subpro=&apiver=v3',
+        '&tt=', util.timestamp(),
+        '&codestring=', codestring,
+        '&safeflg=0&u=https%3A%2F%2Fpassport.baidu.com%2F&isPhone=',
+        '&quick_user=0&logintype=basicLogin&logLoginType=pc_loginBasic&idc=',
+        '&loginmerge=true',
+        '&username=', encoder.encode_uri_component(username),
+        '&password=', encoder.encode_uri_component(password),
+        '&verifycode=', verifycode,
+        '&mem_pass=on',
+        '&rsakey=', rsakey,
+        '&crypttype=12&ppui_logintime=',get_ppui_logintime(),
+        '&callback=parent.bd__pcbs__m8g1kg',
+    ])
+    logger.info('auth.post_login: %s' % data)
+    headers={
+        'Cookie': cookie.header_output(),
+        'Content-Type': const.CONTENT_FORM,
+        'Referer': const.REFERER,
+        'Connection': 'Keep-Alive',
+    }
+    req = net.urlopen(url, headers=headers, data=data.encode())
+    if req:
+        auth_cookie = req.headers.get_all('Set-Cookie')
+        resp_content= req.data.decode()
+        match = re.findall('"(err_no[^"]+)"', resp_content)
+        if len(match) != 1:
+            return (-1, None)
+        query = dict(urllib.parse.parse_qsl(match[0]))
+        err_no = int(query.get('err_no', '-1'))
+        if err_no == 0:
+            return (0, auth_cookie)
+        with open('/tmp/fuck', 'w') as fh:
+            fh.write(resp_content)
+        if err_no != 257:
+            return (err_no, None)
+        vcodetype = query.get('vcodetype', '')
+        codeString = query.get('codeString', '')
+        if vcodetype and codeString:
+            return (257, (vcodetype, codeString))
+        return (-1, None)
+    else:
+        return (-1, None)
+    return (-1, None)
 
 def parse_bdstoken(content):
     '''从页面中解析出bdstoken等信息.

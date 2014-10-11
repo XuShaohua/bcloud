@@ -11,6 +11,7 @@
 BAIDU_URL = 'http://www.baidu.com/'
 PASSPORT_BASE = 'https://passport.baidu.com/'
 PASSPORT_URL = PASSPORT_BASE + 'v2/api/'
+PASSPORT_LOGIN = PASSPORT_BASE + 'v2/api/?login'
 REFERER = PASSPORT_BASE + 'v2/?login'
 #USER_AGENT = 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0;'
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0'

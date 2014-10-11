@@ -588,9 +588,10 @@ class DownloadPage(Gtk.Box):
 
     # handle download speed
     def download_speed_init(self):
-        # update speed label at each 5s
-        GLib.timeout_add(self.DOWNLOAD_SPEED_INTERVAL,
-                         self.download_speed_interval)
+        if not self.download_speed_sid:
+            # update speed label at each 5s
+            self.download_speed_sid = GLib.timeout_add(
+                    self.DOWNLOAD_SPEED_INTERVAL, self.download_speed_interval)
         self.speed_label.set_text('0 kb/s')
 
     def download_speed_add(self, size):
