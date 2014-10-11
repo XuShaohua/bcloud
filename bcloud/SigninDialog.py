@@ -279,7 +279,7 @@ class SigninDialog(Gtk.Dialog):
                 logger.error('SigninDialog.on_post_login: %s, %s' %
                              (info, error))
                 self.signin_failed(
-                        _('Failed on post login, please try again'))
+                        _('Login failed, please try again'))
             else:
                 errno, bduss = info
                 # 257: 需要输入验证码

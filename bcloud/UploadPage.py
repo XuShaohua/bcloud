@@ -15,6 +15,7 @@ from gi.repository import Pango
 
 from bcloud import Config
 _ = Config._
+from bcloud.const import UploadState as State
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.Uploader import Uploader
 from bcloud import gutil
@@ -26,15 +27,6 @@ from bcloud import util
     CURRSIZE_COL, STATE_COL, STATENAME_COL, HUMANSIZE_COL,
     PERCENT_COL, TOOLTIP_COL, THRESHOLD_COL) = list(range(12))
 TASK_FILE = 'upload.sqlite'
-
-class State:
-    '''下载状态常量'''
-    UPLOADING = 0
-    WAITING = 1
-    PAUSED = 2
-    FINISHED = 3
-    CANCELED = 4
-    ERROR = 5
 
 StateNames = [
     _('UPLOADING'),

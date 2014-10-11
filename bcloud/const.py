@@ -55,6 +55,14 @@ class State:
     CANCELED = 4
     ERROR = 5
 
+class UploadState:
+    UPLOADING = 0
+    WAITING = 1
+    PAUSED = 2
+    FINISHED = 3
+    CANCELED = 4
+    ERROR = 5
+
 class UploadMode:
     '''上传时, 如果服务器端已存在同名文件时的操作方式'''
     IGNORE = 0
