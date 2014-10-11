@@ -211,6 +211,7 @@ class DownloadPage(Gtk.Box):
     def load(self):
         self.init_db()
         self.load_tasks_from_db()
+        self.download_speed_init()
         self.show_all()
 
     def init_db(self):
@@ -419,10 +420,7 @@ class DownloadPage(Gtk.Box):
     def start_worker(self, row):
         '''为task新建一个后台下载线程, 并开始下载.'''
         def on_worker_started(worker, fs_id):
-            GLib.idle_add(do_worker_started)
-
-        def do_worker_started():
-            self.download_speed_init()
+            pass
 
         def on_worker_received(worker, fs_id, received, received_total):
             GLib.idle_add(do_worker_received, fs_id, received, received_total)
@@ -466,13 +464,11 @@ class DownloadPage(Gtk.Box):
             self.app.toast(_('{0} downloaded'.format(row[NAME_COL])))
             self.launch_app(fs_id)
             self.scan_tasks()
-            self.download_speed_destroy()
 
         def on_worker_network_error(worker, fs_id):
             GLib.idle_add(do_worker_network_error, fs_id)
 
         def do_worker_network_error(fs_id):
-            self.download_speed_destroy()
             row = self.workers.get(fs_id, None)
             if row:
                 row = row[1]
@@ -496,7 +492,6 @@ class DownloadPage(Gtk.Box):
             # do not retry on disk-error
             self.app.toast(_('Disk Error: failed to read/write {0}').format(
                            tmp_filepath))
-            self.download_speed_destroy()
 
         def on_worker_disk_error(worker, fs_id, tmp_filepath):
             GLib.idle_add(do_worker_disk_error, fs_id, tmp_filepath)
@@ -530,7 +525,6 @@ class DownloadPage(Gtk.Box):
         else:
             worker.pause()
         self.workers.pop(fs_id, None)
-        self.download_speed_destroy()
 
     def restart_task(self, row):
         '''重启下载任务.
@@ -594,28 +588,20 @@ class DownloadPage(Gtk.Box):
 
     # handle download speed
     def download_speed_init(self):
-        if not self.download_speed_sid:
-            # update speed label at each 5s
-            self.download_speed_sid = GLib.timeout_add(
-                    self.DOWNLOAD_SPEED_INTERVAL,
-                    self.download_speed_interval)
-            self.speed_label.set_text('')
-
-    def download_speed_destroy(self, force=False):
-        if force or not self.workers:
-            self.download_speed_sid = 0
-            self.speed_label.set_text('')
+        # update speed label at each 5s
+        GLib.timeout_add(self.DOWNLOAD_SPEED_INTERVAL,
+                         self.download_speed_interval)
+        self.speed_label.set_text('0 kb/s')
 
     def download_speed_add(self, size):
         self.download_speed_received += size
 
     def download_speed_interval(self):
-        if self.download_speed_sid:
-            speed = self.download_speed_received // self.DOWNLOAD_SPEED_INTERVAL
-            self.speed_label.set_text('%s kb/s' % speed)
+        speed = self.download_speed_received // self.DOWNLOAD_SPEED_INTERVAL
+        self.speed_label.set_text('%s kb/s' % speed)
         # reset received data size
         self.download_speed_received = 0
-        return self.download_speed_sid > 0
+        return True
 
     def operate_selected_rows(self, operator):
         '''对选中的条目进行操作.

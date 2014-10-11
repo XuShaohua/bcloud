@@ -75,28 +75,30 @@ class DownloadBatch(threading.Thread):
 
         offset = self.start_size
         while not self.stop_flag:
-            try:
-                block = req.read(CHUNK_SIZE)
-            except OSError:
-                e = traceback.format_exc()
-                logger.error(traceback.format_exc())
-                self.queue.put((self.id_, BATCH_ERROR), block=False)
-                return
-            if not block:
+            for i in range(RETRIES):
+                try:
+                    block = req.read(CHUNK_SIZE)
+                    if block:
+                        break
+                except OSError:
+                    e = traceback.format_exc()
+                    logger.error(traceback.format_exc())
+            else:
                 logger.error('DownloadBatch, block is empty: %s, %s, %s' %
                              (offset, self.start_size, self.end_size))
                 self.queue.put((self.id_, BATCH_ERROR), block=False)
-                break
+                return
+
             with self.lock:
                 if self.fh.closed:
-                    break
+                    return
                 self.fh.seek(offset)
                 self.fh.write(block)
                 self.queue.put((self.id_, len(block)), block=False)
             offset = offset + len(block)
             if offset >= self.end_size:
                 self.queue.put((self.id_, BATCH_FINISISHED), block=False)
-                break
+                return
 
 
 class Downloader(threading.Thread, GObject.GObject):
