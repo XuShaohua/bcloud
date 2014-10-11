@@ -65,6 +65,7 @@ class SigninVcodeDialog(Gtk.Dialog):
         box.pack_start(vcode_confirm, False, False, 10)
 
         box.show_all()
+        self.loading_spin.hide()
 
         gutil.async_call(auth.get_signin_vcode, cookie, codeString,
                          callback=self.update_img)
@@ -83,6 +84,7 @@ class SigninVcodeDialog(Gtk.Dialog):
             fh.write(req_data)
         self.vcode_img.set_from_file(vcode_path)
         self.loading_spin.stop()
+        self.loading_spin.hide()
         self.vcode_entry.set_sensitive(True)
 
     def refresh_vcode(self):
@@ -97,6 +99,7 @@ class SigninVcodeDialog(Gtk.Dialog):
                              self.codeString, callback=self.update_img)
 
         self.loading_spin.start()
+        self.loading_spin.show_all()
         self.vcode_entry.set_sensitive(False)
         gutil.async_call(auth.refresh_signin_vcode, self.cookie, self.token,
                          self.vcodetype, callback=_refresh_vcode)
@@ -279,6 +282,7 @@ class SigninDialog(Gtk.Dialog):
                         _('Failed on post login, please try again'))
             else:
                 errno, bduss = info
+                # 257: 需要输入验证码
                 if errno == 257:
                     nonlocal verifycode
                     nonlocal codeString
@@ -299,10 +303,15 @@ class SigninDialog(Gtk.Dialog):
                                          tokens['token'], username,
                                          password_enc, rsakey, verifycode,
                                          codeString, callback=on_post_login)
+                # 密码错误
                 elif errno == 4:
                     logger.error('SigninDialog.on_post_login: %s, %s' %
                                  (info, error))
                     self.signin_failed(_('Password error, please try again'))
+                # 验证码错误
+                elif errno == 6:
+                    self.signin_failed(
+                            _('Verfication code error, please try again'))
                 elif errno == 0:
                     cookie.load_list(bduss)
                     self.signin_button.set_label(_('Get bdstoken...'))
