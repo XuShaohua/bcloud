@@ -9,11 +9,13 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 * Debian testing
 * Debian stable
 * Fedora 20
+* Fedora 21
 * Gentoo
 * OpenSuse 13
 * Ubuntu 14.04
 * Ubuntu 13.10
 * Ubuntu 12.04
+* Linux Mint 17
 
 类似项目
 =======
@@ -29,9 +31,9 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 请用户直接到 [bcloud-packages](https://github.com/LiuLang/bcloud-packages)
 下载发行版相对应的安装包, 比如deb, rpm等.
 
-如果需要手动安装的话, 也可以用pip3来安装, 比如: `# pip3 install bcloud`
+如果需要手动安装的话, 也可以用`pip3`(ArchLinux里面是`pip`)来安装,
+比如: `# pip3 install bcloud`
 
-如果不想安装安装, 请至少把blcoud/share目录合并到~/.local/share, 不然图标会显示不全.
 
 依赖的软件包
 ===========
@@ -63,12 +65,12 @@ Q&A
 可以用它来直接观看网盘里的视频, 这个脚本属于[monkey-videos](https://github.com/LiuLang/monkey-videos)项目.
 
 
-COPYRIGHT
-========
+版权
+====
 Copyright (C) 2014 [LiuLang](mailto:gsushzhsosgsu@gmail.com)
 
 基于GNU通用许可协议第三版发布, 详细的许可信息请参考 [LICENSE](LICENSE)
 
-SCREENSHOTS
-==========
+截屏
+====
 ![MainWindow](screenshots/bcloud.png)
