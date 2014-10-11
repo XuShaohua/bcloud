@@ -416,7 +416,7 @@ class SigninDialog(Gtk.Dialog):
                 self.update_profile(username, password, cookie, tokens)
                 return
         cookie = RequestCookie()
-        #cookie.load('cflag=65535%3A1; PANWEB=1;')
+        cookie.load('cflag=65535%3A1; PANWEB=1;')
         tokens = {}
         verifycode = ''
         codeString = ''
