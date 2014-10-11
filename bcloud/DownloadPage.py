@@ -66,11 +66,12 @@ class DownloadPage(Gtk.Box):
     disname = _('Download')
     tooltip = _('Downloading tasks')
     first_run = True
-    workers = {} # { `fs_id': (worker,row) }
-    app_infos = {} # { `fs_id': app }
+    workers = {}                    # { `fs_id': (worker,row) }
+    app_infos = {}                  # { `fs_id': app }
     commit_count = 0
-    downloading_size = 0
-    downloading_timestamp = 0
+    download_speed_received = 0     # size of received data
+    download_speed_sid = 0          # signal id
+    DOWNLOAD_SPEED_INTERVAL = 3000  # update download speed every 3s
 
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -417,13 +418,13 @@ class DownloadPage(Gtk.Box):
             GLib.idle_add(do_worker_started)
 
         def do_worker_started():
-            self.downloading_size = 0
-            self.downloading_timestamp = time.time()
+            self.download_speed_init()
 
         def on_worker_received(worker, fs_id, received, received_total):
             GLib.idle_add(do_worker_received, fs_id, received, received_total)
 
         def do_worker_received(fs_id, received, received_total):
+            self.download_speed_add(received)
             row = None
             if fs_id in self.workers:
                 row = self.workers[fs_id][1]
@@ -431,10 +432,6 @@ class DownloadPage(Gtk.Box):
                 row = self.get_row_by_fsid(fs_id)
             if not row:
                 return
-            self.downloading_size += received
-            speed = (self.downloading_size /
-                        (time.time() - self.downloading_timestamp) / 1000)
-            self.speed_label.set_text(_('{0} kb/s').format(int(speed)))
 
             row[CURRSIZE_COL] = received_total
             curr_size = util.get_human_size(row[CURRSIZE_COL], False)[0]
@@ -447,6 +444,7 @@ class DownloadPage(Gtk.Box):
             GLib.idle_add(do_worker_downloaded, fs_id)
 
         def do_worker_downloaded(fs_id):
+            self.download_speed_destroy()
             row = None
             if fs_id in self.workers:
                 row = self.workers[fs_id][1]
@@ -470,6 +468,7 @@ class DownloadPage(Gtk.Box):
             GLib.idle_add(do_worker_network_error, fs_id)
 
         def do_worker_network_error(fs_id):
+            self.download_speed_destroy()
             row = self.workers.get(fs_id, None)
             if row:
                 row = row[1]
@@ -486,12 +485,14 @@ class DownloadPage(Gtk.Box):
                                  self.restart_task, row)
             else:
                 self.app.toast(_('Error occurs will downloading {0}').format(
-                        row[NAME_COL]))
+                               row[NAME_COL]))
             self.scan_tasks()
 
         def do_worker_disk_error(fs_id, tmp_filepath):
+            # do not retry on disk-error
             self.app.toast(_('Disk Error: failed to read/write {0}').format(
-                    tmp_filepath))
+                           tmp_filepath))
+            self.download_speed_destroy()
 
         def on_worker_disk_error(worker, fs_id, tmp_filepath):
             GLib.idle_add(do_worker_disk_error, fs_id, tmp_filepath)
@@ -525,6 +526,7 @@ class DownloadPage(Gtk.Box):
         else:
             worker.pause()
         self.workers.pop(fs_id, None)
+        self.download_speed_destroy()
 
     def restart_task(self, row):
         '''重启下载任务.
@@ -586,6 +588,31 @@ class DownloadPage(Gtk.Box):
             self.liststore.remove(tree_iter)
         if scan:
             self.scan_tasks()
+
+    # handle download speed
+    def download_speed_init(self):
+        if not self.download_speed_sid:
+            # update speed label at each 5s
+            self.download_speed_sid = GLib.timeout_add(
+                    self.DOWNLOAD_SPEED_INTERVAL,
+                    self.download_speed_interval)
+            self.speed_label.set_text('0 kb/s')
+            self.speed_label.show_all()
+
+    def download_speed_destroy(self, force=False):
+        if force or not self.workers:
+            self.download_speed_sid = 0
+            self.speed_label.hide()
+
+    def download_speed_add(self, size):
+        self.download_speed_received += size
+
+    def download_speed_interval(self):
+        speed = self.download_speed_received // self.DOWNLOAD_SPEED_INTERVAL
+        self.speed_label.set_text('%s kb/s' % speed)
+        # reset received data size
+        self.download_speed_received = 0
+        return self.download_speed_sid > 0
 
     def operate_selected_rows(self, operator):
         '''对选中的条目进行操作.
