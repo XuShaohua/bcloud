@@ -24,6 +24,7 @@ from bcloud.log import logger
 CHUNK_SIZE = 65536        # 64K
 RETRIES = 3               # 连接失败时的重试次数
 THRESHOLD_TO_FLUSH = 500  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
+SMALL_FILE_SIZE = 262144  # 256k, 下载小文件时用单线程下载
 
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
     ISDIR_COL, SAVENAME_COL, SAVEDIR_COL, STATE_COL, STATENAME_COL,
@@ -69,8 +70,7 @@ class DownloadBatch(threading.Thread):
             except OSError:
                 logger.error(traceback.format_exc())
         else:
-            with self.lock:
-                self.queue.put((self.id_, BATCH_ERROR), block=False)
+            self.queue.put((self.id_, BATCH_ERROR), block=False)
             return
 
         offset = self.start_size
@@ -81,13 +81,10 @@ class DownloadBatch(threading.Thread):
                 e = traceback.format_exc()
                 logger.error(traceback.format_exc())
                 self.queue.put((self.id_, BATCH_ERROR), block=False)
-                #with self.lock:
-                #    self.queue.put((self.id_, BATCH_ERROR))
                 return
             if not block:
-                with self.lock:
-                    logger.error('DownloadBatch, block is empty')
-                    self.queue.put((self.id_, BATCH_ERROR), block=False)
+                logger.error('DownloadBatch, block is empty')
+                self.queue.put((self.id_, BATCH_ERROR), block=False)
                 break
             with self.lock:
                 if self.fh.closed:
@@ -97,8 +94,7 @@ class DownloadBatch(threading.Thread):
                 self.queue.put((self.id_, len(block)), block=False)
             offset = offset + len(block)
             if offset >= self.end_size:
-                with self.lock:
-                    self.queue.put((self.id_, BATCH_FINISISHED))
+                self.queue.put((self.id_, BATCH_FINISISHED), block=False)
                 break
 
 
@@ -141,7 +137,7 @@ class Downloader(threading.Thread, GObject.GObject):
         if os.path.exists(filepath):
             if self.download_mode == DownloadMode.IGNORE:
                 self.emit('downloaded', row[FSID_COL])
-                logge.debug('File exists, ignored!')
+                logger.debug('File exists, ignored!')
                 return
             elif self.download_mode == DownloadMode.NEWCOPY:
                 name, ext = os.path.splitext(filepath)
@@ -164,7 +160,7 @@ class Downloader(threading.Thread, GObject.GObject):
         else:
             req = net.urlopen_simple(url)
             if not req:
-                logge.warn('Failed to get url to download')
+                logger.warn('Failed to get url to download')
                 self.emit('network-error', row[FSID_COL])
                 return
             content_length = req.getheader('Content-Length')
@@ -172,12 +168,15 @@ class Downloader(threading.Thread, GObject.GObject):
             if not content_length:
                 match = re.search('\sContent-Length:\s*(\d+)', str(req.headers))
                 if not match:
-                    logge.warn('Failed to get url to download')
+                    logger.warn('Failed to get url to download')
                     self.emit('network-error', row[FSID_COL])
                     return
                 content_length = match.group(1)
             size = int(content_length)
-            threads = self.default_threads
+            if size <= SMALL_FILE_SIZE:
+                threads = 1
+            else:
+                threads = self.default_threads
             average_size, pad_size = divmod(size, threads)
             file_exists = False
             status = []
@@ -258,7 +257,7 @@ class Downloader(threading.Thread, GObject.GObject):
             json.dump(status, fh)
 
         if row[STATE_COL] == State.CANCELED:
-            os.remove(tmp_filepah)
+            os.remove(tmp_filepath)
             if os.path.exists(conf_filepath):
                 os.remove(conf_filepath)
         elif row[STATE_COL] == State.ERROR:
