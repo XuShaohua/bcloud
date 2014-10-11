@@ -146,7 +146,8 @@ class App:
         if not self.profile:
             self.show_signin_dialog()
         self.window.show_all()
-        self.switch_page(self.home_page)
+        if hasattr(self, 'home_page'):
+            self.switch_page(self.home_page)
 
     def on_app_shutdown(self, app):
         '''Dump profile content to disk'''
