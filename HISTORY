@@ -1,3 +1,24 @@
+v3.5.4 - 2014.10.12
+* Fixed: 'CloudPage' object has not attribute 'on_remove_button_clicked'
+* Fixed: 'App' object has no attribute 'home_page'
+* Fixed: failed to check file downloaded signal
+* Fixed: check task exists in task list
+* Fixed: catch truncate() exception
+* Fixed: emit network-error signal when socket timed out
+* Fixed: type object 'State' has no attribute 'UPLOADING'; reported by @yui133107
+* Fixed: 'NoneType' object has no attribute 'value'
+* Feature: use new UI style in gtk-3.12
+* Feature: Signin Dialog redesigned
+* Feature: replace WAP API with passport API
+* Feature: use single thread when downloading small files
+* Add log module
+* Simplify download speed calculation
+* Redesign download speed label
+* Support Linut Mint 17
+* Not work with Ubuntu 12.04 any more
+* Using PKCS1_v1_5 as RSA encrypt method
+* i18n updated
+
 v3.5.3 - 2014.10.7
 * Fixed: modify file handler mode from `ab` to `rb+`. That's a serious problem!
 * Fixed: average download speed is incorrect; see https://github.com/LiuLang/bcloud/issues/15

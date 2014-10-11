@@ -30,6 +30,7 @@ bcloud/decoder.py
 bcloud/encoder.py
 bcloud/gutil.py
 bcloud/hasher.py
+bcloud/log.py
 bcloud/net.py
 bcloud/pcs.py
 bcloud/util.py

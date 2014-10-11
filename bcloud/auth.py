@@ -226,7 +226,7 @@ def post_login(cookie, token, username, password, rsakey, verifycode='',
         '&crypttype=12&ppui_logintime=',get_ppui_logintime(),
         '&callback=parent.bd__pcbs__m8g1kg',
     ])
-    logger.info('auth.post_login: %s' % data)
+    logger.debug('auth.post_login: %s' % data)
     headers={
         'Cookie': cookie.header_output(),
         'Content-Type': const.CONTENT_FORM,
