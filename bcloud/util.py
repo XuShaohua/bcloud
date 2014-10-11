@@ -1,4 +1,3 @@
-
 # Copyright (C) 2014 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
@@ -6,17 +5,20 @@
 import base64
 import datetime
 import hashlib
+import json
 import os
 import random
 import re
+import traceback
 import urllib.parse
 import time
 
+from bcloud.log import logger
 try:
     from Crypto.PublicKey import RSA
-    from Crypto.Cipher import PKCS1_OAEP
-except (ImportError, ValueError) as e:
-    print(e, ', RSA encryption will be disabled')
+    from Crypto.Cipher import PKCS1_v1_5
+except (ImportError, ValueError):
+    logger.error(traceback.format_exc())
 
 SIZE_K = 2 ** 10
 SIZE_M = 2 ** 20
@@ -59,8 +61,6 @@ def get_human_size(size, use_giga=True):
                GigaBytes, 这个在显示下载进度时很有用, 因为可以动态的显示下载
                状态.
     '''
-
-    '''将文件大小转为人类可读的形式'''
     size_kb = '{0:,}'.format(size)
     if size < SIZE_K:
         return ('{0} B'.format(size), size_kb)
@@ -120,15 +120,13 @@ def RSA_encrypt(public_key, message):
 
     public_key - 公钥
     message    - 要加密的信息, 使用UTF-8编码的字符串
-    @return 使用base64编码的字符串
+    @return    - 使用base64编码的字符串
     '''
     # 如果没能成功导入RSA模块, 就直接返回空白字符串.
-    # ubuntu 12.04 中使用的python3-crypto-2.4.1, 里面就没有RSA模块.
     if not globals().get('RSA'):
-        print('Error: no RSA module avaible!')
         return ''
     rsakey = RSA.importKey(public_key)
-    rsakey = PKCS1_OAEP.new(rsakey)
+    rsakey = PKCS1_v1_5.new(rsakey)
     encrypted = rsakey.encrypt(message.encode())
     return base64.encodestring(encrypted).decode().replace('\n', '')
 
@@ -144,3 +142,11 @@ def m3u8_to_m3u(pls):
             srcs_set.add(src)
             output.append(url)
     return '\n'.join(output)
+
+def json_loads_single(s):
+    '''处理不标准JSON结构化数据'''
+    try:
+        return json.loads(s.replace("'", '"').replace('\t', ''))
+    except (ValueError, UnicodeDecodeError):
+        logger.error(traceback.format_exc())
+        return None
