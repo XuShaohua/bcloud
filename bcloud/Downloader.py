@@ -22,9 +22,8 @@ from bcloud import util
 from bcloud.log import logger
 
 CHUNK_SIZE = 131072 # 128K
-CHUNK_SIZE2 = 32768 # 32K
-RETRIES = 5
-THRESHOLD_TO_FLUSH = 100  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
+RETRIES = 3
+THRESHOLD_TO_FLUSH = 500  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
 
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
     ISDIR_COL, SAVENAME_COL, SAVEDIR_COL, STATE_COL, STATENAME_COL,
@@ -63,10 +62,15 @@ class DownloadBatch(threading.Thread):
         opener = request.build_opener()
         content_range = 'bytes={0}-{1}'.format(self.start_size, self.end_size)
         opener.addheaders = [('Range', content_range)]
-        try:
-            req = opener.open(self.url, timeout=self.timeout)
-        except OSError:
-            self.queue.put((self.id_, BATCH_ERROR))
+        for i in range(RETRIES):
+            try:
+                req = opener.open(self.url, timeout=self.timeout)
+                break
+            except OSError:
+                logger.error(traceback.format_exc())
+        else:
+            with self.lock:
+                self.queue.put((self.id_, BATCH_ERROR), block=False)
             return
 
         offset = self.start_size
@@ -74,11 +78,16 @@ class DownloadBatch(threading.Thread):
             try:
                 block = req.read(CHUNK_SIZE)
             except OSError:
-                self.queue.put((self.id_, BATCH_ERROR))
+                e = traceback.format_exc()
+                logger.error(traceback.format_exc())
+                self.queue.put((self.id_, BATCH_ERROR), block=False)
+                #with self.lock:
+                #    self.queue.put((self.id_, BATCH_ERROR))
                 return
             if not block:
                 with self.lock:
-                    self.queue.put((self.id_, BATCH_FINISISHED))
+                    logger.error('DownloadBatch, block is empty')
+                    self.queue.put((self.id_, BATCH_ERROR), block=False)
                 break
             with self.lock:
                 if self.fh.closed:
@@ -86,8 +95,11 @@ class DownloadBatch(threading.Thread):
                 self.fh.seek(offset)
                 self.fh.write(block)
                 self.queue.put((self.id_, len(block)), block=False)
-                #self.queue.put((self.id_, len(block)))
-                offset = offset + len(block)
+            offset = offset + len(block)
+            if offset >= self.end_size:
+                with self.lock:
+                    self.queue.put((self.id_, BATCH_FINISISHED))
+                break
 
 
 class Downloader(threading.Thread, GObject.GObject):
@@ -139,7 +151,7 @@ class Downloader(threading.Thread, GObject.GObject):
         if not url:
             row[STATE_COL] = State.ERROR
             self.emit('network-error', row[FSID_COL])
-            logge.warn('Failed to get url to download')
+            logger.warn('Failed to get url to download')
             return
 
         if os.path.exists(conf_filepath) and os.path.exists(tmp_filepath):
@@ -223,9 +235,13 @@ class Downloader(threading.Thread, GObject.GObject):
                     break
                 status[id_][2] += received
                 conf_count += 1
+                # flush data and status to disk
                 if conf_count > THRESHOLD_TO_FLUSH:
+                    with lock:
+                        if not fh.closed:
+                            fh.flush()
                     with open(conf_filepath, 'w') as fh:
-                        fh.write(json.dumps(status))
+                        json.dump(status, fh)
                     conf_count = 0
                 received_total = sum(t[2] for t in status)
                 self.emit('received', row[FSID_COL], received, received_total)
@@ -233,17 +249,20 @@ class Downloader(threading.Thread, GObject.GObject):
             logger.error(traceback.format_exc())
             row[STATE_COL] = State.ERROR
         with lock:
-            fh.close()
+            if not fh.closed:
+                fh.close()
         for task in tasks:
             if task.isAlive():
                 task.stop()
         with open(conf_filepath, 'w') as fh:
-            fh.write(json.dumps(status))
+            json.dump(status, fh)
 
         if row[STATE_COL] == State.CANCELED:
             os.remove(tmp_filepah)
             if os.path.exists(conf_filepath):
                 os.remove(conf_filepath)
+        elif row[STATE_COL] == State.ERROR:
+            self.emit('network-error', row[FSID_COL])
         elif row[STATE_COL] == State.FINISHED:
             self.emit('downloaded', row[FSID_COL])
             os.rename(tmp_filepath, filepath)
