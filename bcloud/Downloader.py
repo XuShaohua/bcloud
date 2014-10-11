@@ -21,8 +21,8 @@ from bcloud import pcs
 from bcloud import util
 from bcloud.log import logger
 
-CHUNK_SIZE = 131072 # 128K
-RETRIES = 3
+CHUNK_SIZE = 65536        # 64K
+RETRIES = 3               # 连接失败时的重试次数
 THRESHOLD_TO_FLUSH = 500  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
 
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
