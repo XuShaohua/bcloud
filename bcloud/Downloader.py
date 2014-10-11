@@ -21,10 +21,10 @@ from bcloud import pcs
 from bcloud import util
 from bcloud.log import logger
 
-CHUNK_SIZE = 65536        # 64K
+CHUNK_SIZE = 131072       # 128K
 RETRIES = 3               # 连接失败时的重试次数
 THRESHOLD_TO_FLUSH = 500  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
-SMALL_FILE_SIZE = 262144  # 256k, 下载小文件时用单线程下载
+SMALL_FILE_SIZE = 1048576 # 1M, 下载小文件时用单线程下载
 
 (NAME_COL, PATH_COL, FSID_COL, SIZE_COL, CURRSIZE_COL, LINK_COL,
     ISDIR_COL, SAVENAME_COL, SAVEDIR_COL, STATE_COL, STATENAME_COL,
@@ -83,7 +83,8 @@ class DownloadBatch(threading.Thread):
                 self.queue.put((self.id_, BATCH_ERROR), block=False)
                 return
             if not block:
-                logger.error('DownloadBatch, block is empty')
+                logger.error('DownloadBatch, block is empty: %s, %s, %s' %
+                             (offset, self.start_size, self.end_size))
                 self.queue.put((self.id_, BATCH_ERROR), block=False)
                 break
             with self.lock:
@@ -198,6 +199,9 @@ class Downloader(threading.Thread, GObject.GObject):
         for id_ in range(threads):
             if file_exists:
                 start_size, end_size, received = status[id_]
+                if start_size + received >= end_size:
+                    # part of file has been downloaded
+                    continue
                 start_size += received
             else:
                 start_size = id_ * average_size
@@ -205,9 +209,6 @@ class Downloader(threading.Thread, GObject.GObject):
                 if id_ == threads - 1:
                     end_size = end_size + pad_size + 1
                 status.append([start_size, end_size, 0])
-            if start_size > end_size:
-                # part of file has been downloaded
-                continue
             task = DownloadBatch(id_, queue, url, lock, start_size, end_size,
                                  fh, self.timeout)
             tasks.append(task)
@@ -224,11 +225,12 @@ class Downloader(threading.Thread, GObject.GObject):
                 # FINISHED
                 if received == BATCH_FINISISHED:
                     done += 1
-                    if done == len(status):
+                    if done == len(tasks):
                         row[STATE_COL] = State.FINISHED
                         break
                     else:
                         continue
+                # error occurs
                 elif received == BATCH_ERROR:
                     row[STATE_COL] = State.ERROR
                     break
