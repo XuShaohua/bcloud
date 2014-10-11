@@ -106,6 +106,9 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
         if not req:
             logger.warn('update_liststore_image(), failed to request %s' % url)
             return
+        if not req.data:
+            logger.warn('update_liststore_image: image data is empty %s' % url)
+            return
         with open(filepath, 'wb') as fh:
             fh.write(req.data)
         # Now, check its mime type
@@ -122,6 +125,8 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
         key = 'url1'
     elif 'url2' in pcs_file['thumbs']:
         key = 'url2'
+    elif 'url3' in pcs_file['thumbs']:
+        key = 'url3'
     else:
         return
     fs_id = pcs_file['fs_id']
