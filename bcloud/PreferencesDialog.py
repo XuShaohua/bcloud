@@ -114,7 +114,7 @@ class PreferencesDialog(Gtk.Dialog):
         segments_label = Gtk.Label.new(_('Per task:'))
         segments_label.props.xalign = 1
         network_grid.attach(segments_label, 0, 2, 1, 1)
-        segments_spin = Gtk.SpinButton.new_with_range(1, 5, 1)
+        segments_spin = Gtk.SpinButton.new_with_range(1, 10, 1)
         segments_spin.set_value(self.app.profile['download-segments'])
         segments_spin.props.halign = Gtk.Align.START
         segments_spin.connect('value-changed', self.on_segments_value_changed)
