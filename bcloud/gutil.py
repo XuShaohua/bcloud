@@ -174,6 +174,8 @@ def load_profile(profile_name):
                 logger.error(traceback.format_exc())
         else:
             keyring_available = False
+    if not profile['password']:
+        profile['password'] = ''
     return profile
 
 def dump_profile(profile):
