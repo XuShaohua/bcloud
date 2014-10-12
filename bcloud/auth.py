@@ -244,8 +244,6 @@ def post_login(cookie, token, username, password, rsakey, verifycode='',
         err_no = int(query.get('err_no', '-1'))
         if err_no == 0:
             return (0, auth_cookie)
-        with open('/tmp/fuck', 'w') as fh:
-            fh.write(resp_content)
         if err_no != 257:
             return (err_no, None)
         vcodetype = query.get('vcodetype', '')
