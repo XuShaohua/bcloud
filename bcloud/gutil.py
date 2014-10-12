@@ -82,15 +82,15 @@ def xdg_open(uri):
     except FileNotFoundError:
         logger.error(traceback.format_exc())
 
-def update_liststore_image(liststore, tree_iter, col, pcs_file,
-                           dir_name, icon_size=96):
+def update_liststore_image(liststore, tree_iters, col, pcs_files, dir_name,
+                           icon_size=96):
     '''下载文件缩略图, 并将它显示到liststore里.
     
-    pcs_file - 里面包含了几个必要的字段.
-    dir_name - 缓存目录, 下载到的图片会保存这个目录里.
-    size     - 指定图片的缩放大小, 默认是96px.
+    pcs_files - 里面包含了几个必要的字段.
+    dir_name  - 缓存目录, 下载到的图片会保存这个目录里.
+    size      - 指定图片的缩放大小, 默认是96px.
     '''
-    def _update_image():
+    def update_image(filepath, tree_iter):
         try:
             pix = GdkPixbuf.Pixbuf.new_from_file_at_size(filepath, icon_size,
                                                          icon_size)
@@ -101,44 +101,37 @@ def update_liststore_image(liststore, tree_iter, col, pcs_file,
         except GLib.GError:
             logger.error(traceback.format_exc())
 
-    def _dump_image():
+    def dump_image(url, filepath):
         req = net.urlopen(url)
-        if not req:
+        if not req or not req.data:
             logger.warn('update_liststore_image(), failed to request %s' % url)
-            return
-        if not req.data:
-            logger.warn('update_liststore_image: image data is empty %s' % url)
-            return
+            return False
         with open(filepath, 'wb') as fh:
             fh.write(req.data)
-        # Now, check its mime type
-        file_ = Gio.File.new_for_path(filepath)
-        file_info = file_.query_info(Gio.FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
-                                     Gio.FileQueryInfoFlags.NONE, None)
-        content_type = file_info.get_content_type()
-        if 'image' in content_type:
-            GLib.idle_add(_update_image)
+        return True
 
-    if 'thumbs' not in pcs_file:
-        return
-    if 'url1' in pcs_file['thumbs']:
-        key = 'url1'
-    elif 'url2' in pcs_file['thumbs']:
-        key = 'url2'
-    elif 'url3' in pcs_file['thumbs']:
-        key = 'url3'
-    else:
-        return
-    fs_id = pcs_file['fs_id']
-    url = pcs_file['thumbs'][key]
-
-    filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
-    if os.path.exists(filepath) and os.path.getsize(filepath):
-        _update_image()
-    elif not url or len(url) < 10:
-        logger.warn('update_liststore_image(), failed to get url')
-    else:
-        async_call(_dump_image)
+    for tree_iter, pcs_file in zip(tree_iters, pcs_files):
+        if 'thumbs' not in pcs_file:
+            continue
+        if 'url1' in pcs_file['thumbs']:
+            key = 'url1'
+        elif 'url2' in pcs_file['thumbs']:
+            key = 'url2'
+        elif 'url3' in pcs_file['thumbs']:
+            key = 'url3'
+        else:
+            continue
+        fs_id = pcs_file['fs_id']
+        url = pcs_file['thumbs'][key]
+        filepath = os.path.join(dir_name, '{0}.jpg'.format(fs_id))
+        if os.path.exists(filepath) and os.path.getsize(filepath):
+            GLib.idle_add(update_image, filepath, tree_iter)
+        elif not url or len(url) < 10:
+            logger.warn('update_liststore_image(), failed to get url')
+        else:
+            status = dump_image(url, filepath)
+            if status:
+                GLib.idle_add(update_image, filepath, tree_iter)
 
 def ellipse_text(text, length=10):
     if len(text) < length:

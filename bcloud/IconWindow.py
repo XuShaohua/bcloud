@@ -85,6 +85,7 @@ class IconWindow(Gtk.ScrolledWindow):
         文件的path都被提取出来, 然后放到了一个list中.
         '''
         cache_path = Config.get_cache_path(self.app.profile['username'])
+        tree_iters = []
         for pcs_file in pcs_files:
             path = pcs_file['path']
             pixbuf, type_ = self.app.mime.get(
@@ -100,9 +101,10 @@ class IconWindow(Gtk.ScrolledWindow):
                 pcs_file['isdir'], mtime, human_mtime, type_,
                 json.dumps(pcs_file)
             ])
-            gutil.update_liststore_image(self.liststore, tree_iter, PIXBUF_COL,
-                                         pcs_file, cache_path,
-                                         icon_size=self.ICON_SIZE)
+            tree_iters.append(tree_iter)
+        gutil.async_call(gutil.update_liststore_image, self.liststore,
+                         tree_iters, PIXBUF_COL, pcs_files, cache_path,
+                         self.ICON_SIZE)
 
     def get_pcs_file(self, tree_path):
         '''获取原始的pcs文件信息'''
