@@ -17,7 +17,7 @@ from bcloud import const
 from bcloud.log import logger
 
 RETRIES = 3
-TIMEOUT = 30
+TIMEOUT = 50
 
 default_headers = {
     'User-agent': const.USER_AGENT,
