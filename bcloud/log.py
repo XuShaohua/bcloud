@@ -24,4 +24,4 @@ def _init_logger(log_level, maxBytes=5*1024*1024, backupCount=5):
     looger.setLevel(log_level)
     return looger
 
-logger = _init_logger(logging.DEBUG)
+logger = _init_logger(logging.INFO)
