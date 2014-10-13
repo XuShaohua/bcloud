@@ -134,7 +134,7 @@ class CategoryPage(Gtk.Box):
             elif info.get('errno', -1) != 0:
                 self.app.toast(info.get('error_msg', _('Network error')))
             if error or not info or info.get('errno', -1) != 0:
-                logger.error('info: %s, error: %s' % (info, error))
+                logger.error('%s.on_load: %s, %s' % (self.disname, info, error))
                 return
             self.icon_window.load(info['info'])
 
@@ -154,7 +154,8 @@ class CategoryPage(Gtk.Box):
             elif info.get('errno', -1) != 0:
                 self.app.toast(info.get('error_msg', _('Network error')))
             if error or not info or info['errno'] != 0:
-                logger.error('info: %s, error: %s' % (info, error))
+                logger.error('%s.on_load_next: %s, %s' %
+                             (self.disname, info, error))
                 return
             if info['info']:
                 self.icon_window.load_next(info['info'])
