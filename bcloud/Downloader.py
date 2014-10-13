@@ -23,6 +23,7 @@ from bcloud.log import logger
 
 CHUNK_SIZE = 131072       # 128K
 RETRIES = 3               # 连接失败时的重试次数
+DOWNLOAD_RETRIES = 10     # 下载线程的重试次数
 THRESHOLD_TO_FLUSH = 500  # 磁盘写入数据次数超过这个值时, 就进行一次同步.
 SMALL_FILE_SIZE = 1048576 # 1M, 下载小文件时用单线程下载
 
@@ -59,23 +60,33 @@ class DownloadBatch(threading.Thread):
     def stop(self):
         self.stop_flag = True
 
-    def download(self):
+    def get_req(self, start_size, end_size):
+        '''打开socket'''
+        logger.debug('DownloadBatch.get_req: %s, %s' % (start_size, end_size))
         opener = request.build_opener()
-        content_range = 'bytes={0}-{1}'.format(self.start_size, self.end_size)
+        content_range = 'bytes={0}-{1}'.format(start_size, end_size)
         opener.addheaders = [('Range', content_range)]
         for i in range(RETRIES):
             try:
-                req = opener.open(self.url, timeout=self.timeout)
-                break
+                return opener.open(self.url, timeout=self.timeout)
             except OSError:
                 logger.error(traceback.format_exc())
         else:
+            return None
+
+    def download(self):
+        offset = self.start_size
+        req = self.get_req(offset, self.end_size)
+        if not req:
             self.queue.put((self.id_, BATCH_ERROR), block=False)
             return
 
-        offset = self.start_size
         while not self.stop_flag:
-            for i in range(RETRIES):
+            for i in range(DOWNLOAD_RETRIES):
+                if not req:
+                    req = self.get_req(offset, self.end_size)
+                    logger.debug('DownloadBatch.download: socket reconnected')
+                    continue
                 try:
                     block = req.read(CHUNK_SIZE)
                     if block:
@@ -83,6 +94,7 @@ class DownloadBatch(threading.Thread):
                 except OSError:
                     e = traceback.format_exc()
                     logger.error(traceback.format_exc())
+                    req = None
             else:
                 logger.error('DownloadBatch, block is empty: %s, %s, %s' %
                              (offset, self.start_size, self.end_size))
@@ -96,6 +108,7 @@ class DownloadBatch(threading.Thread):
                 self.fh.write(block)
                 self.queue.put((self.id_, len(block)), block=False)
             offset = offset + len(block)
+            # 下载完成
             if offset >= self.end_size:
                 self.queue.put((self.id_, BATCH_FINISISHED), block=False)
                 return
