@@ -331,8 +331,6 @@ class DownloadPage(Gtk.Box):
     def add_launch_task(self, pcs_file, app_info):
         self.check_first()
         fs_id = str(pcs_file['fs_id'])
-        if fs_id in self.app_infos:
-            return
         self.app_infos[fs_id] = app_info
         self.add_task(pcs_file)
 
@@ -382,6 +380,9 @@ class DownloadPage(Gtk.Box):
         if row:
             self.app.toast(_('Task exists: {0}').format(
                            pcs_file['server_filename']))
+            # 如果文件已下载完成, 就直接尝试用本地程序打开
+            if row[STATE_COL] == State.FINISHED:
+                self.launch_app(fs_id)
             return
         saveDir = os.path.split(self.app.profile['save-dir'] + 
                                 pcs_file['path'])[0]
