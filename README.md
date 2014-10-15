@@ -42,8 +42,7 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 * gnome-icon-theme-symbolic Gnome3 提供的一套按纽.
 * python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到
 gnome-keyring或kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
-* gnome-keyring-daemon, 并且要保证它在用户登录桌面后自动启动, 对于xfce等
-轻量级桌面, 请将这个daemon加入到开机启动列表中; 当然也可以用KDE的kwallet
+* gnome-keyring或者kwalletmanager, 并且要保证它在用户登录桌面后自动启动.
 代替gnome-keyring.
 * python3-dbus  dbus的python3绑定, 如果在密码时超时, 会产生一个dbus.exceptions.Exception异常.
 * python3-lxml 强大的XML解析器, 可以在[这里](https://pypi.python.org/pypi/lxml)下载.
@@ -65,6 +64,15 @@ Q&A
 
 关于 115 网盘, 前段时间写了一个[油猴脚本](https://github.com/LiuLang/monkey-videos/tree/master/115),
 可以用它来直接观看网盘里的视频, 这个脚本属于[monkey-videos](https://github.com/LiuLang/monkey-videos)项目.
+
+3.如果设置keyring?
+ArchLinux 用户最有可能遇到这个问题. 因为在debian/ubuntu/mint等系统里面, keyring
+在安装后会自动被配置好, 而在arch中, 这些都需要用户手动设定, 很麻烦.
+
+arch的wiki里面有完整的介绍, 请arch用户到[这里](https://wiki.archlinux.org/index.php/GNOME_Keyring)
+读完整篇文章, 然后针对自己的桌面环境以及自己的需要, 选择相应的配置方式.
+
+还有一篇类似的文档, 是gnomekeyring官方的, 有也相应[介绍](https://wiki.gnome.org/action/show/Projects/GnomeKeyring?action=show&redirect=GnomeKeyring#Automatic_Unlocking)
 
 
 版权
