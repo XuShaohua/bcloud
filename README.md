@@ -74,6 +74,11 @@ arch的wiki里面有完整的介绍, 请arch用户到[这里](https://wiki.archl
 
 还有一篇类似的文档, 是gnomekeyring官方的, 有也相应[介绍](https://wiki.gnome.org/action/show/Projects/GnomeKeyring?action=show&redirect=GnomeKeyring#Automatic_Unlocking)
 
+4.为什么不同的发行版里面, bcloud的界面不一样?
+bcloud目前已经开始调用gtk3.12中的组件, 这样与新版gnome-shell的样式更统一;
+但旧的发行版, 比如debian 7等, 里面的gtk3的版本很老, 只能继续使用旧的界面了.
+它们在功能上并无差别.
+
 
 版权
 ====

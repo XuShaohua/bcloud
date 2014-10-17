@@ -1,3 +1,13 @@
+v3.5.5 - 2014.10.17
+* Change url request timeout from 30s to 50s
+* Change log level from DEBUG to INFO
+* Set max downlaod retries to 10
+* Set max segments of download to 10
+* Update icons in IconView in order
+* Set connection timeout to 60s by default
+* Fixed: TypeError: Argument 1 does not allow None as a value
+* Remvoe test code
+
 v3.5.4 - 2014.10.12
 * Fixed: 'CloudPage' object has not attribute 'on_remove_button_clicked'
 * Fixed: 'App' object has no attribute 'home_page'
