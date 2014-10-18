@@ -41,19 +41,6 @@ def latency():
     '''
     return str(random.random())[:7]
 
-def rec_split_path(path):
-    '''将一个路径进行分隔, 分别得到每父母的绝对路径及目录名'''
-    if len(path) > 1 and path.endswith('/'):
-        path = path[:-1]
-    result = []
-    while path != '/':
-        parent, name = os.path.split(path)
-        result.append((path, name))
-        path = parent
-    result.append(('/', '/'))
-    result.reverse()
-    return result
-
 def get_human_size(size, use_giga=True):
     '''将文件大小由byte, 转为人类可读的字符串
     size     -  整数, 文件的大小, 以byte为单位
@@ -77,6 +64,47 @@ def get_delta_days(from_sec, to_sec):
     seconds = abs(to_sec - from_sec)
     delta = datetime.timedelta(seconds=seconds)
     return delta.days
+
+def get_human_time(t):
+    '''将时间标记转换成字符串'''
+    if isinstance(t, int):
+        # ignore micro seconds
+        if len(str(t)) == 13:
+            t = t // 1000
+        t = datetime.datetime.fromtimestamp(t)
+    return datetime.datetime.strftime(t, '%Y-%m-%d %H:%M:%S')
+
+def get_recent_mtime(t):
+    '''获取更精简的时间.
+
+    如果是当天的, 就返回时间; 如果是当年的, 就近回月份和日期; 否则返回完整的时间
+    '''
+    if isinstance(t, int):
+        # ignore micro seconds
+        if len(str(t)) == 13:
+            t = t // 1000
+        t = datetime.datetime.fromtimestamp(t)
+    now = datetime.datetime.now()
+    delta = now - t
+    if delta.days == 0:
+        return datetime.datetime.strftime(t, '%H:%M:%S')
+    elif now.year == t.year:
+        return datetime.datetime.strftime(t, '%b %d')
+    else:
+        return datetime.datetime.strftime(t, '%b %d %Y')
+
+def rec_split_path(path):
+    '''将一个路径进行分隔, 分别得到每父母的绝对路径及目录名'''
+    if len(path) > 1 and path.endswith('/'):
+        path = path[:-1]
+    result = []
+    while path != '/':
+        parent, name = os.path.split(path)
+        result.append((path, name))
+        path = parent
+    result.append(('/', '/'))
+    result.reverse()
+    return result
 
 def list_remove_by_index(l, index):
     '''将list中的index位的数据删除'''

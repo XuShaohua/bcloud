@@ -497,7 +497,7 @@ class DownloadPage(Gtk.Box):
         def on_worker_disk_error(worker, fs_id, tmp_filepath):
             GLib.idle_add(do_worker_disk_error, fs_id, tmp_filepath)
 
-        if row[FSID_COL] in self.workers:
+        if not row or row[FSID_COL] in self.workers:
             return
         row[STATE_COL] = State.DOWNLOADING
         row[STATENAME_COL] = StateNames[State.DOWNLOADING]
@@ -541,7 +541,7 @@ class DownloadPage(Gtk.Box):
         将任务状态设定为Downloading, 如果没有超过最大任务数的话;
         否则将它设定为Waiting.
         '''
-        if row[STATE_COL] in RUNNING_STATES :
+        if not row or row[STATE_COL] in RUNNING_STATES :
             return
         row[STATE_COL] = State.WAITING
         row[STATENAME_COL] = StateNames[State.WAITING]
@@ -558,6 +558,8 @@ class DownloadPage(Gtk.Box):
             self.pause_task(row, scan=False)
 
     def pause_task(self, row, scan=True):
+        if not row:
+            return
         if row[STATE_COL] == State.DOWNLOADING:
             self.pause_worker(row)
         if row[STATE_COL] in (State.DOWNLOADING, State.WAITING):
@@ -570,6 +572,8 @@ class DownloadPage(Gtk.Box):
     def remove_task(self, row, scan=True):
         # 当删除正在下载的任务时, 直接调用stop_worker(), 它会自动删除本地的
         # 文件片段
+        if not row:
+            return
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)
         elif row[CURRSIZE_COL] < row[SIZE_COL]:
