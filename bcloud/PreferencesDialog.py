@@ -74,7 +74,7 @@ class PreferencesDialog(Gtk.Dialog):
         dark_theme_switch.props.halign = Gtk.Align.START
         general_grid.attach(dark_theme_switch, 1, 3, 1, 1)
 
-        status_label = Gtk.Label.new(_('Minimize to system tray:'))
+        status_label = Gtk.Label.new(_('Use Status Icon:'))
         status_label.props.xalign = 1
         general_grid.attach(status_label, 0, 4, 1, 1)
         status_switch = Gtk.Switch()
