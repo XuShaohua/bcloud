@@ -72,3 +72,6 @@ class UploadMode:
 DownloadMode = UploadMode
 
 UPLOAD_ONDUP = ('', 'overwrite', 'newcopy')
+
+# 视图模式
+ICON_VIEW, TREE_VIEW = 0, 1

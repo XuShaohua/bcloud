@@ -7,6 +7,7 @@ from gi.repository import Gtk
 
 from bcloud import Config
 _ = Config._
+from bcloud import const
 from bcloud.IconWindow import IconWindow
 from bcloud.IconWindow import TreeWindow
 from bcloud import gutil
@@ -24,6 +25,7 @@ class CategoryPage(Gtk.Box):
     page_num = 1
     has_next = True
     first_run = True
+    name = 'CategoryPage'
 
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
@@ -53,7 +55,8 @@ class CategoryPage(Gtk.Box):
             grid_view_button = Gtk.RadioButton()
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
-            grid_view_button.set_active(True)
+            grid_view_button.set_active(
+                    self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
             grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
@@ -102,7 +105,8 @@ class CategoryPage(Gtk.Box):
             grid_view_button.props.margin_right = 10
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
-            grid_view_button.set_active(True)
+            grid_view_button.set_active(
+                    self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
             grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
@@ -112,9 +116,6 @@ class CategoryPage(Gtk.Box):
                     self.on_grid_view_button_clicked)
             nav_bar.pack_start(grid_view_button, False, False, 0)
 
-        self.icon_window = IconWindow(self, app)
-        self.pack_end(self.icon_window, True, True, 0)
-
     def on_page_show(self):
         if Config.GTK_GE_312:
             self.app.window.set_titlebar(self.headerbar)
@@ -123,6 +124,12 @@ class CategoryPage(Gtk.Box):
     def check_first(self):
         if self.first_run:
             self.first_run = False
+            if self.app.profile['view-mode'][self.name] == const.ICON_VIEW:
+                self.icon_window = IconWindow(self, self.app)
+            else:
+                self.icon_window = TreeWindow(self, self.app)
+            self.pack_end(self.icon_window, True, True, 0)
+            self.icon_window.show_all()
             self.load()
 
     def load(self):
@@ -179,6 +186,8 @@ class CategoryPage(Gtk.Box):
             self.icon_window = TreeWindow(self, self.app)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
+            self.app.profile['view-mode'][self.name] = const.TREE_VIEW
+            gutil.dump_profile(self.app.profile)
             self.reload()
 
     def on_grid_view_button_clicked(self, button):
@@ -187,6 +196,8 @@ class CategoryPage(Gtk.Box):
             self.icon_window = IconWindow(self, self.app)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
+            self.app.profile['view-mode'][self.name] = const.ICON_VIEW
+            gutil.dump_profile(self.app.profile)
             self.reload()
 
 
@@ -194,6 +205,7 @@ class VideoPage(CategoryPage):
 
     icon_name = 'videos-symbolic'
     disname = _('Videos')
+    name = 'VideoPage'
     tooltip = _('Videos')
     category = 1
 
@@ -202,6 +214,7 @@ class MusicPage(CategoryPage):
 
     icon_name = 'music-symbolic'
     disname = _('Music')
+    name = 'MusicPage'
     tooltip = _('Music')
     category = 2
 
@@ -210,6 +223,7 @@ class PicturePage(CategoryPage):
 
     icon_name = 'pictures-symbolic'
     disname = _('Pictures')
+    name = 'PicturePage'
     tooltip = _('Pictures')
     category = 3
 
@@ -218,6 +232,7 @@ class DocPage(CategoryPage):
 
     icon_name = 'documents-symbolic'
     disname = _('Documents')
+    name = 'DocPage'
     tooltip = _('Documents')
     category = 4
 
@@ -226,6 +241,7 @@ class OtherPage(CategoryPage):
 
     icon_name = 'others-symbolic'
     disname = _('Others')
+    name = 'OtherPage'
     tooltip = _('Others')
     category = 6
 
@@ -234,5 +250,6 @@ class BTPage(CategoryPage):
 
     icon_name = 'bittorrent-symbolic'
     disname = _('BT')
+    name = 'BTPage'
     tooltip = _('BT seeds')
     category = 7

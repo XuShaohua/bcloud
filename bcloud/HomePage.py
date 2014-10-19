@@ -10,6 +10,7 @@ from gi.repository import Gtk
 
 from bcloud import Config
 _ = Config._
+from bcloud import const
 from bcloud.IconWindow import IconWindow
 from bcloud.IconWindow import TreeWindow
 from bcloud import gutil
@@ -50,6 +51,7 @@ class HomePage(Gtk.Box):
 
     icon_name = 'home-symbolic'
     disname = _('Home')
+    name = 'HomePage'
     tooltip = _('Show all of your files on Cloud')
     first_run = False
     page_num = 1
@@ -76,7 +78,7 @@ class HomePage(Gtk.Box):
 
             path_win = Gtk.ScrolledWindow()
             self.headerbar.pack_start(path_win)
-            # FIXME: add arrows
+            # FIXME: add arrows in both sides
             path_win.props.hscrollbar_policy = Gtk.PolicyType.NEVER
             path_win.props.vscrollbar_policy = Gtk.PolicyType.NEVER
             path_viewport = Gtk.Viewport()
@@ -102,7 +104,8 @@ class HomePage(Gtk.Box):
             grid_view_button = Gtk.RadioButton()
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
-            grid_view_button.set_active(True)
+            grid_view_button.set_active(
+                    self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
             grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
@@ -136,7 +139,6 @@ class HomePage(Gtk.Box):
             self.loading_spin.props.valign = Gtk.Align.CENTER
             self.headerbar.pack_end(self.loading_spin)
 
-            # TODO: use gtk search bar
             self.search_entry = Gtk.SearchEntry()
             self.search_entry.set_icon_from_icon_name(
                     Gtk.EntryIconPosition.PRIMARY,
@@ -192,7 +194,8 @@ class HomePage(Gtk.Box):
             grid_view_button = Gtk.RadioButton()
             grid_view_button.set_mode(False)
             grid_view_button.join_group(list_view_button)
-            grid_view_button.set_active(True)
+            grid_view_button.set_active(
+                    self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
             grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
@@ -212,9 +215,6 @@ class HomePage(Gtk.Box):
                                       self.on_search_entry_activated)
             self.pack_start(self.search_entry, False, False, 0)
 
-        self.icon_window = IconWindow(self, app)
-        self.pack_end(self.icon_window, True, True, 0)
-
     def on_page_show(self):
         if Config.GTK_GE_312:
             self.app.window.set_titlebar(self.headerbar)
@@ -223,6 +223,12 @@ class HomePage(Gtk.Box):
     def check_first(self):
         if self.first_run:
             self.first_run = False
+            if self.app.profile['view-mode'][self.name] == const.ICON_VIEW:
+                self.icon_window = IconWindow(self, self.app)
+            else:
+                self.icon_window = TreeWindow(self, self.app)
+            self.pack_end(self.icon_window, True, True, 0)
+            self.icon_window.show_all()
             self.load()
 
     # Open API
@@ -300,6 +306,8 @@ class HomePage(Gtk.Box):
             self.icon_window = TreeWindow(self, self.app)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
+            self.app.profile['view-mode'][self.name] = const.TREE_VIEW
+            gutil.dump_profile(self.app.profile)
             self.reload()
 
     def on_grid_view_button_clicked(self, grid_view_button):
@@ -308,6 +316,8 @@ class HomePage(Gtk.Box):
             self.icon_window = IconWindow(self, self.app)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
+            self.app.profile['view-mode'][self.name] = const.ICON_VIEW
+            gutil.dump_profile(self.app.profile)
             self.reload()
 
     def on_search_entry_activated(self, search_entry):

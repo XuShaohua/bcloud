@@ -64,6 +64,7 @@ class DownloadPage(Gtk.Box):
 
     icon_name = 'download-symbolic'
     disname = _('Download')
+    name = 'DownloadPage'
     tooltip = _('Downloading tasks')
     first_run = True
     workers = {}                    # { `fs_id': (worker,row) }

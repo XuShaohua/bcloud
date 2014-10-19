@@ -32,6 +32,7 @@ class CloudPage(Gtk.Box):
 
     icon_name = 'cloud-symbolic'
     disname = _('Cloud')
+    name = 'CloudPage'
     tooltip = _('Cloud Download')
     first_run = True
 

@@ -44,6 +44,7 @@ class UploadPage(Gtk.Box):
 
     icon_name = 'upload-symbolic'
     disname = _('Upload')
+    name = 'UploadPage'
     tooltip = _('Uploading tasks')
     first_run = True
     workers = {}  # {`fid`: (worker, row)}

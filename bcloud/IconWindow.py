@@ -18,6 +18,7 @@ from gi.repository import Pango
 
 from bcloud import Config
 _ = Config._
+from bcloud import const
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.NewFolderDialog import NewFolderDialog
 from bcloud.PropertiesDialog import PropertiesDialog

@@ -47,6 +47,16 @@ DEFAULT_PROFILE = {
     'download-timeout': 60, # 60 秒后下载超时
     'download-mode': 0,     # 下载时如果本地已存在同名文件时的操作方式
     'upload-mode': 0,       # 上传时如果服务器端已存在同名文件时的操作方式
+    'view-mode': {          # 保存的视图模式
+        'HomePage': 0,
+        'CategoryPage': 0,
+        'BTPage': 0,
+        'OtherPage': 0,
+        'DocPage': 0,
+        'PicturePage': 0,
+        'MusicPage': 0,
+        'VideoPage': 0,
+    },
 }
 RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
 AVATAR_UPDATE_INTERVAL = 604800  # 用户头像更新频率, 默认是7天
