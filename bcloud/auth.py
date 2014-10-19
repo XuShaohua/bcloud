@@ -15,9 +15,6 @@ import traceback
 import urllib.request
 from urllib import parse
 
-from lxml import html
-from lxml.cssselect import CSSSelector as CSS
-
 from bcloud import const
 from bcloud import encoder
 from bcloud.log import logger

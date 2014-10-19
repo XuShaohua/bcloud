@@ -17,6 +17,7 @@ from bcloud import Config
 Config.check_first()
 _ = Config._
 from bcloud import gutil
+from bcloud.log import logger
 from bcloud import util
 from bcloud.MimeProvider import MimeProvider
 from bcloud.PreferencesDialog import PreferencesDialog
@@ -105,12 +106,12 @@ class App:
         self.window.add(paned)
 
         left_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+        left_box.get_style_context().add_class(Gtk.STYLE_CLASS_SIDEBAR)
         paned.add1(left_box)
         paned.child_set_property(left_box, 'shrink', False)
         paned.child_set_property(left_box, 'resize', False)
 
         nav_window = Gtk.ScrolledWindow()
-        nav_window.get_style_context().add_class(Gtk.STYLE_CLASS_SIDEBAR)
         nav_window.props.hscrollbar_policy = Gtk.PolicyType.NEVER
         left_box.pack_start(nav_window, True, True, 0)
 
@@ -137,6 +138,11 @@ class App:
         self.progressbar.set_show_text(True)
         self.progressbar.set_text(_('Unknown'))
         left_box.pack_end(self.progressbar, False, False, 0)
+
+        self.img_avatar = Gtk.Image()
+        self.img_avatar.props.halign = Gtk.Align.CENTER
+        left_box.pack_end(self.img_avatar, False, False, 5)
+
 
         self.notebook = Gtk.Notebook()
         self.notebook.props.show_tabs = False
@@ -195,6 +201,7 @@ class App:
             for index, page in enumerate(self.notebook):
                 page.first_run = True
             self.switch_page(self.home_page)
+            self.update_avatar()
         else:
             self.quit()
 
@@ -262,6 +269,19 @@ class App:
         total_size = util.get_human_size(total)[0]
         self.progressbar.set_text(used_size + ' / ' + total_size)
         self.progressbar.set_fraction(used / total)
+
+    def update_avatar(self):
+        '''更新用户头像'''
+        def do_update_avatar(img_path, error=None):
+            if error or not img_path:
+                logger.error('Failed to get user avatar: %s, %s' %
+                             (img_path, error))
+            else:
+                self.img_avatar.set_from_file(img_path)
+        cache_path = Config.get_cache_path(self.profile['username'])
+        self.img_avatar.props.tooltip_text = self.profile['username']
+        gutil.async_call(gutil.update_avatar, self.cookie, cache_path,
+                         callback=do_update_avatar)
 
     def init_notebook(self):
         def append_page(page):

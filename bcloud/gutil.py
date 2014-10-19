@@ -7,6 +7,7 @@ import json
 import os
 import subprocess
 import threading
+import time
 import traceback
 
 import dbus
@@ -18,6 +19,7 @@ from gi.repository import GLib
 from bcloud import Config
 from bcloud.log import logger
 from bcloud import net
+from bcloud import pcs
 from bcloud import util
 try:
     import keyring
@@ -47,6 +49,8 @@ DEFAULT_PROFILE = {
     'upload-mode': 0,       # 上传时如果服务器端已存在同名文件时的操作方式
 }
 RETRIES = 3   # 调用keyring模块与libgnome-keyring交互的尝试次数
+AVATAR_UPDATE_INTERVAL = 604800  # 用户头像更新频率, 默认是7天
+
 
 def async_call(func, *args, callback=None):
     '''Call `func` in background thread, and then call `callback` in Gtk main thread.
@@ -132,6 +136,24 @@ def update_liststore_image(liststore, tree_iters, col, pcs_files, dir_name,
             status = dump_image(url, filepath)
             if status:
                 GLib.idle_add(update_image, filepath, tree_iter)
+
+def update_avatar(cookie, dir_name):
+    '''获取用户头像信息'''
+    filepath = os.path.join(dir_name, 'avatar.jpg')
+    if (os.path.exists(filepath) and
+            time.time() - os.stat(filepath).st_mtime <= AVATAR_UPDATE_INTERVAL):
+        return filepath
+    img_url = pcs.get_avatar(cookie)
+    if not img_url:
+        return None
+    else:
+        req = net.urlopen(img_url)
+        if not req or not req.data:
+            logger.warn('gutil.update_avatar(), failed to request %s' % url)
+            return None
+        with open(filepath, 'wb') as fh:
+            fh.write(req.data)
+        return filepath
 
 def ellipse_text(text, length=10):
     if len(text) < length:

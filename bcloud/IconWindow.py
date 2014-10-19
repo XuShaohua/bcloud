@@ -255,10 +255,10 @@ class IconWindow(Gtk.ScrolledWindow):
             sep_item = Gtk.SeparatorMenuItem()
             menu.append(sep_item)
 
-        download_item = Gtk.MenuItem.new_with_label(_('Download...'))
+        download_item = Gtk.MenuItem.new_with_label(_('Download'))
         download_item.connect('activate', self.on_download_activated)
         menu.append(download_item)
-        share_item = Gtk.MenuItem.new_with_label(_('Share...'))
+        share_item = Gtk.MenuItem.new_with_label(_('Share'))
         share_item.connect('activate', self.on_share_activated)
         menu.append(share_item)
 

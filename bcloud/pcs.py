@@ -11,6 +11,9 @@ import json
 import os
 import re
 
+from lxml import html
+from lxml.cssselect import CSSSelector as CSS
+
 from bcloud import auth
 from bcloud import const
 from bcloud import encoder
@@ -962,5 +965,23 @@ def cloud_clear_task(cookie, tokens):
     if req:
         content = req.data
         return json.loads(content.decode())
+    else:
+        return None
+
+def get_avatar(cookie):
+    '''获取当前用户的头像'''
+    def parse_avatar(content):
+        img_sel = CSS('img.account-avatar-show')
+        tree = html.fromstring(content)
+        img_elems = img_sel(tree)
+        if len(img_elems) == 1:
+            return img_elems[0].attrib.get('src', None)
+        else:
+            return None
+
+    url = 'http://passport.baidu.com/center?_t=' + util.timestamp()
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        return parse_avatar(req.data.decode())
     else:
         return None
