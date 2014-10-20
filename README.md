@@ -79,6 +79,13 @@ bcloud目前已经开始调用gtk3.12中的组件, 这样与新版gnome-shell的
 但旧的发行版, 比如debian 7等, 里面的gtk3的版本很老, 只能继续使用旧的界面了.
 它们在功能上并无差别.
 
+5.有命令行界面吗?
+bcloud只提供了GUI界面. 但是, 可以很方便的基于bcloud进行扩展, bcloud实现了百度网
+盘的大部分接口, 其中bcloud/auth.py用于授权登录, bcloud/pcs.py是网盘接口.
+
+比如, [这个issue](https://github.com/LiuLang/bcloud/issues/47)里面,
+通过调用bcloud, 来遍历网盘, 得到文件目录结构.
+
 
 版权
 ====
