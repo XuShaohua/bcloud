@@ -116,21 +116,28 @@ class DownloadPage(Gtk.Box):
                                        self.on_open_folder_button_clicked)
             self.headerbar.pack_start(open_folder_button)
 
+            right_box = Gtk.Box()
+            right_box_context = right_box.get_style_context()
+            right_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            self.headerbar.pack_end(right_box)
+
             remove_button = Gtk.Button()
             remove_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             remove_button.set_image(remove_img)
             remove_button.set_tooltip_text(_('Remove'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
-            self.headerbar.pack_end(remove_button)
+            right_box.pack_start(remove_button, False, False, 0)
 
             remove_finished_button = Gtk.Button()
-            remove_finished_img = Gtk.Image.new_from_icon_name('list-remove-all-symbolic',
-                                                               Gtk.IconSize.SMALL_TOOLBAR)
+            remove_finished_img = Gtk.Image.new_from_icon_name(
+                    'list-remove-all-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
             remove_finished_button.set_image(remove_finished_img)
-            remove_finished_button.set_tooltip_text(_('Remove finished'))
-            remove_finished_button.connect('clicked', self.on_remove_finished_button_clicked)
-            self.headerbar.pack_end(remove_finished_button)
+            remove_finished_button.set_tooltip_text(_('Remove completed tasks'))
+            remove_finished_button.connect('clicked',
+                    self.on_remove_finished_button_clicked)
+            right_box.pack_end(remove_finished_button, False, False, 0)
 
             self.speed_label = Gtk.Label()
             self.headerbar.pack_end(self.speed_label)
@@ -152,9 +159,10 @@ class DownloadPage(Gtk.Box):
             open_folder_button.props.margin_left = 40
             control_box.pack_start(open_folder_button, False, False, 0)
 
-            remove_finished_button = Gtk.Button.new_with_label(_('Remove finished'))
-            remove_finished_button.connect('clicked', self.on_remove_finished_button_clicked)
-            remove_finished_button.props.margin_right = 5
+            remove_finished_button = Gtk.Button.new_with_label(
+                    _('Remove completed tasks'))
+            remove_finished_button.connect('clicked',
+                    self.on_remove_finished_button_clicked)
             control_box.pack_end(remove_finished_button, False, False, 0)
 
             remove_button = Gtk.Button.new_with_label(_('Remove'))
@@ -654,7 +662,6 @@ class DownloadPage(Gtk.Box):
         for row in self.liststore:
             if row[STATE_COL] == State.FINISHED:
                 self.remove_task(row, scan=False)
-
         self.scan_tasks()
 
     def on_open_folder_button_clicked(self, button):

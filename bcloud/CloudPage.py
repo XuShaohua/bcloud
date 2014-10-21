@@ -76,7 +76,6 @@ class CloudPage(Gtk.Box):
                     Gtk.IconSize.SMALL_TOOLBAR)
             remove_button.set_image(delete_img)
             remove_button.set_tooltip_text(_('Remove'))
-            remove_button.set_tooltip_text(_('Delete selected tasks'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
             right_box.pack_start(remove_button, False, False, 0)
 
@@ -84,7 +83,7 @@ class CloudPage(Gtk.Box):
             clear_img = Gtk.Image.new_from_icon_name('list-remove-all-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             clear_button.set_image(clear_img)
-            clear_button.set_tooltip_text(_('Delete all cloud tasks'))
+            clear_button.set_tooltip_text(_('Remove completed cloud tasks'))
             clear_button.connect('clicked', self.on_clear_button_clicked)
             right_box.pack_start(clear_button, False, False, 0)
 
@@ -117,12 +116,12 @@ class CloudPage(Gtk.Box):
             control_box.pack_start(open_button, False, False, 0)
 
             clear_button = Gtk.Button.new_with_label(_('Clear'))
-            clear_button.set_tooltip_text(_('Clear finished or canceled tasks'))
+            clear_button.set_tooltip_text(_('Remove completed cloud tasks'))
             clear_button.connect('clicked', self.on_clear_button_clicked)
             control_box.pack_end(clear_button, False, False, 0)
 
             remove_button = Gtk.Button.new_with_label(_('Remove'))
-            remove_button.set_tooltip_text(_('Remove selected tasks'))
+            remove_button.set_tooltip_text(_('Remove'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
             control_box.pack_end(remove_button, False, False, 0)
 

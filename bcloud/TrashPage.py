@@ -73,7 +73,7 @@ class TrashPage(Gtk.Box):
             clear_img = Gtk.Image.new_from_icon_name('list-remove-all-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             clear_button.set_image(clear_img)
-            clear_button.set_tooltip_text(_('Delete all files in trash'))
+            clear_button.set_tooltip_text(_('Clear trash'))
             clear_button.connect('clicked', self.on_clear_button_clicked)
             right_box.pack_start(clear_button, False, False, 0)
 
@@ -102,7 +102,7 @@ class TrashPage(Gtk.Box):
             control_box.pack_start(reload_button, False, False, 0)
 
             clear_button = Gtk.Button.new_with_label(_('Clear Trash'))
-            clear_button.set_tooltip_text(_('Will delete all files in trash'))
+            clear_button.set_tooltip_text(_('Clear trash'))
             clear_button.connect('clicked', self.on_clear_button_clicked)
             control_box.pack_end(clear_button, False, False, 0)
 

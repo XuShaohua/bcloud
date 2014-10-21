@@ -100,13 +100,28 @@ class UploadPage(Gtk.Box):
             upload_button.connect('clicked', self.on_upload_button_clicked)
             self.headerbar.pack_start(upload_button)
 
+            right_box = Gtk.Box()
+            right_box_context = right_box.get_style_context()
+            right_box_context.add_class(Gtk.STYLE_CLASS_RAISED)
+            right_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
+            self.headerbar.pack_end(right_box)
+
             remove_button = Gtk.Button()
             remove_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             remove_button.set_image(remove_img)
             remove_button.set_tooltip_text(_('Remove'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
-            self.headerbar.pack_end(remove_button)
+            right_box.pack_start(remove_button, False, False, 0)
+
+            remove_finished_button = Gtk.Button()
+            remove_finished_img = Gtk.Image.new_from_icon_name(
+                    'list-remove-all-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
+            remove_finished_button.set_image(remove_finished_img)
+            remove_finished_button.set_tooltip_text(_('Remove completed tasks'))
+            remove_finished_button.connect('clicked',
+                    self.on_remove_finished_button_clicked)
+            right_box.pack_start(remove_finished_button, False, False, 0)
         else:
             control_box = Gtk.Box()
             self.pack_start(control_box, False, False, 0)
@@ -129,6 +144,12 @@ class UploadPage(Gtk.Box):
                                        self.on_open_folder_button_clicked)
             open_folder_button.props.margin_left = 40
             control_box.pack_start(open_folder_button, False, False, 0)
+
+            remove_finished_button = Gtk.Button.new_with_label(
+                    _('Remove completed tasks'))
+            remove_finished_button.connect('clicked',
+                    self.on_remove_finished_button_clicked)
+            control_box.pack_end(remove_finished_button, False, False, 0)
 
             remove_button = Gtk.Button.new_with_label(_('Remove'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
@@ -620,6 +641,15 @@ class UploadPage(Gtk.Box):
 
     def on_remove_button_clicked(self, button):
         self.operate_selected_rows(self.remove_task)
+
+    def on_remove_finished_button_clicked(self, button):
+        tree_iters = []
+        for row in self.liststore:
+            if row[STATE_COL] == Status.FINISHED:
+                tree_iters.append(self.liststore.get_iter(row.path))
+        for tree_iter in tree_iters:
+            if tree_iter:
+                self.liststore.remove(tree_iter)
 
     def on_open_folder_button_clicked(self, button):
         model, tree_paths = self.selection.get_selected_rows()
