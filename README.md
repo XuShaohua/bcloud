@@ -25,30 +25,29 @@ bcloud 是[百度网盘](http://pan.baidu.com)的Linux桌面客户端.
 服务器的连接授权, 然后使用bcloud/pcs.py调用相应的网盘接口.
 
 
-安装
-====
+自动安装
+=======
 请用户直接到 [bcloud-packages](https://github.com/LiuLang/bcloud-packages)
-下载发行版相对应的安装包, 比如deb, rpm等.
+下载发行版相对应的安装包, 比如deb, rpm等..
 
+手动安装
+========
 如果需要手动安装的话, 也可以用`pip3`(ArchLinux里面是`pip`)来安装,
 比如: `# pip3 install bcloud`
 
+但要确保已经安装了以下依赖包:
 
-依赖的软件包
-===========
-
-* python3-gi  Gtk3 的 python3 绑定. 这个包需要手动安装gir1.2-gtk-3.0, 但它并
-没有把这个依赖关系写清楚, 详细情况请看 [issue 5](https://github.com/LiuLang/bcloud/issues/5)
+* python3-gi  Gtk3 的 python3 绑定, Fedora里面的名称是python3-gobject.
+* gir1.2-gtk-3.0, gtk3界面的gir动态绑定.
 * gnome-icon-theme-symbolic Gnome3 提供的一套按钮图标.
-* python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到
-gnome-keyring或kwallet里面; 如果缺少了这个模块, 帐户的密码就会被明文存储!
-* gnome-keyring或者kwalletmanager, 并且要保证它在用户登录桌面后自动启动.
-代替gnome-keyring.
-* python3-dbus  dbus的python3绑定, 如果在密码时超时, 会产生一个dbus.exceptions.Exception异常.
+* python3-keyring  这个模块是推荐安装的, 用于把帐户的密码存放到gnome-keyring或
+kwallet里面.
+* gnome-keyring或者kwalletmanager, 用于托管用户密码
+* python3-dbus  dbus的python3绑定.
 * python3-lxml 强大的XML解析器, 可以在[这里](https://pypi.python.org/pypi/lxml)下载.
 * python3-cssselect CSS3 属性选择器, 在[这里](https://pypi.python.org/pypi/cssselect).
 * python3-crypto  使用RSA算法加密用户密码.
-* gir1.2-notify 这个是GtkNotification的接口, 显示桌面消息通知
+* gir1.2-notify 这个用于显示桌面消息通知.
 
 Q&A
 ===
