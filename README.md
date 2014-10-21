@@ -62,10 +62,7 @@ Q&A
 本来工作之外的时间就非常少, 还有很多其它事情要处理. 所以如果你报告了bug或者
 反馈了问题, 没有及时收到回复, 请多等待一下, 我会安排时间处理这些问题的.
 
-关于 115 网盘, 前段时间写了一个[油猴脚本](https://github.com/LiuLang/monkey-videos/tree/master/115),
-可以用它来直接观看网盘里的视频, 这个脚本属于[monkey-videos](https://github.com/LiuLang/monkey-videos)项目.
-
-3.如果设置keyring?
+3.如何设置keyring?
 ArchLinux 用户最有可能遇到这个问题. 因为在debian/ubuntu/mint等系统里面, keyring
 在安装后会自动被配置好, 而在arch中, 这些都需要用户手动设定, 很麻烦.
 
