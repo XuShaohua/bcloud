@@ -124,6 +124,14 @@ class DownloadPage(Gtk.Box):
             remove_button.connect('clicked', self.on_remove_button_clicked)
             self.headerbar.pack_end(remove_button)
 
+            remove_finished_button = Gtk.Button()
+            remove_finished_img = Gtk.Image.new_from_icon_name('list-remove-all-symbolic',
+                                                               Gtk.IconSize.SMALL_TOOLBAR)
+            remove_finished_button.set_image(remove_finished_img)
+            remove_finished_button.set_tooltip_text(_('Remove finished'))
+            remove_finished_button.connect('clicked', self.on_remove_finished_button_clicked)
+            self.headerbar.pack_end(remove_finished_button)
+
             self.speed_label = Gtk.Label()
             self.headerbar.pack_end(self.speed_label)
         else:
@@ -143,6 +151,11 @@ class DownloadPage(Gtk.Box):
                                        self.on_open_folder_button_clicked)
             open_folder_button.props.margin_left = 40
             control_box.pack_start(open_folder_button, False, False, 0)
+
+            remove_finished_button = Gtk.Button.new_with_label(_('Remove finished'))
+            remove_finished_button.connect('clicked', self.on_remove_finished_button_clicked)
+            remove_finished_button.props.margin_right = 5
+            control_box.pack_end(remove_finished_button, False, False, 0)
 
             remove_button = Gtk.Button.new_with_label(_('Remove'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
@@ -636,6 +649,13 @@ class DownloadPage(Gtk.Box):
 
     def on_remove_button_clicked(self, button):
         self.operate_selected_rows(self.remove_task)
+
+    def on_remove_finished_button_clicked(self, button):
+        for row in self.liststore:
+            if row[STATE_COL] == State.FINISHED:
+                self.remove_task(row, scan=False)
+
+        self.scan_tasks()
 
     def on_open_folder_button_clicked(self, button):
         model, tree_paths = self.selection.get_selected_rows()
