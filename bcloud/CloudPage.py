@@ -33,7 +33,7 @@ class CloudPage(Gtk.Box):
     icon_name = 'cloud-symbolic'
     disname = _('Cloud')
     name = 'CloudPage'
-    tooltip = _('Cloud Download')
+    tooltip = _('Cloud download')
     first_run = True
 
     def __init__(self, app):
@@ -75,7 +75,7 @@ class CloudPage(Gtk.Box):
             delete_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             remove_button.set_image(delete_img)
-            remove_button.set_tooltip_text(_('Remove'))
+            remove_button.set_tooltip_text(_('Remove selected tasks'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
             right_box.pack_start(remove_button, False, False, 0)
 

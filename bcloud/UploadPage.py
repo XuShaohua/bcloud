@@ -45,7 +45,7 @@ class UploadPage(Gtk.Box):
     icon_name = 'upload-symbolic'
     disname = _('Upload')
     name = 'UploadPage'
-    tooltip = _('Uploading tasks')
+    tooltip = _('Uploading files')
     first_run = True
     workers = {}  # {`fid`: (worker, row)}
     commit_count = 0
@@ -110,7 +110,7 @@ class UploadPage(Gtk.Box):
             remove_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             remove_button.set_image(remove_img)
-            remove_button.set_tooltip_text(_('Remove'))
+            remove_button.set_tooltip_text(_('Remove selected tasks'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
             right_box.pack_start(remove_button, False, False, 0)
 

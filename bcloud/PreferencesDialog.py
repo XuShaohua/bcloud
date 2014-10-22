@@ -128,6 +128,7 @@ class PreferencesDialog(Gtk.Dialog):
         network_grid.attach(retries_each, 0, 3, 1, 1)
         retries_spin = Gtk.SpinButton.new_with_range(0, 120, 1)
         retries_spin.set_value(self.app.profile['retries-each'])
+        retries_spin.connect('value-changed', self.on_retries_value_changed)
         retries_spin.props.halign = Gtk.Align.START
         retries_spin.set_tooltip_text(_('0: disable retries'))
         network_grid.attach(retries_spin, 1, 3, 1, 1)

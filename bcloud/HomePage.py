@@ -52,7 +52,7 @@ class HomePage(Gtk.Box):
     icon_name = 'home-symbolic'
     disname = _('Home')
     name = 'HomePage'
-    tooltip = _('Show all of your files on Cloud')
+    tooltip = _('List all of your files')
     first_run = False
     page_num = 1
     path = '/'

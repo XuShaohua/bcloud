@@ -65,7 +65,7 @@ class DownloadPage(Gtk.Box):
     icon_name = 'download-symbolic'
     disname = _('Download')
     name = 'DownloadPage'
-    tooltip = _('Downloading tasks')
+    tooltip = _('Downloading files')
     first_run = True
     workers = {}                    # { `fs_id': (worker,row) }
     app_infos = {}                  # { `fs_id': app }
@@ -126,7 +126,7 @@ class DownloadPage(Gtk.Box):
             remove_img = Gtk.Image.new_from_icon_name('list-remove-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             remove_button.set_image(remove_img)
-            remove_button.set_tooltip_text(_('Remove'))
+            remove_button.set_tooltip_text(_('Remove selected tasks'))
             remove_button.connect('clicked', self.on_remove_button_clicked)
             right_box.pack_start(remove_button, False, False, 0)
 
