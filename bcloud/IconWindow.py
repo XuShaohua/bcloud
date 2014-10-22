@@ -119,7 +119,7 @@ class IconWindow(Gtk.ScrolledWindow):
         path = self.liststore[tree_path][PATH_COL]
         type_ = self.liststore[tree_path][TYPE_COL]
         if type_ == 'folder':
-            self.app.home_page.load(path)
+            self.app.home_page.load(path, is_user=True)
         else:
             self.launch_app(tree_path)
 

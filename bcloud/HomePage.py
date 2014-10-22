@@ -19,11 +19,18 @@ from bcloud import pcs
 from bcloud import util
 
 class PathBox(Gtk.Box):
+    MOUSE_BACK_BUTTON = 8
+    MOUSE_FORWARD_BUTTON = 9
 
     def __init__(self, parent):
         super().__init__(spacing=0)
         self.parent = parent
-        
+
+        self.view_history = list()
+        self.view_history_pos = -1
+
+        parent.connect('button-press-event', self.on_button_press)
+
     def clear_buttons(self):
         buttons = self.get_children()
         for button in buttons:
@@ -39,11 +46,43 @@ class PathBox(Gtk.Box):
     def on_button_clicked(self, button):
         self.parent.load(button.abspath)
 
-    def set_path(self, path):
+    def on_button_press(self, window, event: Gdk.EventKey):
+        if event.button == self.MOUSE_BACK_BUTTON:
+            path = self.history_navigate(True)
+        elif event.button == self.MOUSE_FORWARD_BUTTON:
+            path = self.history_navigate(False)
+        else:
+            return
+
+        if path:
+            self.parent.load(path)
+
+    def add_view_history(self, abs_path):
+        logger.debug("add view history: %s", abs_path)
+        self.view_history = self.view_history[:self.view_history_pos + 1]
+        self.view_history.append(abs_path)
+        self.view_history_pos += 1
+
+    def history_navigate(self, is_back: bool) -> str:
+        length = len(self.view_history)
+        pos = self.view_history_pos + (-1 if is_back else 1)
+        if pos not in range(0, length):
+            return None
+        path = self.view_history[pos]
+        self.view_history_pos = pos
+        return path
+
+    def set_path(self, path, is_user=False):
+        """
+        :param bool is_user: this event was fired by user
+        """
         self.clear_buttons()
         pathlist = util.rec_split_path(path)
         for (abspath, name) in pathlist:
             self.append_button(abspath, name)
+
+        if is_user:
+            self.add_view_history(path)
         self.show_all()
 
 
@@ -229,14 +268,14 @@ class HomePage(Gtk.Box):
                 self.icon_window = TreeWindow(self, self.app)
             self.pack_end(self.icon_window, True, True, 0)
             self.icon_window.show_all()
-            self.load()
+            self.load(is_user=True)
 
     # Open API
-    def load(self, path='/'):
+    def load(self, path='/', is_user=False):
         self.path = path
         self.page_num = 1
         self.has_next = True
-        self.path_box.set_path(path)
+        self.path_box.set_path(path, is_user)
         self.loading_spin.start()
         self.loading_spin.show_all()
         gutil.async_call(pcs.list_dir, self.app.cookie, self.app.tokens,
