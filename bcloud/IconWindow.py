@@ -34,6 +34,13 @@ from bcloud import util
             range(11))
 TYPE_TORRENT = 'application/x-bittorrent'
 
+DRAG_TEXT = 0
+DRAG_TARGETS = (
+    ('text/plain', Gtk.TargetFlags.SAME_WIDGET, DRAG_TEXT),
+)
+TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DRAG_TARGETS]
+DRAG_ACTION = Gdk.DragAction.MOVE
+
 class IconWindow(Gtk.ScrolledWindow):
     '''这个类用于获取文件, 并将它显示到IconView中去.
 
@@ -63,6 +70,12 @@ class IconWindow(Gtk.ScrolledWindow):
         self.iconview.set_tooltip_column(TOOLTIP_COL)
         self.iconview.set_item_width(84)
         self.iconview.set_selection_mode(Gtk.SelectionMode.MULTIPLE)
+
+        self.iconview.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
+                                               TARGET_LIST, DRAG_ACTION)
+        self.iconview.connect('drag-data-get', self.on_drag_data_get)
+        self.iconview.enable_model_drag_dest(TARGET_LIST, DRAG_ACTION)
+        self.iconview.connect('drag-data-received', self.on_drag_data_received)
         self.iconview.connect('item-activated', self.on_iconview_item_activated)
         self.iconview.connect('button-press-event',
                               self.on_iconview_button_pressed)
@@ -114,6 +127,43 @@ class IconWindow(Gtk.ScrolledWindow):
     def on_scrolled(self, adj):
         if gutil.reach_scrolled_bottom(adj) and self.parent.has_next:
             self.parent.load_next()
+
+    def on_drag_data_get(self, widget, context, data, info, time):
+        '''拖放开始'''
+        tree_paths = self.iconview.get_selected_items()
+        if not tree_paths:
+            return
+        filelist = []
+        for tree_path in tree_paths:
+            filelist.append({
+                'path': self.liststore[tree_path][PATH_COL],
+                'newname': self.liststore[tree_path][NAME_COL],
+            })
+        filelist_str = json.dumps(filelist)
+        if info == DRAG_TEXT:
+            data.set_text(filelist_str, -1)
+
+    def on_drag_data_received(self, widget, context, x, y, data, info, time):
+        '''拖放结束'''
+        if not data:
+            return
+        tree_path = self.iconview.get_path_at_pos(x, y)
+        if tree_path is None:
+            return
+        target_path = self.liststore[tree_path][PATH_COL]
+        if info != DRAG_TEXT:
+            return
+        filelist_str = data.get_data().decode()
+        filelist = json.loads(filelist_str)
+        for file_item in filelist:
+            if file_item['path'] == target_path:
+                # TODO: show a message dialog
+                # move a folder into itself
+                return
+        for file_item in filelist:
+            file_item['dest'] = target_path
+        gutil.async_call(pcs.move, self.app.cookie, self.app.tokens, filelist,
+                         callback=self.parent.reload)
 
     def on_iconview_item_activated(self, iconview, tree_path):
         path = self.liststore[tree_path][PATH_COL]
@@ -452,18 +502,18 @@ class IconWindow(Gtk.ScrolledWindow):
 
         dialog = FolderBrowserDialog(self.parent, self.app, _('Move To...'))
         response = dialog.run()
-        targ_path = ''
+        target_path = ''
         if response != Gtk.ResponseType.OK:
             dialog.destroy()
             return
-        targ_path = dialog.get_path()
+        target_path = dialog.get_path()
         dialog.destroy()
 
         filelist = []
         for tree_path in tree_paths:
             filelist.append({
                 'path': self.liststore[tree_path][PATH_COL],
-                'dest': targ_path,
+                'dest': target_path,
                 'newname': self.liststore[tree_path][NAME_COL],
             })
         gutil.async_call(pcs.move, self.app.cookie, self.app.tokens, filelist,
@@ -476,18 +526,18 @@ class IconWindow(Gtk.ScrolledWindow):
 
         dialog = FolderBrowserDialog(self.parent, self.app, _('Copy To...'))
         response = dialog.run()
-        targ_path = ''
+        target_path = ''
         if response != Gtk.ResponseType.OK:
             dialog.destroy()
             return
-        targ_path = dialog.get_path()
+        target_path = dialog.get_path()
         dialog.destroy()
 
         filelist = []
         for tree_path in tree_paths:
             filelist.append({
                 'path': self.liststore[tree_path][PATH_COL],
-                'dest': targ_path,
+                'dest': target_path,
                 'newname': self.liststore[tree_path][NAME_COL],
             })
         gutil.async_call(pcs.copy, self.app.cookie, self.app.tokens, filelist,

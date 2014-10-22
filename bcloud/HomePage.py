@@ -65,8 +65,11 @@ class PathBox(Gtk.Box):
 
     def history_navigate(self, is_back: bool) -> str:
         length = len(self.view_history)
-        pos = self.view_history_pos + (-1 if is_back else 1)
-        if pos not in range(0, length):
+        if is_back:
+            pos = self.view_history_pos -1
+        else:
+            pos = self.view_history_pos + 1
+        if pos not in range(length):
             return None
         path = self.view_history[pos]
         self.view_history_pos = pos
