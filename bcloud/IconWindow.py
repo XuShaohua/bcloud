@@ -151,14 +151,14 @@ class IconWindow(Gtk.ScrolledWindow):
         if tree_path is None:
             return
         target_path = self.liststore[tree_path][PATH_COL]
-        if info != DRAG_TEXT:
+        is_dir = self.liststore[tree_path][ISDIR_COL]
+        if not is_dir or info != DRAG_TEXT:
             return
         filelist_str = data.get_data().decode()
         filelist = json.loads(filelist_str)
         for file_item in filelist:
             if file_item['path'] == target_path:
-                # TODO: show a message dialog
-                # move a folder into itself
+                self.app.toast(_('Error: Move folder to itself!'))
                 return
         for file_item in filelist:
             file_item['dest'] = target_path
@@ -592,6 +592,11 @@ class TreeWindow(IconWindow):
     def init_ui(self):
         self.iconview = Gtk.TreeView(model=self.liststore)
         self.iconview.set_tooltip_column(TOOLTIP_COL)
+        self.iconview.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
+                                               TARGET_LIST, DRAG_ACTION)
+        self.iconview.connect('drag-data-get', self.on_drag_data_get)
+        self.iconview.enable_model_drag_dest(TARGET_LIST, DRAG_ACTION)
+        self.iconview.connect('drag-data-received', self.on_drag_data_received)
         self.iconview.connect('row-activated',
                 lambda view, path, column:
                     self.on_iconview_item_activated(view, path))
@@ -654,3 +659,29 @@ class TreeWindow(IconWindow):
             else:
                 return None
         self.iconview.get_path_at_pos = get_path_at_pos
+
+    def on_drag_data_received(self, widget, context, x, y, data, info, time):
+        '''拖放结束'''
+        if not data:
+            return
+        bx, by = self.iconview.convert_widget_to_bin_window_coords(x, y)
+        selected = Gtk.TreeView.get_path_at_pos(self.iconview, bx, by)
+        if not selected:
+            return
+        tree_path = selected[0]
+        if tree_path is None:
+            return
+        target_path = self.liststore[tree_path][PATH_COL]
+        is_dir = self.liststore[tree_path][ISDIR_COL]
+        if not is_dir or info != DRAG_TEXT:
+            return
+        filelist_str = data.get_data().decode()
+        filelist = json.loads(filelist_str)
+        for file_item in filelist:
+            if file_item['path'] == target_path:
+                self.app.toast(_('Error: Move folder to itself!'))
+                return
+        for file_item in filelist:
+            file_item['dest'] = target_path
+        gutil.async_call(pcs.move, self.app.cookie, self.app.tokens, filelist,
+                         callback=self.parent.reload)
