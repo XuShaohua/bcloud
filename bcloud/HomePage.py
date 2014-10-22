@@ -44,7 +44,7 @@ class PathBox(Gtk.Box):
         button.connect('clicked', self.on_button_clicked)
 
     def on_button_clicked(self, button):
-        self.parent.load(button.abspath)
+        self.parent.load(button.abspath, is_user=True)
 
     def on_button_press(self, window, event: Gdk.EventKey):
         if event.button == self.MOUSE_BACK_BUTTON:
