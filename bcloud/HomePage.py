@@ -25,34 +25,46 @@ class PathBox(Gtk.Box):
     MOUSE_FORWARD_BUTTON = 9
 
     def __init__(self, parent):
-        super().__init__(spacing=0)
+        super().__init__(spacing=10)
         self.parent = parent
-        self.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED)
-        self.get_style_context().add_class(Gtk.STYLE_CLASS_LINKED)
 
         self.view_history = list()
         self.view_history_pos = -1
-        self.init_history_navigate()
+        self.back_button, self.forward_button = self.init_history_navigate()
+
+        self.path_box = Gtk.Box()
+        self.path_box.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED)
+        self.path_box.get_style_context().add_class(Gtk.STYLE_CLASS_LINKED)
+        self.pack_start(self.path_box, False, False, 0)
 
     def init_history_navigate(self):
+        navigate_box = Gtk.Box()
+        navigate_box.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED)
+        navigate_box.get_style_context().add_class(Gtk.STYLE_CLASS_LINKED)
+        self.pack_start(navigate_box, False, False, 0)
+
         back_button = Gtk.Button()
         back_img = Gtk.Image.new_from_icon_name('go-previous-symbolic',
                                                 Gtk.IconSize.SMALL_TOOLBAR)
         back_button.set_image(back_img)
         back_button.set_tooltip_text(_('Back'))
+        back_button.set_can_focus(False)
         back_button.connect('clicked', self.on_back_button_clicked)
-        self.pack_start(back_button, False, False, 0)
+        navigate_box.pack_start(back_button, False, False, 0)
 
         forward_button = Gtk.Button()
         forward_img = Gtk.Image.new_from_icon_name('go-next-symbolic',
                                                    Gtk.IconSize.SMALL_TOOLBAR)
         forward_button.set_image(forward_img)
         forward_button.set_tooltip_text(_('Forward'))
-        forward_button.props.margin_right = 10
+        forward_button.set_can_focus(False)
         forward_button.connect('clicked', self.on_forward_button_clicked)
-        self.pack_start(forward_button, False, False, 0)
+        navigate_box.pack_start(forward_button, False, False, 0)
 
+        # listen mouse button events
         self.parent.connect('button-press-event', self.on_button_press)
+
+        return back_button, forward_button
 
     def on_back_button_clicked(self, button):
         self.history_navigate(True)
@@ -61,18 +73,17 @@ class PathBox(Gtk.Box):
         self.history_navigate(False)
 
     def clear_buttons(self):
-        buttons = self.get_children()
+        buttons = self.path_box.get_children()
         for button in buttons:
-            if hasattr(button, 'abspath'):
-                self.remove(button)
+            self.path_box.remove(button)
 
     def append_button(self, abspath, name):
         button = Gtk.Button.new_with_label(gutil.ellipse_text(name))
         button.abspath = abspath
         button.set_tooltip_text(name)
-        if Gtk.MINOR_VERSION < 12:
+        if not Config.GTK_GE_312:
             button.set_size_request(45, -1)
-        self.pack_start(button, False, False, 0)
+        self.path_box.pack_start(button, False, False, 0)
         button.connect('clicked', self.on_button_clicked)
 
     def on_button_clicked(self, button):
@@ -110,6 +121,12 @@ class PathBox(Gtk.Box):
         self.view_history_pos = pos
         return path
 
+    def can_back(self):
+        return self.view_history_pos > 0
+
+    def can_forward(self):
+        return self.view_history_pos < (len(self.view_history) - 1)
+
     def set_path(self, path, is_user=False):
         """
         :param bool is_user: this event was fired by user
@@ -121,6 +138,10 @@ class PathBox(Gtk.Box):
 
         if is_user:
             self.add_view_history(path)
+
+        self.back_button.set_sensitive(self.can_back())
+        self.forward_button.set_sensitive(self.can_forward())
+
         self.show_all()
 
 
