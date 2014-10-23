@@ -17,7 +17,7 @@ if __file__.startswith('/usr/local/'):
 elif __file__.startswith('/usr/'):
     PREF = '/usr/share'
 elif __file__.startswith('/home/'):
-    PREF = os.path.expanduser("~") + '/.local/share'
+    PREF = os.path.join(os.path.expanduser("~"), '.local/share')
 else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
 
