@@ -19,12 +19,16 @@ from bcloud import pcs
 from bcloud import util
 
 class PathBox(Gtk.Box):
+    '''路径栏'''
+
     MOUSE_BACK_BUTTON = 8
     MOUSE_FORWARD_BUTTON = 9
 
     def __init__(self, parent):
         super().__init__(spacing=0)
         self.parent = parent
+        self.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED)
+        self.get_style_context().add_class(Gtk.STYLE_CLASS_LINKED)
 
         self.view_history = list()
         self.view_history_pos = -1
@@ -65,7 +69,7 @@ class PathBox(Gtk.Box):
         self.view_history.append(abs_path)
         self.view_history_pos += 1
 
-    def history_navigate(self, is_back: bool) -> str:
+    def history_navigate(self, is_back):
         length = len(self.view_history)
         if is_back:
             pos = self.view_history_pos -1
@@ -331,6 +335,7 @@ class HomePage(Gtk.Box):
         self.load(self.path)
 
     def do_drag_data_received(self, drag_context, x, y, data, info, time):
+        '''从其它程序拖放目录/文件, 以便上传'''
         uris = data.get_text()
         source_paths = util.uris_to_paths(uris)
         if source_paths and self.app.profile:
