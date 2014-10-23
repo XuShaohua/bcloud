@@ -83,12 +83,14 @@ bcloud只提供了GUI界面. 但是, 可以很方便的基于bcloud进行扩展,
 通过调用bcloud, 来遍历网盘, 得到文件目录结构.
 
 
+截屏
+====
+![bcloud-dark](screenshots/bcloud-dark.png)
+![bcloud-light](screenshots/bcloud-light.png)
+
+
 版权
 ====
 Copyright (C) 2014 [LiuLang](mailto:gsushzhsosgsu@gmail.com)
 
 基于GNU通用许可协议第三版发布, 详细的许可信息请参考 [LICENSE](LICENSE)
-
-截屏
-====
-![MainWindow](screenshots/bcloud.png)
