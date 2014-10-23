@@ -89,7 +89,7 @@ class PathBox(Gtk.Box):
     def on_button_clicked(self, button):
         self.parent.load(button.abspath, is_user=True)
 
-    def on_button_press(self, window, event: Gdk.EventKey):
+    def on_button_press(self, window, event):
         if event.button == self.MOUSE_BACK_BUTTON:
             self.history_navigate(True)
         elif event.button == self.MOUSE_FORWARD_BUTTON:

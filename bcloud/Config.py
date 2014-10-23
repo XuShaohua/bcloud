@@ -40,7 +40,6 @@ AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
 DESCRIPTION = _('Baidu Pan client for GNU/Linux desktop users.')
 
-HOME_DIR = os.path.expanduser('~')
 CACHE_DIR = os.path.join(HOME_DIR, '.cache', NAME)
 
 # Check Gtk version <= 3.6
