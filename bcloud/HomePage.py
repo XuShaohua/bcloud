@@ -32,13 +32,39 @@ class PathBox(Gtk.Box):
 
         self.view_history = list()
         self.view_history_pos = -1
+        self.init_history_navigate()
 
-        parent.connect('button-press-event', self.on_button_press)
+    def init_history_navigate(self):
+        back_button = Gtk.Button()
+        back_img = Gtk.Image.new_from_icon_name('go-previous-symbolic',
+                                                Gtk.IconSize.SMALL_TOOLBAR)
+        back_button.set_image(back_img)
+        back_button.set_tooltip_text(_('Back'))
+        back_button.connect('clicked', self.on_back_button_clicked)
+        self.pack_start(back_button, False, False, 0)
+
+        forward_button = Gtk.Button()
+        forward_img = Gtk.Image.new_from_icon_name('go-next-symbolic',
+                                                   Gtk.IconSize.SMALL_TOOLBAR)
+        forward_button.set_image(forward_img)
+        forward_button.set_tooltip_text(_('Forward'))
+        forward_button.props.margin_right = 10
+        forward_button.connect('clicked', self.on_forward_button_clicked)
+        self.pack_start(forward_button, False, False, 0)
+
+        self.parent.connect('button-press-event', self.on_button_press)
+
+    def on_back_button_clicked(self, button):
+        self.history_navigate(True)
+
+    def on_forward_button_clicked(self, button):
+        self.history_navigate(False)
 
     def clear_buttons(self):
         buttons = self.get_children()
         for button in buttons:
-            self.remove(button)
+            if hasattr(button, 'abspath'):
+                self.remove(button)
 
     def append_button(self, abspath, name):
         button = Gtk.Button.new_with_label(gutil.ellipse_text(name))
@@ -54,11 +80,14 @@ class PathBox(Gtk.Box):
 
     def on_button_press(self, window, event: Gdk.EventKey):
         if event.button == self.MOUSE_BACK_BUTTON:
-            path = self.history_navigate(True)
+            self.history_navigate(True)
         elif event.button == self.MOUSE_FORWARD_BUTTON:
-            path = self.history_navigate(False)
+            self.history_navigate(False)
         else:
             return
+
+    def history_navigate(self, is_back):
+        path = self.get_history_path(is_back)
 
         if path:
             self.parent.load(path)
@@ -69,7 +98,7 @@ class PathBox(Gtk.Box):
         self.view_history.append(abs_path)
         self.view_history_pos += 1
 
-    def history_navigate(self, is_back):
+    def get_history_path(self, is_back):
         length = len(self.view_history)
         if is_back:
             pos = self.view_history_pos -1
