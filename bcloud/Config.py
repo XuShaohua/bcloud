@@ -12,12 +12,14 @@ from gi.repository import Gtk
 
 import bcloud
 
+HOME_DIR = os.path.expanduser('~')
+LOCAL_DIR = os.path.join(HOME_DIR, '.local')
 if __file__.startswith('/usr/local/'):
     PREF = '/usr/local/share'
 elif __file__.startswith('/usr/'):
     PREF = '/usr/share'
-elif __file__.startswith('/home/'):
-    PREF = os.path.join(os.path.expanduser("~"), '.local/share')
+elif __file__.startswith(LOCAL_DIR):
+    PREF = os.path.join(LOCAL_DIR, 'share')
 else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
 
