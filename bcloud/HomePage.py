@@ -40,6 +40,7 @@ class PathBox(Gtk.Box):
         button = Gtk.Button.new_with_label(gutil.ellipse_text(name))
         button.abspath = abspath
         button.set_tooltip_text(name)
+        button.set_size_request(45, -1)
         self.pack_start(button, False, False, 0)
         button.connect('clicked', self.on_button_clicked)
 
