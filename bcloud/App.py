@@ -65,6 +65,7 @@ class App:
         GLib.set_prgname(Config.NAME)
         GLib.set_application_name(Config.APPNAME)
         self.window.set_icon_from_file(Config.ICON_PATH)
+        self.window.props.window_position = Gtk.WindowPosition.CENTER
         self.window.props.hide_titlebar_when_maximized = True
         self.window.connect('check-resize', self.on_main_window_resized)
         self.window.connect('delete-event', self.on_main_window_deleted)
