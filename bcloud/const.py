@@ -8,6 +8,9 @@
 与界面相关的常量, 都位于Config.py.
 '''
 
+from bcloud import Config
+_ = Config._
+
 BAIDU_URL = 'http://www.baidu.com/'
 PASSPORT_BASE = 'https://passport.baidu.com/'
 PASSPORT_URL = PASSPORT_BASE + 'v2/api/'
@@ -75,3 +78,17 @@ UPLOAD_ONDUP = ('', 'overwrite', 'newcopy')
 
 # 视图模式
 ICON_VIEW, TREE_VIEW = 0, 1
+
+class ValidatePathState:
+    '''文件路径检验结果'''
+    OK = 0
+    LENGTH_ERROR = 1
+    CHAR_ERROR2 = 2
+    CHAR_ERROR3 = 3
+
+ValidatePathStateText = [
+    '',
+    _('Max characters in filepath shall no more than 1000'),
+    _('Filepath should not contain "\\ ? | \" > < : *"'),
+    _('"\\r \\n \\t \\0 \\x0B" or SPACE should not appear in start or end of filename'),
+]

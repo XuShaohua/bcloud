@@ -13,6 +13,7 @@ import traceback
 import urllib.parse
 import time
 
+from bcloud.const import ValidatePathState
 from bcloud.log import logger
 try:
     from Crypto.PublicKey import RSA
@@ -97,6 +98,8 @@ def rec_split_path(path):
     '''将一个路径进行分隔, 分别得到每父母的绝对路径及目录名'''
     if len(path) > 1 and path.endswith('/'):
         path = path[:-1]
+    if '/' not in path:
+        return [path,]
     result = []
     while path != '/':
         parent, name = os.path.split(path)
@@ -178,3 +181,29 @@ def json_loads_single(s):
     except (ValueError, UnicodeDecodeError):
         logger.error(traceback.format_exc())
         return None
+
+def validate_pathname(filepath):
+    '''检查路径中是否包含特殊字符.
+
+    百度网盘对路径/文件名的要求很严格:
+      1. 路径长度限制为1000
+      2. 路径中不能包含以下字符：\\ ? | " > < : *
+      3. 文件名或路径名开头结尾不能是“.”或空白字符，空白字符包括: \r, \n, \t, 空格, \0, \x0B
+
+    @return, 返回的状态码: 0 表示正常
+
+    '''
+    if filepath == '/':
+        return ValidatePathState.OK
+    if len(filepath) > 1000:
+        return ValidatePathState.LENGTH_ERROR
+    filter2 = '\\?|"><:*'
+    for c in filter2:
+        if c in filepath:
+            return ValidatePathState.CHAR_ERROR2
+    paths = rec_split_path(filepath)
+    filter3 = '.\r\n\t \0\x0b'
+    for path in paths:
+        if path[0] in filter3 or path[-1] in filter3:
+            return ValidatePathState.CHAR_ERROR3
+    return ValidatePathState.OK
