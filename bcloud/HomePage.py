@@ -174,7 +174,7 @@ class HomePage(Gtk.Box):
             ['text/plain', Gtk.TargetFlags.OTHER_APP, 0],
             ['*.*', Gtk.TargetFlags.OTHER_APP, 1]
         ]
-        target_list =[Gtk.TargetEntry.new(*t) for t in targets]
+        target_list = [Gtk.TargetEntry.new(*t) for t in targets]
         self.drag_dest_set(Gtk.DestDefaults.ALL, target_list,
                            Gdk.DragAction.COPY)
 

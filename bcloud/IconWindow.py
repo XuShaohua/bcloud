@@ -261,20 +261,25 @@ class IconWindow(Gtk.ScrolledWindow):
                     cloud_download_item.connect('activate',
                             self.on_cloud_download_item_activated)
                     menu.append(cloud_download_item)
+                default_app_info = Gio.AppInfo.get_default_for_type(file_type,
+                                                                    False)
                 app_infos = Gio.AppInfo.get_recommended_for_type(file_type)
+                if app_infos:
+                    app_infos = [info for info in app_infos if \
+                            info.get_name() != default_app_info.get_name()]
                 # 第一个app_info是默认的app.
-                if len(app_infos) > 2:
-                    app_info = app_infos[0]
+                if len(app_infos) > 1:
                     launch_item = Gtk.ImageMenuItem.new_with_label(
-                        _('Open With {0}').format(app_info.get_display_name()))
-                    build_app_menu(menu, launch_item, app_info)
+                        _('Open With {0}').format(
+                            default_app_info.get_display_name()))
+                    build_app_menu(menu, launch_item, default_app_info)
 
                     more_app_item = Gtk.MenuItem.new_with_label(_('Open With'))
                     menu.append(more_app_item)
                     sub_menu = Gtk.Menu()
                     more_app_item.set_submenu(sub_menu)
 
-                    for app_info in app_infos[1:]:
+                    for app_info in app_infos:
                         launch_item = Gtk.ImageMenuItem.new_with_label(
                                 app_info.get_display_name())
                         build_app_menu(sub_menu, launch_item, app_info)
@@ -286,6 +291,10 @@ class IconWindow(Gtk.ScrolledWindow):
                                             self.on_choose_app_activated)
                     sub_menu.append(choose_app_item)
                 else:
+                    if app_infos:
+                        app_infos = (default_app_info, app_infos[0])
+                    elif default_app_info:
+                        app_infos = (default_app_info, )
                     for app_info in app_infos:
                         launch_item = Gtk.ImageMenuItem.new_with_label(
                             _('Open With {0}').format(
