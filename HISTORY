@@ -1,3 +1,13 @@
+v3.5.6 - 2014.10.24
+* Feature: add navigation button to path box; https://github.com/LiuLang/bcloud/pull/74, https://github.com/LiuLang/bcloud/pull/80
+* Feature: support drag and drop in IconWindow
+* Feature: save view mode in IconWindow
+* Feature: show avatar
+* Fixed: show default app_info in popup menu
+* Fixed: failed to load bcloud/bcloud.png; https://github.com/LiuLang/bcloud/pull/78
+* Fixed: TypeError: unknown type(null) in DownloadPage
+* i18n updated
+
 v3.5.5 - 2014.10.17
 * Change url request timeout from 30s to 50s
 * Change log level from DEBUG to INFO
