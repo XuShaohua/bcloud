@@ -83,8 +83,8 @@ class PathBox(Gtk.Box):
         button.set_tooltip_text(name)
 
         if abspath == '/':
-            home_img = Gtk.Image.new_from_icon_name('user-home-symbolic', False)
-            button.set_label(_('Home'))
+            home_img = Gtk.Image.new_from_icon_name('user-home-symbolic',
+                                                    Gtk.IconSize.SMALL_TOOLBAR)
             button.set_image(home_img)
         else:
             button.set_label(gutil.ellipse_text(name))
