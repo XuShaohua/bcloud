@@ -78,11 +78,20 @@ class PathBox(Gtk.Box):
             self.path_box.remove(button)
 
     def append_button(self, abspath, name):
-        button = Gtk.Button.new_with_label(gutil.ellipse_text(name))
+        button = Gtk.Button()
         button.abspath = abspath
         button.set_tooltip_text(name)
+
+        if abspath == '/':
+            home_img = Gtk.Image.new_from_icon_name('user-home-symbolic', False)
+            button.set_label(_('Home'))
+            button.set_image(home_img)
+        else:
+            button.set_label(gutil.ellipse_text(name))
+
         if not Config.GTK_GE_312:
-            button.set_size_request(45, -1)
+            button.set_size_request(32, -1)
+
         self.path_box.pack_start(button, False, False, 0)
         button.connect('clicked', self.on_button_clicked)
 
