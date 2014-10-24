@@ -16,6 +16,8 @@ from gi.repository import Pango
 from bcloud import Config
 _ = Config._
 from bcloud.const import UploadState as State
+from bcloud.const import ValidatePathState
+from bcloud.const import ValidatePathStateText
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.Uploader import Uploader
 from bcloud import gutil
@@ -396,7 +398,11 @@ class UploadPage(Gtk.Box):
                 return
             dir_name = folder_dialog.get_path()
             folder_dialog.destroy()
+        invalid_paths = []
         for source_path in source_paths:
+            if util.validate_pathname(source_path) != ValidatePathState.OK:
+                invalid_paths.append(source_path)
+                continue
             if (os.path.split(source_path)[1].startswith('.') and
                     not self.app.profile['uploading-hidden-files']):
                 continue
@@ -404,8 +410,42 @@ class UploadPage(Gtk.Box):
                 self.add_file_task(source_path, dir_name)
             elif os.path.isdir(source_path):
                 scan_folders(source_path)
+
         self.app.blink_page(self)
         self.scan_tasks()
+
+        if not invalid_paths:
+            return
+        dialog = Gtk.Dialog(_('Invalid Filepath'), self.app.window,
+                            Gtk.DialogFlags.MODAL,
+                            (Gtk.STOCK_CLOSE, Gtk.ResponseType.OK))
+        dialog.set_default_size(640, 480)
+        dialog.set_border_width(10)
+        box = dialog.get_content_area()
+
+        scrolled_window = Gtk.ScrolledWindow()
+        box.pack_start(scrolled_window, True, True, 0)
+        text_buffer = Gtk.TextBuffer()
+        textview = Gtk.TextView.new_with_buffer(text_buffer)
+        scrolled_window.add(textview)
+        for invalid_path in invalid_paths:
+            text_buffer.insert_at_cursor(invalid_path)
+            text_buffer.insert_at_cursor('\n')
+
+        infobar = Gtk.InfoBar()
+        infobar.set_message_type(Gtk.MessageType.ERROR)
+        box.pack_end(infobar, False, False, 0)
+        info_label= Gtk.Label()
+        infobar.get_content_area().pack_start(info_label, False, False, 0)
+        info_label.set_label(''.join([
+            '* ', ValidatePathStateText[1], '\n',
+            '* ', ValidatePathStateText[2], '\n',
+            '* ', ValidatePathStateText[3], '\n',
+        ]))
+
+        box.show_all()
+        dialog.run()
+        dialog.destroy()
 
     def add_file_task(self, source_path, dir_name):
         '''创建新的上传任务'''
@@ -645,7 +685,7 @@ class UploadPage(Gtk.Box):
     def on_remove_finished_button_clicked(self, button):
         tree_iters = []
         for row in self.liststore:
-            if row[STATE_COL] == Status.FINISHED:
+            if row[STATE_COL] == State.FINISHED:
                 tree_iters.append(self.liststore.get_iter(row.path))
         for tree_iter in tree_iters:
             if tree_iter:
