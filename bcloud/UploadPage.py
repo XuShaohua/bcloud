@@ -44,7 +44,7 @@ RUNNING_STATES = (State.FINISHED, State.UPLOADING, State.WAITING)
 
 class UploadPage(Gtk.Box):
 
-    icon_name = 'upload-symbolic'
+    icon_name = 'folder-upload-symbolic'
     disname = _('Upload')
     name = 'UploadPage'
     tooltip = _('Uploading files')
@@ -95,7 +95,7 @@ class UploadPage(Gtk.Box):
             self.headerbar.pack_start(open_folder_button)
 
             upload_button = Gtk.Button()
-            upload_img = Gtk.Image.new_from_icon_name('upload-symbolic',
+            upload_img = Gtk.Image.new_from_icon_name('folder-upload-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             upload_button.set_image(upload_img)
             upload_button.set_tooltip_text(_('Upload files'))

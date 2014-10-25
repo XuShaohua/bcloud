@@ -24,7 +24,7 @@ else:
     PREF = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'share')
 
 NAME = 'bcloud'
-ICON_PATH = os.path.join(PREF, NAME, 'bcloud.png')
+ICON_PATH = os.path.join(PREF, NAME, 'icons')
 COLOR_SCHEMA = os.path.join(PREF, NAME, 'color_schema.json')
 
 LOCALEDIR = os.path.join(PREF, 'locale')
@@ -36,7 +36,9 @@ DBUS_APP_NAME = 'org.liulang.bcloud'
 APPNAME = 'BCloud'
 VERSION = bcloud.__version__
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
-AUTHORS = ['LiuLang <gsushzhsosgsu@gmail.com>', ]
+AUTHORS = [
+    'LiuLang <gsushzhsosgsu@gmail.com>',
+]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
 DESCRIPTION = _('Baidu Pan client for GNU/Linux desktop users.')
 

@@ -156,7 +156,7 @@ class PathBox(Gtk.Box):
 
 class HomePage(Gtk.Box):
 
-    icon_name = 'home-symbolic'
+    icon_name = 'go-home-symbolic'
     disname = _('Home')
     name = 'HomePage'
     tooltip = _('List all of your files')
@@ -203,7 +203,7 @@ class HomePage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+            list_view_img = Gtk.Image.new_from_icon_name('view-list-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             right_box.pack_start(list_view_button, False, False, 0)
@@ -213,7 +213,7 @@ class HomePage(Gtk.Box):
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
                     self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
-            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+            grid_view_img = Gtk.Image.new_from_icon_name('view-grid-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
             list_view_button.connect('clicked',
@@ -233,7 +233,7 @@ class HomePage(Gtk.Box):
 
             # search button
             search_button = Gtk.ToggleButton()
-            search_img = Gtk.Image.new_from_icon_name('search-symbolic',
+            search_img = Gtk.Image.new_from_icon_name('edit-find-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             search_button.set_image(search_img)
             search_button.set_tooltip_text(
@@ -248,8 +248,7 @@ class HomePage(Gtk.Box):
 
             self.search_entry = Gtk.SearchEntry()
             self.search_entry.set_icon_from_icon_name(
-                    Gtk.EntryIconPosition.PRIMARY,
-                    'folder-saved-search-symbolic')
+                    Gtk.EntryIconPosition.PRIMARY, 'edit-find-symbolic')
             self.search_entry.props.no_show_all = True
             self.search_entry.props.visible = False
             self.search_entry.connect('activate',
@@ -275,7 +274,7 @@ class HomePage(Gtk.Box):
 
             # search button
             search_button = Gtk.ToggleButton()
-            search_img = Gtk.Image.new_from_icon_name('search-symbolic',
+            search_img = Gtk.Image.new_from_icon_name('edit-find-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             search_button.set_image(search_img)
             search_button.set_tooltip_text(
@@ -293,7 +292,7 @@ class HomePage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+            list_view_img = Gtk.Image.new_from_icon_name('view-list-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             right_box.pack_start(list_view_button, False, False, 0)
@@ -303,7 +302,7 @@ class HomePage(Gtk.Box):
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
                     self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
-            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+            grid_view_img = Gtk.Image.new_from_icon_name('view-grid-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
             list_view_button.connect('clicked',

@@ -47,7 +47,7 @@ class CategoryPage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+            list_view_img = Gtk.Image.new_from_icon_name('view-list-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             right_box.pack_start(list_view_button, False, False, 0)
@@ -57,7 +57,7 @@ class CategoryPage(Gtk.Box):
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
                     self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
-            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+            grid_view_img = Gtk.Image.new_from_icon_name('view-grid-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
             list_view_button.connect('clicked',
@@ -96,7 +96,7 @@ class CategoryPage(Gtk.Box):
             # toggle view mode
             list_view_button = Gtk.RadioButton()
             list_view_button.set_mode(False)
-            list_view_img = Gtk.Image.new_from_icon_name('list-view-symbolic',
+            list_view_img = Gtk.Image.new_from_icon_name('view-list-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             list_view_button.set_image(list_view_img)
             nav_bar.pack_start(list_view_button, False, False, 0)
@@ -107,7 +107,7 @@ class CategoryPage(Gtk.Box):
             grid_view_button.join_group(list_view_button)
             grid_view_button.set_active(
                     self.app.profile['view-mode'][self.name] == const.ICON_VIEW)
-            grid_view_img = Gtk.Image.new_from_icon_name('grid-view-symbolic',
+            grid_view_img = Gtk.Image.new_from_icon_name('view-grid-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             grid_view_button.set_image(grid_view_img)
             list_view_button.connect('clicked',
@@ -203,7 +203,7 @@ class CategoryPage(Gtk.Box):
 
 class VideoPage(CategoryPage):
 
-    icon_name = 'videos-symbolic'
+    icon_name = 'folder-videos-symbolic'
     disname = _('Videos')
     name = 'VideoPage'
     tooltip = _('Videos')
@@ -212,7 +212,7 @@ class VideoPage(CategoryPage):
 
 class MusicPage(CategoryPage):
 
-    icon_name = 'music-symbolic'
+    icon_name = 'folder-music-symbolic'
     disname = _('Music')
     name = 'MusicPage'
     tooltip = _('Music')
@@ -221,7 +221,7 @@ class MusicPage(CategoryPage):
 
 class PicturePage(CategoryPage):
 
-    icon_name = 'pictures-symbolic'
+    icon_name = 'folder-pictures-symbolic'
     disname = _('Pictures')
     name = 'PicturePage'
     tooltip = _('Pictures')
@@ -230,7 +230,7 @@ class PicturePage(CategoryPage):
 
 class DocPage(CategoryPage):
 
-    icon_name = 'documents-symbolic'
+    icon_name = 'folder-documents-symbolic'
     disname = _('Documents')
     name = 'DocPage'
     tooltip = _('Documents')

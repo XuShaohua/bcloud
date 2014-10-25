@@ -54,17 +54,16 @@ class App:
         self.app.connect('shutdown', self.on_app_shutdown)
 
     def on_app_startup(self, app):
+        GLib.set_application_name(Config.APPNAME)
         self.icon_theme = Gtk.IconTheme.get_default()
-        #self.icon_theme.append_search_path(Config.ICON_PATH)
+        self.icon_theme.append_search_path(Config.ICON_PATH)
         self.mime = MimeProvider(self)
         self.color_schema = Config.load_color_schema()
         self.set_dark_theme(True)
 
         self.window = Gtk.ApplicationWindow.new(application=app)
         self.window.set_default_size(*gutil.DEFAULT_PROFILE['window-size'])
-        GLib.set_prgname(Config.NAME)
-        GLib.set_application_name(Config.APPNAME)
-        self.window.set_icon_from_file(Config.ICON_PATH)
+        self.window.set_default_icon_name(Config.NAME)
         self.window.props.window_position = Gtk.WindowPosition.CENTER
         self.window.props.hide_titlebar_when_maximized = True
         self.window.connect('check-resize', self.on_main_window_resized)
