@@ -36,8 +36,11 @@ DBUS_APP_NAME = 'org.liulang.bcloud'
 APPNAME = 'BCloud'
 VERSION = bcloud.__version__
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
+# 这里只列出了提交代码在三次以上的开发者, 完整的开发者信息可以在
+# https://github.com/LiuLang/bcloud/pulls 查看
 AUTHORS = [
     'LiuLang <gsushzhsosgsu@gmail.com>',
+    'CzBiX <czbix@live.com>',
 ]
 COPYRIGHT = 'Copyright (c) 2014 LiuLang'
 DESCRIPTION = _('Baidu Pan client for GNU/Linux desktop users.')
