@@ -985,3 +985,47 @@ def get_avatar(cookie):
         return parse_avatar(req.data.decode())
     else:
         return None
+
+
+def share_transfer(shareid, bdstoken, myuk, paths, dest, cookie):
+    """
+    :param paths: the paths of file to save
+    :type paths: list
+    """
+    url = ('http://yun.baidu.com/share/transfer?shareid=%sfrom=%s'
+           '&bdstoken=%s&channel=chunlei&clienttype=0&web=1&app_id=250528')
+    if len(paths) > 1:
+        url += '&ondup=newcopy&async=1'
+    url %= shareid, myuk, bdstoken
+
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        'Content-Type': const.CONTENT_FORM_UTF8
+    }, data={'filelist': paths, 'path': dest})
+    if req:
+        content = req.data.decode()
+        return json.loads(content)
+    else:
+        return None
+
+
+def verify_share_password(share_id, share_uk, pwd, vcode=''):
+    """
+    :return: None for failed, otherwise will return cookie
+    """
+    url = (const.PAN_URL + 'share/verify?shareid=%s&uk=%s'
+           '&channel=chunlei&clienttype=0&web=1')
+    url %= share_id, share_uk
+
+    req = net.urlopen(url, data={'pwd': pwd, 'vcode': vcode})
+
+    if req:
+        content = req.data.decode()
+        result = json.loads(content)
+        if result.errno == 0:
+            return req.headers.get_all('Set-Cookie')
+        if result.errno in (-19, -62, -63):
+            pass  # TODO: need verify code
+
+    return None
+
