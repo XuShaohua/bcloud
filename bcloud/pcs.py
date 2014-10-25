@@ -985,3 +985,24 @@ def get_avatar(cookie):
         return parse_avatar(req.data.decode())
     else:
         return None
+
+def share_transfer(shareid, bdstoken, myuk, paths, dest, cookie):
+    """
+    :param paths: the paths of file to save
+    :type paths: list
+    """
+    url = ('http://yun.baidu.com/share/transfer?shareid=%sfrom=%s'
+           '&bdstoken=%s&channel=chunlei&clienttype=0&web=1&app_id=250528')
+    if len(paths) > 1:
+        url += '&ondup=newcopy&async=1'
+    url %= shareid, myuk, bdstoken
+
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        'Content-Type': const.CONTENT_FORM_UTF8
+        }, data={'filelist': paths, 'path': dest})
+    if req:
+        content = req.data.decode()
+        return json.loads(content)
+    else:
+        return None
