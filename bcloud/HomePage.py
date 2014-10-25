@@ -156,7 +156,7 @@ class PathBox(Gtk.Box):
 
 class HomePage(Gtk.Box):
 
-    icon_name = 'go-home-symbolic'
+    icon_name = 'user-home-symbolic'
     disname = _('Home')
     name = 'HomePage'
     tooltip = _('List all of your files')
