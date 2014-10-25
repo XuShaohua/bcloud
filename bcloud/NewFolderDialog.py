@@ -97,4 +97,5 @@ class NewFolderDialog(Gtk.Dialog):
     def mkdir(self):
         if self.validate_path():
             gutil.async_call(pcs.mkdir, self.app.cookie, self.app.tokens,
-                             abspath, callback=self.app.reload_current_page)
+                             self.entry.get_text(),
+                             callback=self.app.reload_current_page)
