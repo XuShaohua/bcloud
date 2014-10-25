@@ -9,6 +9,7 @@ import sqlite3
 import threading
 import time
 
+from gi.repository import Gdk
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
@@ -190,6 +191,8 @@ class DownloadPage(Gtk.Box):
         self.treeview.set_search_column(NAME_COL)
         self.selection = self.treeview.get_selection()
         self.selection.set_mode(Gtk.SelectionMode.MULTIPLE)
+        self.treeview.connect('button-press-event',
+                              self.on_treeview_button_pressed)
         scrolled_win.add(self.treeview)
         
         name_cell = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END,
@@ -670,3 +673,95 @@ class DownloadPage(Gtk.Box):
             return
         for tree_path in tree_paths:
             gutil.xdg_open(self.liststore[tree_path][SAVEDIR_COL])
+
+    def on_treeview_button_pressed(self, treeview, event):
+        def on_choose_app_activated(menu_item):
+            dialog = Gtk.AppChooserDialog.new_for_content_type(self.app.window,
+                    Gtk.DialogFlags.MODAL, file_type)
+            response = dialog.run()
+            app_info = dialog.get_app_info()
+            dialog.destroy()
+            if response != Gtk.ResponseType.OK:
+                return
+            do_launch_app(app_info)
+
+        def do_launch_app(app_info):
+            row = self.get_row_by_fsid(fs_id)
+            if not row:
+                return
+            filepath = os.path.join(row[SAVEDIR_COL], row[SAVENAME_COL])
+            gfile = Gio.File.new_for_path(filepath)
+            app_info.launch([gfile, ], None)
+
+        def build_app_menu(menu, menu_item, app_info):
+            menu_item.set_always_show_image(True)
+            img = self.app.mime.get_app_img(app_info)
+            if img:
+                menu_item.set_image(img)
+            menu_item.connect('activate', lambda *args: do_launch_app(app_info))
+            menu.append(menu_item)
+
+        if (event.type != Gdk.EventType.BUTTON_PRESS or
+                event.button != Gdk.BUTTON_SECONDARY):
+            return False
+        selection = self.selection.get_selected_rows()
+        if not selection or len(selection[1]) != 1:
+            return False
+        selected_path = selection[1][0]
+        row = self.liststore[int(str(selected_path))]
+        if row[STATE_COL] != State.FINISHED:
+            return
+        fs_id = row[FSID_COL]
+        file_type = self.app.mime.get(row[PATH_COL], False, icon_size=64)[1]
+
+        menu = Gtk.Menu()
+        self.menu = menu
+
+        default_app_info = Gio.AppInfo.get_default_for_type(file_type, False)
+        app_infos = Gio.AppInfo.get_recommended_for_type(file_type)
+        if app_infos:
+            app_infos = [info for info in app_infos if \
+                    info.get_name() != default_app_info.get_name()]
+        if len(app_infos) > 1:
+            launch_item = Gtk.ImageMenuItem.new_with_label(
+                _('Open With {0}').format(default_app_info.get_display_name()))
+            build_app_menu(menu, launch_item, default_app_info)
+
+            more_app_item = Gtk.MenuItem.new_with_label(_('Open With'))
+            menu.append(more_app_item)
+            sub_menu = Gtk.Menu()
+            more_app_item.set_submenu(sub_menu)
+
+            for app_info in app_infos:
+                launch_item = Gtk.ImageMenuItem.new_with_label(
+                        app_info.get_display_name())
+                build_app_menu(sub_menu, launch_item, app_info)
+            sep_item = Gtk.SeparatorMenuItem()
+            sub_menu.append(sep_item)
+            choose_app_item = Gtk.MenuItem.new_with_label(
+                    _('Other Application...'))
+            choose_app_item.connect('activate', on_choose_app_activated)
+            sub_menu.append(choose_app_item)
+        else:
+            if app_infos:
+                app_infos = (default_app_info, app_infos[0])
+            elif default_app_info:
+                app_infos = (default_app_info, )
+            for app_info in app_infos:
+                launch_item = Gtk.ImageMenuItem.new_with_label(
+                    _('Open With {0}').format(app_info.get_display_name()))
+                build_app_menu(menu, launch_item, app_info)
+            choose_app_item = Gtk.MenuItem.new_with_label(
+                    _('Open With Other Application...'))
+            choose_app_item.connect('activate', on_choose_app_activated)
+            menu.append(choose_app_item)
+
+        sep_item = Gtk.SeparatorMenuItem()
+        menu.append(sep_item)
+
+        remove_item = Gtk.MenuItem.new_with_label(_('Remove'))
+        remove_item.connect('activate', lambda *args: self.remove_task(row))
+        menu.append(remove_item)
+
+        menu.show_all()
+        menu.popup(None, None, None, None, event.button, event.time)

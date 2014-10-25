@@ -174,8 +174,8 @@ class IconWindow(Gtk.ScrolledWindow):
             self.launch_app(tree_path)
 
     def on_iconview_button_pressed(self, iconview, event):
-        if ((event.type != Gdk.EventType.BUTTON_PRESS) or
-                (event.button != Gdk.BUTTON_SECONDARY)):
+        if (event.type != Gdk.EventType.BUTTON_PRESS or
+                event.button != Gdk.BUTTON_SECONDARY):
             return False
 
         tree_path = self.iconview.get_path_at_pos(event.x, event.y)
