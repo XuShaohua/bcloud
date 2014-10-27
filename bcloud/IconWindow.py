@@ -39,7 +39,7 @@ DRAG_TARGETS = (
     ('text/plain', Gtk.TargetFlags.SAME_WIDGET, DRAG_TEXT),
 )
 TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DRAG_TARGETS]
-DRAG_ACTION = Gdk.DragAction.MOVE
+DRAG_ACTION = Gdk.DragAction.COPY
 
 class IconWindow(Gtk.ScrolledWindow):
     '''这个类用于获取文件, 并将它显示到IconView中去.
