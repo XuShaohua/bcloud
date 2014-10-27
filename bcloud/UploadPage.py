@@ -734,6 +734,7 @@ class UploadPage(Gtk.Box):
                 tree_iters.append(self.liststore.get_iter(row.path))
         for tree_iter in tree_iters:
             if tree_iter:
+                self.remove_task_db(self.liststore[tree_iter][FID_COL])
                 self.liststore.remove(tree_iter)
 
     def on_open_folder_button_clicked(self, button):
