@@ -17,6 +17,7 @@ from bcloud import Config
 Config.check_first()
 _ = Config._
 from bcloud import const
+from bcloud.const import TargetInfo, TargetType
 from bcloud import gutil
 from bcloud.log import logger
 from bcloud import util
@@ -36,6 +37,12 @@ if Config.GTK_LE_36:
 (ICON_COL, NAME_COL, TOOLTIP_COL, COLOR_COL) = list(range(4))
 BLINK_DELTA = 250    # 字体闪烁间隔, 250 miliseconds 
 BLINK_SUSTAINED = 3  # 字体闪烁持续时间, 5 seconds
+
+# 用于处理拖放上传
+DROP_TARGETS = (
+    (TargetType.URI_LIST, Gtk.TargetFlags.OTHER_APP, TargetInfo.URI_LIST),
+)
+DROP_TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DROP_TARGETS]
 
 
 class App:
@@ -71,7 +78,7 @@ class App:
         self.window.connect('delete-event', self.on_main_window_deleted)
         app.add_window(self.window)
 
-        self.window.drag_dest_set(Gtk.DestDefaults.ALL, const.DnD_TARGET_LIST,
+        self.window.drag_dest_set(Gtk.DestDefaults.ALL, DROP_TARGET_LIST,
                                   Gdk.DragAction.COPY)
         self.window.connect('drag-data-received',
                             self.on_main_window_drag_data_received)
@@ -219,7 +226,7 @@ class App:
         '''
         if not self.profile:
             return
-        if info == const.TARGET_TYPE_URI_LIST:
+        if info == TargetInfo.URI_LIST:
             uris = data.get_uris()
             source_paths = util.uris_to_paths(uris)
             if source_paths:

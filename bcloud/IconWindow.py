@@ -19,6 +19,7 @@ from gi.repository import Pango
 from bcloud import Config
 _ = Config._
 from bcloud import const
+from bcloud.const import TargetInfo, TargetType
 from bcloud.FolderBrowserDialog import FolderBrowserDialog
 from bcloud.NewFolderDialog import NewFolderDialog
 from bcloud.PropertiesDialog import PropertiesDialog
@@ -34,12 +35,18 @@ from bcloud import util
             range(11))
 TYPE_TORRENT = 'application/x-bittorrent'
 
-DRAG_TEXT = 0
 DRAG_TARGETS = (
-    ('text/plain', Gtk.TargetFlags.SAME_WIDGET, DRAG_TEXT),
+    # 用于拖拽下载
+    (TargetType.URI_LIST, Gtk.TargetFlags.OTHER_APP, TargetInfo.URI_LIST),
+    # 用于移动文件到子目录
+    (TargetType.PLAIN_TEXT, Gtk.TargetFlags.SAME_WIDGET, TargetInfo.PLAIN_TEXT),
 )
-TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DRAG_TARGETS]
-DRAG_ACTION = Gdk.DragAction.COPY
+DROP_TARGETS = (
+    (TargetType.PLAIN_TEXT, Gtk.TargetFlags.SAME_WIDGET, TargetInfo.PLAIN_TEXT),
+)
+DRAG_TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DRAG_TARGETS]
+DROP_TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DROP_TARGETS]
+DRAG_ACTION = Gdk.DragAction.MOVE
 
 class IconWindow(Gtk.ScrolledWindow):
     '''这个类用于获取文件, 并将它显示到IconView中去.
@@ -72,9 +79,9 @@ class IconWindow(Gtk.ScrolledWindow):
         self.iconview.set_selection_mode(Gtk.SelectionMode.MULTIPLE)
 
         self.iconview.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
-                                               TARGET_LIST, DRAG_ACTION)
+                                               DRAG_TARGET_LIST, DRAG_ACTION)
         self.iconview.connect('drag-data-get', self.on_drag_data_get)
-        self.iconview.enable_model_drag_dest(TARGET_LIST, DRAG_ACTION)
+        self.iconview.enable_model_drag_dest(DROP_TARGET_LIST, DRAG_ACTION)
         self.iconview.connect('drag-data-received', self.on_drag_data_received)
         self.iconview.connect('item-activated', self.on_iconview_item_activated)
         self.iconview.connect('button-press-event',
@@ -140,8 +147,11 @@ class IconWindow(Gtk.ScrolledWindow):
                 'newname': self.liststore[tree_path][NAME_COL],
             })
         filelist_str = json.dumps(filelist)
-        if info == DRAG_TEXT:
+        if info == TargetInfo.PLAIN_TEXT:
             data.set_text(filelist_str, -1)
+        # 拖拽时无法获取目标路径, 所以不能实现拖拽下载功能
+        elif info == TargetInfo.URI_LIST:
+            data.set_uris([])
 
     def on_drag_data_received(self, widget, context, x, y, data, info, time):
         '''拖放结束'''
@@ -152,9 +162,11 @@ class IconWindow(Gtk.ScrolledWindow):
             return
         target_path = self.liststore[tree_path][PATH_COL]
         is_dir = self.liststore[tree_path][ISDIR_COL]
-        if not is_dir or info != DRAG_TEXT:
+        if not is_dir or info != TargetInfo.PLAIN_TEXT:
             return
-        filelist_str = data.get_data().decode()
+        filelist_str = data.get_text()
+        if not filelist_str:
+            return
         filelist = json.loads(filelist_str)
         for file_item in filelist:
             if file_item['path'] == target_path:
@@ -624,9 +636,9 @@ class TreeWindow(IconWindow):
         self.iconview = Gtk.TreeView(model=self.liststore)
         self.iconview.set_tooltip_column(TOOLTIP_COL)
         self.iconview.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
-                                               TARGET_LIST, DRAG_ACTION)
+                                               DRAG_TARGET_LIST, DRAG_ACTION)
         self.iconview.connect('drag-data-get', self.on_drag_data_get)
-        self.iconview.enable_model_drag_dest(TARGET_LIST, DRAG_ACTION)
+        self.iconview.enable_model_drag_dest(DROP_TARGET_LIST, DRAG_ACTION)
         self.iconview.connect('drag-data-received', self.on_drag_data_received)
         self.iconview.connect('row-activated',
                 lambda view, path, column:
@@ -704,9 +716,9 @@ class TreeWindow(IconWindow):
             return
         target_path = self.liststore[tree_path][PATH_COL]
         is_dir = self.liststore[tree_path][ISDIR_COL]
-        if not is_dir or info != DRAG_TEXT:
+        if not is_dir or info != TargetInfo.PLAIN_TEXT:
             return
-        filelist_str = data.get_data().decode()
+        filelist_str = data.get_text()
         filelist = json.loads(filelist_str)
         for file_item in filelist:
             if file_item['path'] == target_path:

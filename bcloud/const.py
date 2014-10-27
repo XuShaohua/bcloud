@@ -8,8 +8,6 @@
 与界面相关的常量, 都位于Config.py.
 '''
 
-from gi.repository import Gtk
-
 from bcloud import Config
 _ = Config._
 
@@ -96,9 +94,19 @@ ValidatePathStateText = (
 )
 
 
-# 拖放目标, 接收从其它程序拖进来的目录
-TARGET_TYPE_URI_LIST = 0
-DnD_LIST = (
-    ('text/uri-list', Gtk.TargetFlags.OTHER_APP, TARGET_TYPE_URI_LIST),
-)
-DnD_TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DnD_LIST]
+class TargetInfo:
+    '''拖放类型编号'''
+
+    URI_LIST = 0
+    PLAIN_TEXT = 1
+    RAW = 2
+    TEXT_JSON = 3
+
+
+class TargetType:
+    '''拖放类型'''
+
+    URI_LIST = 'text/uri-list'
+    PLAIN_TEXT = 'text/plain'
+    RAW = 'application/octet-stream'
+    TEXT_JSON = 'application/json'

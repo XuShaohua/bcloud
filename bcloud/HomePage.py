@@ -11,12 +11,21 @@ from gi.repository import Gtk
 from bcloud import Config
 _ = Config._
 from bcloud import const
+from bcloud.const import TargetInfo, TargetType
 from bcloud.IconWindow import IconWindow
 from bcloud.IconWindow import TreeWindow
 from bcloud import gutil
 from bcloud.log import logger
 from bcloud import pcs
 from bcloud import util
+
+
+# 用于处理拖放上传
+DROP_TARGETS = (
+    (TargetType.URI_LIST, Gtk.TargetFlags.OTHER_APP, TargetInfo.URI_LIST),
+)
+DROP_TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DROP_TARGETS]
+
 
 class PathBox(Gtk.Box):
     '''路径栏'''
@@ -169,7 +178,7 @@ class HomePage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
 
-        self.drag_dest_set(Gtk.DestDefaults.ALL, const.DnD_TARGET_LIST,
+        self.drag_dest_set(Gtk.DestDefaults.ALL, DROP_TARGET_LIST,
                            Gdk.DragAction.COPY)
 
         if Config.GTK_GE_312:
@@ -394,7 +403,7 @@ class HomePage(Gtk.Box):
         '''
         if not self.app.profile:
             return
-        if info == const.TARGET_TYPE_URI_LIST:
+        if info == TargetInfo.URI_LIST:
             uris = data.get_uris()
             source_paths = util.uris_to_paths(uris)
             if source_paths:
