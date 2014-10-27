@@ -16,6 +16,7 @@ from gi.repository import Notify
 from bcloud import Config
 Config.check_first()
 _ = Config._
+from bcloud import const
 from bcloud import gutil
 from bcloud.log import logger
 from bcloud import util
@@ -70,13 +71,7 @@ class App:
         self.window.connect('delete-event', self.on_main_window_deleted)
         app.add_window(self.window)
 
-        # set drop action
-        targets = [
-            ['text/plain', Gtk.TargetFlags.OTHER_APP, 0],
-            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]
-        ]
-        target_list =[Gtk.TargetEntry.new(*t) for t in targets]
-        self.window.drag_dest_set(Gtk.DestDefaults.ALL, target_list,
+        self.window.drag_dest_set(Gtk.DestDefaults.ALL, const.DnD_TARGET_LIST,
                                   Gdk.DragAction.COPY)
         self.window.connect('drag-data-received',
                             self.on_main_window_drag_data_received)
@@ -222,10 +217,13 @@ class App:
 
         这里, 会弹出一个选择目标文件夹的对话框
         '''
-        uris = data.get_text()
-        source_paths = util.uris_to_paths(uris)
-        if source_paths and self.profile:
-            self.upload_page.upload_files(source_paths)
+        if not self.profile:
+            return
+        if info == const.TARGET_TYPE_URI_LIST:
+            uris = data.get_uris()
+            source_paths = util.uris_to_paths(uris)
+            if source_paths:
+                self.upload_page.upload_files(source_paths)
 
     def on_preferences_action_activated(self, action, params):
         if self.profile:

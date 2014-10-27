@@ -169,13 +169,7 @@ class HomePage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
 
-        # set drop action
-        targets = [
-            ['text/plain', Gtk.TargetFlags.OTHER_APP, 0],
-            ['*.*', Gtk.TargetFlags.OTHER_APP, 1]
-        ]
-        target_list = [Gtk.TargetEntry.new(*t) for t in targets]
-        self.drag_dest_set(Gtk.DestDefaults.ALL, target_list,
+        self.drag_dest_set(Gtk.DestDefaults.ALL, const.DnD_TARGET_LIST,
                            Gdk.DragAction.COPY)
 
         if Config.GTK_GE_312:
@@ -398,10 +392,13 @@ class HomePage(Gtk.Box):
         这里, 会直接把文件上传到当前目录(self.path).
         拖放事件已经被处理, 所以不会触发self.app.window的拖放动作.
         '''
-        uris = data.get_text()
-        source_paths = util.uris_to_paths(uris)
-        if source_paths and self.app.profile:
-            self.app.upload_page.add_file_tasks(source_paths, self.path)
+        if not self.app.profile:
+            return
+        if info == const.TARGET_TYPE_URI_LIST:
+            uris = data.get_uris()
+            source_paths = util.uris_to_paths(uris)
+            if source_paths:
+                self.app.upload_page.upload_files(source_paths, self.path)
 
     def on_search_button_toggled(self, search_button):
         status = search_button.get_active()

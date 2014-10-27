@@ -8,6 +8,8 @@
 与界面相关的常量, 都位于Config.py.
 '''
 
+from gi.repository import Gtk
+
 from bcloud import Config
 _ = Config._
 
@@ -86,9 +88,17 @@ class ValidatePathState:
     CHAR_ERROR2 = 2
     CHAR_ERROR3 = 3
 
-ValidatePathStateText = [
+ValidatePathStateText = (
     '',
     _('Max characters in filepath shall no more than 1000'),
     _('Filepath should not contain "\\ ? | \" > < : *"'),
     _('"\\r \\n \\t \\0 \\x0B" or SPACE should not appear in start or end of filename'),
-]
+)
+
+
+# 拖放目标, 接收从其它程序拖进来的目录
+TARGET_TYPE_URI_LIST = 0
+DnD_LIST = (
+    ('text/uri-list', Gtk.TargetFlags.OTHER_APP, TARGET_TYPE_URI_LIST),
+)
+DnD_TARGET_LIST = [Gtk.TargetEntry.new(*t) for t in DnD_LIST]
