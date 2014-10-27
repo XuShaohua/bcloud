@@ -393,7 +393,11 @@ class HomePage(Gtk.Box):
         self.load(self.path)
 
     def do_drag_data_received(self, drag_context, x, y, data, info, time):
-        '''从其它程序拖放目录/文件, 以便上传'''
+        '''从其它程序拖放目录/文件, 以便上传.
+
+        这里, 会直接把文件上传到当前目录(self.path).
+        拖放事件已经被处理, 所以不会触发self.app.window的拖放动作.
+        '''
         uris = data.get_text()
         source_paths = util.uris_to_paths(uris)
         if source_paths and self.app.profile:

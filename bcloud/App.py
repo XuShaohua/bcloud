@@ -218,10 +218,14 @@ class App:
 
     def on_main_window_drag_data_received(self, window, drag_context, x, y,
                                           data, info, time):
+        '''从其它程序拖放目录/文件, 以便上传.
+
+        这里, 会弹出一个选择目标文件夹的对话框
+        '''
         uris = data.get_text()
         source_paths = util.uris_to_paths(uris)
         if source_paths and self.profile:
-            self.upload_page.add_file_tasks(source_paths)
+            self.upload_page.upload_files(source_paths)
 
     def on_preferences_action_activated(self, action, params):
         if self.profile:

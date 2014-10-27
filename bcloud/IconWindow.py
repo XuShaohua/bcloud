@@ -194,7 +194,7 @@ class IconWindow(Gtk.ScrolledWindow):
         return True
 
     def popup_folder_menu(self, event):
-        # create folder; reload; share; properties
+        # create folder; upload files; reload; share; properties
         menu = Gtk.Menu()
         self.menu = menu
         
@@ -204,9 +204,14 @@ class IconWindow(Gtk.ScrolledWindow):
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
-        upload_item = Gtk.MenuItem.new_with_label(_('Upload To This Folder'))
-        upload_item.connect('activate', self.on_upload_activated)
-        menu.append(upload_item)
+        upload_files_item = Gtk.MenuItem.new_with_label(_('Upload Files...'))
+        upload_files_item.connect('activate', self.on_upload_files_activated)
+        menu.append(upload_files_item)
+        upload_folders_item = Gtk.MenuItem.new_with_label(
+                _('Upload Folders...'))
+        upload_folders_item.connect('activate',
+                                    self.on_upload_folders_activated)
+        menu.append(upload_folders_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
@@ -249,10 +254,18 @@ class IconWindow(Gtk.ScrolledWindow):
                                       self.on_open_dir_item_activated)
                 menu.append(open_dir_item)
 
-                upload_dir_item = Gtk.MenuItem.new_with_label(_('Upload To..'))
-                upload_dir_item.connect('activate',
-                                        self.on_upload_dir_item_activated)
-                menu.append(upload_dir_item)
+                sep_item = Gtk.SeparatorMenuItem()
+                menu.append(sep_item)
+                upload_files_dir_item = Gtk.MenuItem.new_with_label(
+                        _('Upload Files to...'))
+                upload_files_dir_item.connect('activate',
+                        self.on_upload_files_dir_item_activated)
+                menu.append(upload_files_dir_item)
+                upload_folders_dir_item = Gtk.MenuItem.new_with_label(
+                        _('Upload Folders to...'))
+                upload_folders_dir_item.connect('activate',
+                        self.on_upload_folders_dir_item_activated)
+                menu.append(upload_folders_dir_item)
             # 不是目录的话, 就显示出程序菜单
             else:
                 if file_type == TYPE_TORRENT:
@@ -355,8 +368,11 @@ class IconWindow(Gtk.ScrolledWindow):
         dialog.run()
         dialog.destroy()
 
-    def on_upload_activated(self, menu_item):
-        self.app.upload_page.add_task(self.parent.path)
+    def on_upload_files_activated(self, menu_item):
+        self.app.upload_page.add_file_task(self.parent.path)
+
+    def on_upload_folders_activated(self, menu_item):
+        self.app.upload_page.add_folder_task(self.parent.path)
 
     def on_reload_activated(self, menu_item):
         self.parent.reload()
@@ -445,10 +461,16 @@ class IconWindow(Gtk.ScrolledWindow):
         if tree_paths and len(tree_paths) == 1:
             self.parent.load(self.liststore[tree_paths[0]][PATH_COL])
 
-    def on_upload_dir_item_activated(self, menu_item):
+    def on_upload_files_dir_item_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
         if tree_paths and len(tree_paths) == 1:
-            self.app.upload_page.add_task(
+            self.app.upload_page.add_file_task(
+                    self.liststore[tree_paths[0]][PATH_COL])
+
+    def on_upload_folders_dir_item_activated(self, menu_item):
+        tree_paths = self.iconview.get_selected_items()
+        if tree_paths and len(tree_paths) == 1:
+            self.app.upload_page.add_folder_task(
                     self.liststore[tree_paths[0]][PATH_COL])
 
     def on_cloud_download_item_activated(self, menu_item):
