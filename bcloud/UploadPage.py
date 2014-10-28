@@ -275,23 +275,6 @@ class UploadPage(Gtk.Box):
         '''
         self.cursor.execute(sql)
 
-        # mig 3.2.1 -> 3.3.1
-        try:
-            req = self.cursor.execute('SELECT * FROM tasks')
-            tasks = []
-            threshold = 2 ** 20
-            for row in req:
-                tasks.append(row + ('', threshold))
-            if tasks:
-                sql = '''INSERT INTO upload
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
-                self.cursor.executemany(sql, tasks)
-                self.check_commit()
-            self.cursor.execute('DROP TABLE tasks')
-            self.check_commit()
-        except sqlite3.OperationalError:
-            pass
-
     def reload(self):
         pass
 
