@@ -301,10 +301,10 @@ class UploadPage(Gtk.Box):
         for task in req:
             self.liststore.append(task)
 
-    def check_commit(self):
+    def check_commit(self, force=False):
         '''当修改数据库超过50次后, 就自动commit数据.'''
         self.commit_count = self.commit_count + 1
-        if self.commit_count >= 50:
+        if force or self.commit_count >= 50:
             self.commit_count = 0
             self.conn.commit()
 
@@ -315,7 +315,7 @@ class UploadPage(Gtk.Box):
         human_size, percent, tooltip, threshold)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
         req = self.cursor.execute(sql, task)
-        self.check_commit()
+        self.check_commit(force=True)
         return req.lastrowid
 
     def add_slice_db(self, fid, slice_end, md5):
@@ -349,7 +349,7 @@ class UploadPage(Gtk.Box):
         else:
             return None
 
-    def update_task_db(self, row):
+    def update_task_db(self, row, force=False):
         '''更新数据库中的任务信息'''
         sql = '''UPDATE upload SET 
         curr_size=?, state=?, state_name=?, human_size=?, percent=?
@@ -359,14 +359,14 @@ class UploadPage(Gtk.Box):
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
             row[HUMANSIZE_COL], row[PERCENT_COL], row[FID_COL]
         ])
-        self.check_commit()
+        self.check_commit(force=force)
 
     def remove_task_db(self, fid):
         '''将任务从数据库中删除'''
         self.remove_slice_db(fid)
         sql = 'DELETE FROM upload WHERE fid=?'
         self.cursor.execute(sql, [fid, ])
-        self.check_commit()
+        self.check_commit(force=True)
 
     def remove_slice_db(self, fid):
         '''将上传任务的分片从数据库中删除'''
@@ -643,7 +643,7 @@ class UploadPage(Gtk.Box):
             row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
             row[STATE_COL] = State.FINISHED
             row[STATENAME_COL] = StateNames[State.FINISHED]
-            self.update_task_db(row)
+            self.update_task_db(row, force=True)
             self.workers.pop(fid, None)
             self.app.toast(_('{0} uploaded').format(row[NAME_COL]))
             self.app.home_page.reload()
