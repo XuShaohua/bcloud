@@ -1,3 +1,15 @@
+v3.5.7 - 2014.10.31
+* Feature: validate filepath
+* Feature: add popup menu in DownloadPage
+* Feature: add "Upload Folders" menu item; https://github.com/LiuLang/bcloud/issues/39
+* Remove deprecated icons; add some new icons
+* Fixed: NameErro, name Status is not defined; validate upload file path, https://github.com/LiuLang/bcloud/issues/70
+* Fixed: NameError: name 'abspath' is not defined in NewFolderDialog
+* Fixed: go-home-symbolic icon is missing in Debian 7
+* Fixed: failed to handle file drop action; https://github.com/LiuLang/bcloud/issues/39
+* Fixed: remove task from upload db when remove-button is clicked
+* i18n updated
+
 v3.5.6 - 2014.10.24
 * Feature: add navigation button to path box; https://github.com/LiuLang/bcloud/pull/74, https://github.com/LiuLang/bcloud/pull/80
 * Feature: support drag and drop in IconWindow

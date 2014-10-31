@@ -89,8 +89,8 @@ class ValidatePathState:
 ValidatePathStateText = (
     '',
     _('Max characters in filepath shall no more than 1000'),
-    _('Filepath should not contain "\\ ? | \" > < : *"'),
-    _('"\\r \\n \\t \\0 \\x0B" or SPACE should not appear in start or end of filename'),
+    _('Filepath should not contain \\ ? | " > < : *'),
+    _('\\r \\n \\t \\0 \\x0B or SPACE should not appear in start or end of filename'),
 )
 
 
