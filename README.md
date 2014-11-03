@@ -63,6 +63,15 @@ bcloud只提供了GUI界面. 但是, 可以很方便的基于bcloud进行扩展,
 比如, [这个issue](https://github.com/LiuLang/bcloud/issues/47)里面,
 通过调用bcloud, 来遍历网盘, 得到文件目录结构.
 
+6.如何设置代理?
+bcloud支持桌面的全局代理设置, 比如在Gnome的网络设置里面可以加入代理.
+也可以在终端里设置代理, 比如 `export http_proxy='http://127.0.0.1:8086'` 来设定
+http代理, `export https_proxy='http://127.0.0.1:8086'` 来设定https代理, 设定完
+之后, 在这个终端里运行 `$ bcloud-gui`, 这时, bcloud就会使用刚刚设定的网络代理.
+
+要注意的是, bcloud的部分网络连接要求使用https, 这就要求你设定https代理后, 同时
+导入相应的证书, 不然会出现错误.
+
 
 截屏
 ====
