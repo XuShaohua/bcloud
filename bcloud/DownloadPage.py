@@ -289,7 +289,7 @@ class DownloadPage(Gtk.Box):
         '''向数据库中写入一个新的任务记录'''
         sql = 'INSERT INTO tasks VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
         req = self.cursor.execute(sql, task)
-        self.check_commit(force=True)
+        self.check_commit()
 
     def get_task_db(self, fs_id):
         '''从数据库中查询fsid的信息.
@@ -311,7 +311,7 @@ class DownloadPage(Gtk.Box):
             self.commit_count = 0
             self.conn.commit()
 
-    def update_task_db(self, row, force=False):
+    def update_task_db(self, row):
         '''更新数据库中的任务信息'''
         sql = '''UPDATE tasks SET 
         currsize=?, state=?, statename=?, humansize=?, percent=?
@@ -321,13 +321,13 @@ class DownloadPage(Gtk.Box):
             row[CURRSIZE_COL], row[STATE_COL], row[STATENAME_COL],
             row[HUMANSIZE_COL], row[PERCENT_COL], row[FSID_COL]
         ])
-        self.check_commit(force=force)
+        self.check_commit()
 
     def remove_task_db(self, fs_id):
         '''将任务从数据库中删除'''
         sql = 'DELETE FROM tasks WHERE fsid=?'
         self.cursor.execute(sql, [fs_id, ])
-        self.check_commit(force=True)
+        self.check_commit()
 
     def get_row_by_fsid(self, fs_id):
         '''确认在Liststore中是否存在这条任务. 如果存在, 返回TreeModelRow,
@@ -380,6 +380,7 @@ class DownloadPage(Gtk.Box):
                                  callback=on_list_dir)
             else:
                 self.add_task(pcs_file)
+        self.check_commit(force=True)
 
     def add_task(self, pcs_file):
         '''加入新的下载任务'''
@@ -470,7 +471,8 @@ class DownloadPage(Gtk.Box):
             total_size = util.get_human_size(row[SIZE_COL])[0]
             row[HUMANSIZE_COL] = '{0} / {1}'.format(total_size, total_size)
             row[STATENAME_COL] = StateNames[State.FINISHED]
-            self.update_task_db(row, force=True)
+            self.update_task_db(row)
+            self.check_commit(force=True)
             self.workers.pop(row[FSID_COL], None)
             self.app.toast(_('{0} downloaded'.format(row[NAME_COL])))
             self.launch_app(fs_id)
@@ -635,6 +637,7 @@ class DownloadPage(Gtk.Box):
             if not row:
                 return
             operator(row, scan=False)
+        self.check_commit(force=True)
         self.scan_tasks()
 
     def on_start_button_clicked(self, button):
@@ -650,6 +653,7 @@ class DownloadPage(Gtk.Box):
         for row in self.liststore:
             if row[STATE_COL] == State.FINISHED:
                 self.remove_task(row, scan=False)
+        self.check_commit(force=True)
         self.scan_tasks()
 
     def on_open_folder_button_clicked(self, button):
