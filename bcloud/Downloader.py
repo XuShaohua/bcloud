@@ -90,7 +90,7 @@ class DownloadBatch(threading.Thread):
                     block = req.read(CHUNK_SIZE)
                     if block:
                         break
-                except OSError:
+                except (OSError, AttributeError):
                     logger.error(traceback.format_exc())
                     req = None
             else:
