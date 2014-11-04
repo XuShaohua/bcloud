@@ -5,6 +5,7 @@
 import os
 import random
 import time
+import traceback
 
 from gi.repository import Gdk
 from gi.repository import Gio
@@ -31,6 +32,13 @@ from bcloud.PreferencesDialog import PreferencesDialog
 from bcloud.SigninDialog import SigninDialog
 from bcloud.TrashPage import TrashPage
 from bcloud.UploadPage import UploadPage
+
+try:
+# Ubuntu Unity uses appindicator instead of status icon
+    from gi.repository import AppIndicator3 as AppIndicator
+except ImportError:
+    logger.debug(traceback.format_exc())
+
 
 if Config.GTK_LE_36:
     GObject.threads_init()
@@ -359,28 +367,24 @@ class App:
         self.switch_page_by_index(index)
 
     def init_status_icon(self):
-        if (self.profile and self.profile['use-status-icon'] and
-                not self.status_icon):
-            self.status_icon = Gtk.StatusIcon()
-            self.status_icon.set_from_icon_name(Config.NAME)
-            # left click
-            self.status_icon.connect('activate', self.on_status_icon_activate)
-            # right click
-            self.status_icon.connect('popup_menu',
-                                     self.on_status_icon_popup_menu)
-        else:
+        def on_status_icon_popup_menu(status_icon, event_button, event_time):
+            menu.popup(None, None,
+                    lambda a,b: Gtk.StatusIcon.position_menu(menu, status_icon),
+                    None, event_button, event_time)
+
+        def on_status_icon_activate(status_icon):
+            if self.window.props.visible:
+                self.window.hide()
+            else:
+                self.window.present()
+
+        if not self.profile or not self.profile['use-status-icon']:
             self.status_icon = None
+            return
 
-    def on_status_icon_activate(self, status_icon):
-        if self.window.props.visible:
-            self.window.hide()
-        else:
-            self.window.present()
-
-    def on_status_icon_popup_menu(self, status_icon, event_button, event_time):
         menu = Gtk.Menu()
         show_item = Gtk.MenuItem.new_with_label(_('Show App'))
-        show_item.connect('activate', self.on_status_icon_show_app_activate)
+        show_item.connect('activate', lambda item: self.window.present())
         menu.append(show_item)
 
         sep_item = Gtk.SeparatorMenuItem()
@@ -389,32 +393,38 @@ class App:
         pause_upload_item = Gtk.MenuItem.new_with_label(
                 _('Pause Uploading Tasks'))
         pause_upload_item.connect('activate',
-                                  lambda *args: self.upload_page.pause_tasks())
+                lambda item: self.upload_page.pause_tasks())
         menu.append(pause_upload_item)
 
         pause_download_item = Gtk.MenuItem.new_with_label(
                 _('Pause Downloading Tasks'))
         pause_download_item.connect('activate',
-                lambda *args: self.download_page.pause_tasks())
+                lambda item: self.download_page.pause_tasks())
         menu.append(pause_download_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
 
         quit_item = Gtk.MenuItem.new_with_label(_('Quit'))
-        quit_item.connect('activate', self.on_status_icon_quit_activate)
+        quit_item.connect('activate', lambda item: self.quit())
         menu.append(quit_item)
 
         menu.show_all()
-        menu.popup(None, None,
-                lambda a,b: Gtk.StatusIcon.position_menu(menu, status_icon),
-                None, event_button, event_time)
+        self.status_menu = menu
 
-    def on_status_icon_show_app_activate(self, menuitem):
-        self.window.present()
-
-    def on_status_icon_quit_activate(self, menuitem):
-        self.quit()
+        if hasattr(__package__, 'AppIndicator'):
+            self.status_icon = AppIndicator.Indicator.new(Config.NAME,
+                    Config.NAME,
+                    AppIndicator.IndicatorCategory.APPLICATION_STATUS)
+            self.status_icon.set_menu(menu)
+            self.status_icon.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+        else:
+            self.status_icon = Gtk.StatusIcon()
+            self.status_icon.set_from_icon_name(Config.NAME)
+            # left click
+            self.status_icon.connect('activate', on_status_icon_activate)
+            # right click
+            self.status_icon.connect('popup_menu', on_status_icon_popup_menu)
 
     # Open API
     def blink_page(self, page):
