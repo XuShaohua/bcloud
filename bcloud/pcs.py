@@ -51,7 +51,7 @@ def get_user_uk(cookie, tokens):
         if len(match) == 1:
             return match[0]
         else:
-            logger.warn('get_user_uk(), failed to parse uk, %s' % url)
+            logger.warn('pcs.get_user_uk(), failed to parse uk, %s' % url)
     return None
 
 def list_share(cookie, tokens, uk, page=1):
@@ -114,34 +114,34 @@ def list_share_path(cookie, tokens, uk, path, share_id, page):
     else:
         return None
 
-def get_share_page(url):
-    '''获取共享页面的文件信息'''
-    req = net.urlopen(url)
-    if req:
-        content = req.data.decode()
-        match = re.findall('applicationConfig,(.+)\]\);', content)
-        share_files = {}
-        if not match:
-            match = re.findall('viewShareData=(.+");FileUtils.spublic', content)
-            if not match:
-                logger.error('get_share_page(): %s, %s' % (url, match))
-                return None
-            list_ = json.loads(json.loads(match[0]))
-        else:
-            list_ = json.loads(json.loads(match[0]))
-        if isinstance(list_, dict):
-            share_files['list'] = [list_, ]
-        else:
-            share_files['list'] = list_
-        id_match = re.findall('FileUtils\.share_id="(\d+)"', content)
-        uk_match = re.findall('/share/home\?uk=(\d+)" target=', content)
-        sign_match = re.findall('FileUtils\.share_sign="([^"]+)"', content)
-        if id_match and uk_match and sign_match:
-            share_files['share_id'] = id_match[0]
-            share_files['uk'] = uk_match[0]
-            share_files['sign'] = sign_match[0]
-            return share_files
-    return None
+#def get_share_page(url):
+#    '''获取共享页面的文件信息'''
+#    req = net.urlopen(url)
+#    if req:
+#        content = req.data.decode()
+#        match = re.findall('applicationConfig,(.+)\]\);', content)
+#        share_files = {}
+#        if not match:
+#            match = re.findall('viewShareData=(.+");FileUtils.spublic', content)
+#            if not match:
+#                logger.error('get_share_page(): %s, %s' % (url, match))
+#                return None
+#            list_ = json.loads(json.loads(match[0]))
+#        else:
+#            list_ = json.loads(json.loads(match[0]))
+#        if isinstance(list_, dict):
+#            share_files['list'] = [list_, ]
+#        else:
+#            share_files['list'] = list_
+#        id_match = re.findall('FileUtils\.share_id="(\d+)"', content)
+#        uk_match = re.findall('/share/home\?uk=(\d+)" target=', content)
+#        sign_match = re.findall('FileUtils\.share_sign="([^"]+)"', content)
+#        if id_match and uk_match and sign_match:
+#            share_files['share_id'] = id_match[0]
+#            share_files['uk'] = uk_match[0]
+#            share_files['sign'] = sign_match[0]
+#            return share_files
+#    return None
 
 def enable_share(cookie, tokens, fid_list):
     '''建立新的分享.
@@ -187,6 +187,96 @@ def disable_share(cookie, tokens, shareid_list):
     if req:
         content = req.data
         return json.loads(content.decode())
+    else:
+        return None
+
+def get_others_share_page(url, cookie):
+    '''列举其他用户共享了的文件的信息.
+
+    如果成功, 返回(uk, shareid, filelist)
+    如果失败, 就返回None
+
+    目前支持的链接格式有:
+      * http://pan.baidu.com/wap/link?uk=202032639&shareid=420754&third=0
+      * http://pan.baidu.com/share/link?uk=202032639&shareid=420754
+    '''
+    def parse_share(content):
+        tree = html.fromstring(content)
+        script_sel = CSS('script')
+        scripts = script_sel(tree)
+        for script in scripts:
+            if (script.text and (script.text.find('viewsingle_param') > -1 or
+                script.text.find('mpan.viewlist_param') > -1)):
+                break
+        else:
+            logger.warn('pcs.list_other_share: failed to get filelist, %s', url)
+            return None
+        start = script.text.find('viewsingle_param.list=JSON.parse(')
+        end = script.text.find(');mpan.viewsingle_param.username')
+        if start == -1 or end == -1:
+            start = script.text.find('listArr:JSON.parse(')
+            end = script.text.find('),rootPath:')
+            if start == -1 or end == -1:
+                return None
+            else:
+                json_str = script.text[start+19:end]
+        else:
+            json_str = script.text[start+33:end]
+        try:
+            return json.loads(json.loads(json_str))
+        except ValueError:
+            return None
+
+    url = url.replace('com/share/', 'com/wap/')
+    url = re.sub('num=\d+', 'num=1000', url)
+    uk_reg = re.compile('uk=(\d+)')
+    uk_match = uk_reg.search(url)
+    shareid_reg = re.compile('shareid=(\d+)')
+    shareid_match = shareid_reg.search(url)
+    if not uk_match or not shareid_match:
+        return None
+    uk = uk_match.group(1)
+    shareid = shareid_match.group(1)
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        'Referer': const.SHARE_REFERER,
+    })
+    if req:
+        filelist = parse_share(req.data)
+        if filelist:
+            return (uk, shareid, filelist)
+    return None
+
+def share_transfer(cookie, tokens, shareid, uk, filelist, dest, upload_mode):
+    '''
+    将其他用户的文件保存到自己网盘里.
+
+    uk - 其他用户的uk
+    filelist - 要转移文件的列表, 是绝对路径
+    '''
+    ondup = const.UPLOAD_ONDUP[upload_mode]
+    if not ondup:
+        ondup = 'newcopy',
+    url = ''.join([
+        const.PAN_URL,
+        'share/transfer?app_id=250528&channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        '&from=', shareid,
+        '&ondup=', ondup,
+        '&async=1',
+    ])
+    data = ''.join([
+        'filelist=', encoder.encode_uri_component(filelist),
+        '&path=', encoder.encode_uri_component(dest),
+    ])
+
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        'Content-Type': const.CONTENT_FORM_UTF8
+    }, data=data.encode())
+    if req:
+        content = req.data.decode()
+        return json.loads(content)
     else:
         return None
 
@@ -499,7 +589,7 @@ def get_download_link(cookie, tokens, path):
     metas = get_metas(cookie, tokens, path)
     if (not metas or metas.get('errno', -1) != 0 or
             'info' not in metas or len(metas['info']) != 1):
-        logger.error('get_download_link(): %s' % metas)
+        logger.error('pcs.get_download_link(): %s' % metas)
         return None
     dlink = metas['info'][0]['dlink']
     url = '{0}&cflg={1}'.format(dlink, cookie.get('cflag').value)
@@ -551,33 +641,32 @@ def get_streaming_playlist(cookie, path, video_type='M3U8_AUTO_480'):
         return None
 
 
-def upload_option(cookie, path):
-    '''上传之前的检查.
-
-    path   - 准备在服务器上放到的绝对路径.
-    '''
-    dir_name, file_name = os.path.split(path)
-    url = ''.join([
-        const.PCS_URL_C,
-        'file?method=upload&app_id=250528&ondup=newcopy',
-        '&dir=', encoder.encode_uri_component(dir_name),
-        '&filename=', encoder.encode_uri_component(file_name),
-        '&', cookie.sub_output('BDUSS'),
-    ])
-    resp = net.urloption(url, headers={'Accept': const.ACCEPT_HTML})
-    if resp:
-        return resp.getheaders()
-    else:
-        return None
+#def upload_option(cookie, path):
+#    '''上传之前的检查.
+#
+#    path   - 准备在服务器上放到的绝对路径.
+#    '''
+#    dir_name, file_name = os.path.split(path)
+#    url = ''.join([
+#        const.PCS_URL_C,
+#        'file?method=upload&app_id=250528&ondup=newcopy',
+#        '&dir=', encoder.encode_uri_component(dir_name),
+#        '&filename=', encoder.encode_uri_component(file_name),
+#        '&', cookie.sub_output('BDUSS'),
+#    ])
+#    resp = net.urloption(url, headers={'Accept': const.ACCEPT_HTML})
+#    if resp:
+#        return resp.getheaders()
+#    else:
+#        return None
 
 def upload(cookie, source_path, path, upload_mode):
     '''上传一个文件.
 
     这个是使用的网页中的上传接口.
-    upload_mode - 只能是1或者2.
-    ondup - 如果文件已在服务器上存在, 该如何操作. 有两个选项:
-            overwrite, 直接将其重写.
-            newcopy, 保留原先的文件, 并在新上传的文件名尾部加上当前时间戳.
+    upload_mode - const.UploadMode, 如果文件已在服务器上存在:
+      * overwrite, 直接将其重写.
+      * newcopy, 保留原先的文件, 并在新上传的文件名尾部加上当前时间戳.
     '''
     ondup = const.UPLOAD_ONDUP[upload_mode]
     if not ondup:
@@ -615,7 +704,7 @@ def rapid_upload(cookie, tokens, source_path, path, upload_mode):
     url = ''.join([
         const.PCS_URL_C,
         'file?method=rapidupload&app_id=250528',
-        '&ondup=newcopy',
+        '&ondup=', ondup,
         '&dir=', encoder.encode_uri_component(dir_name),
         '&filename=', encoder.encode_uri_component(file_name),
         '&content-length=', str(content_length),
@@ -983,28 +1072,6 @@ def get_avatar(cookie):
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     if req:
         return parse_avatar(req.data.decode())
-    else:
-        return None
-
-
-def share_transfer(shareid, bdstoken, myuk, paths, dest, cookie):
-    """
-    :param paths: the paths of file to save
-    :type paths: list
-    """
-    url = ('http://yun.baidu.com/share/transfer?shareid=%sfrom=%s'
-           '&bdstoken=%s&channel=chunlei&clienttype=0&web=1&app_id=250528')
-    if len(paths) > 1:
-        url += '&ondup=newcopy&async=1'
-    url %= shareid, myuk, bdstoken
-
-    req = net.urlopen(url, headers={
-        'Cookie': cookie.header_output(),
-        'Content-Type': const.CONTENT_FORM_UTF8
-    }, data={'filelist': paths, 'path': dest})
-    if req:
-        content = req.data.decode()
-        return json.loads(content)
     else:
         return None
 
