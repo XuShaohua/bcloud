@@ -391,13 +391,13 @@ class App:
         menu.append(sep_item)
 
         pause_upload_item = Gtk.MenuItem.new_with_label(
-                _('Pause Uploading Tasks'))
+                _('Pause Upload Tasks'))
         pause_upload_item.connect('activate',
                 lambda item: self.upload_page.pause_tasks())
         menu.append(pause_upload_item)
 
         pause_download_item = Gtk.MenuItem.new_with_label(
-                _('Pause Downloading Tasks'))
+                _('Pause Download Tasks'))
         pause_download_item.connect('activate',
                 lambda item: self.download_page.pause_tasks())
         menu.append(pause_download_item)
