@@ -412,7 +412,7 @@ class App:
         menu.show_all()
         self.status_menu = menu
 
-        if hasattr(__package__, 'AppIndicator'):
+        if 'AppIndicator' in globals():
             self.status_icon = AppIndicator.Indicator.new(Config.NAME,
                     Config.NAME,
                     AppIndicator.IndicatorCategory.APPLICATION_STATUS)
