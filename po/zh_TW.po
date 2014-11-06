@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-31 12:53+0800\n"
+"POT-Creation-Date: 2014-11-06 19:03+0800\n"
 "PO-Revision-Date: 2014-10-21 17:15+0800\n"
 "Last-Translator: CzBiX <gliuwr@gmail.com>\n"
 "Language-Team: Chinese (traditional)\n"
@@ -17,39 +17,39 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: ../bcloud/App.py:87 ../bcloud/PreferencesDialog.py:17
+#: ../bcloud/App.py:96 ../bcloud/PreferencesDialog.py:17
 msgid "Preferences"
 msgstr "首選項"
 
-#: ../bcloud/App.py:88
+#: ../bcloud/App.py:97
 msgid "Sign out"
 msgstr "註銷"
 
-#: ../bcloud/App.py:89
+#: ../bcloud/App.py:98
 msgid "About"
 msgstr "關於"
 
-#: ../bcloud/App.py:90 ../bcloud/App.py:404
+#: ../bcloud/App.py:99 ../bcloud/App.py:411
 msgid "Quit"
 msgstr "退出"
 
-#: ../bcloud/App.py:141
+#: ../bcloud/App.py:150
 msgid "Unknown"
 msgstr "未知"
 
-#: ../bcloud/App.py:382
+#: ../bcloud/App.py:389
 msgid "Show App"
 msgstr "顯示程序"
 
-#: ../bcloud/App.py:390
-msgid "Pause Uploading Tasks"
+#: ../bcloud/App.py:397
+msgid "Pause Upload Tasks"
 msgstr "暫停所有上傳任務"
 
-#: ../bcloud/App.py:396
-msgid "Pause Downloading Tasks"
+#: ../bcloud/App.py:403
+msgid "Pause Download Tasks"
 msgstr "暫停所有下載任務"
 
-#: ../bcloud/App.py:444
+#: ../bcloud/App.py:457
 #, python-brace-format
 msgid "{0} copied to clipboard"
 msgstr "{0} 已被複製到剪貼板"
@@ -60,14 +60,15 @@ msgstr "全選"
 
 #: ../bcloud/BTBrowserDialog.py:64 ../bcloud/CloudPage.py:150
 #: ../bcloud/DownloadPage.py:200 ../bcloud/IconWindow.py:660
-#: ../bcloud/TrashPage.py:141 ../bcloud/UploadPage.py:205
+#: ../bcloud/SharePage.py:161 ../bcloud/TrashPage.py:141
+#: ../bcloud/UploadPage.py:205
 msgid "Name"
 msgstr "文件名"
 
 #: ../bcloud/BTBrowserDialog.py:68 ../bcloud/CloudPage.py:157
 #: ../bcloud/DownloadPage.py:214 ../bcloud/IconWindow.py:676
-#: ../bcloud/PropertiesDialog.py:55 ../bcloud/TrashPage.py:156
-#: ../bcloud/UploadPage.py:219
+#: ../bcloud/PropertiesDialog.py:55 ../bcloud/SharePage.py:173
+#: ../bcloud/TrashPage.py:156 ../bcloud/UploadPage.py:219
 msgid "Size"
 msgstr "大小"
 
@@ -168,7 +169,7 @@ msgid "Clear"
 msgstr "清空"
 
 #: ../bcloud/CloudPage.py:123 ../bcloud/CloudPage.py:124
-#: ../bcloud/DownloadPage.py:169 ../bcloud/DownloadPage.py:747
+#: ../bcloud/DownloadPage.py:169 ../bcloud/DownloadPage.py:751
 #: ../bcloud/TrashPage.py:66 ../bcloud/UploadPage.py:180
 msgid "Remove"
 msgstr "刪除"
@@ -188,7 +189,7 @@ msgid "Error: {0}"
 msgstr "錯誤: {0}"
 
 #: ../bcloud/CloudPage.py:292 ../bcloud/CloudPage.py:392
-#: ../bcloud/FolderBrowserDialog.py:22
+#: ../bcloud/FolderBrowserDialog.py:22 ../bcloud/SharePage.py:342
 msgid "Save to.."
 msgstr "保存到.."
 
@@ -268,12 +269,12 @@ msgstr "掃描目錄出錯"
 msgid "Please download {0} again"
 msgstr "請重新下載 {0}"
 
-#: ../bcloud/DownloadPage.py:391
+#: ../bcloud/DownloadPage.py:392
 #, python-brace-format
 msgid "Task exists: {0}"
 msgstr "任務已存在: {0}"
 
-#: ../bcloud/DownloadPage.py:401 ../bcloud/UploadPage.py:486
+#: ../bcloud/DownloadPage.py:402 ../bcloud/UploadPage.py:486
 #, python-brace-format
 msgid ""
 "From {0}\n"
@@ -282,36 +283,36 @@ msgstr ""
 "從 {0}\n"
 "到{1}"
 
-#: ../bcloud/DownloadPage.py:475
+#: ../bcloud/DownloadPage.py:477
 #, python-brace-format
 msgid "{0} downloaded"
 msgstr "{0} 下載完成"
 
-#: ../bcloud/DownloadPage.py:498
+#: ../bcloud/DownloadPage.py:500
 #, python-brace-format
 msgid "Error occurs will downloading {0}"
 msgstr "在下載 {0} 時出錯"
 
-#: ../bcloud/DownloadPage.py:504
+#: ../bcloud/DownloadPage.py:506
 #, python-brace-format
 msgid "Disk Error: failed to read/write {0}"
 msgstr "磁盤錯誤: 無法讀取/寫入 {0}"
 
-#: ../bcloud/DownloadPage.py:712 ../bcloud/DownloadPage.py:737
+#: ../bcloud/DownloadPage.py:716 ../bcloud/DownloadPage.py:741
 #: ../bcloud/IconWindow.py:298 ../bcloud/IconWindow.py:325
 #, python-brace-format
 msgid "Open With {0}"
 msgstr "使用 {0} 打開"
 
-#: ../bcloud/DownloadPage.py:715 ../bcloud/IconWindow.py:302
+#: ../bcloud/DownloadPage.py:719 ../bcloud/IconWindow.py:302
 msgid "Open With"
 msgstr "打開方式"
 
-#: ../bcloud/DownloadPage.py:727 ../bcloud/IconWindow.py:314
+#: ../bcloud/DownloadPage.py:731 ../bcloud/IconWindow.py:314
 msgid "Other Application..."
 msgstr "其它程序..."
 
-#: ../bcloud/DownloadPage.py:740 ../bcloud/IconWindow.py:329
+#: ../bcloud/DownloadPage.py:744 ../bcloud/IconWindow.py:329
 msgid "Open With Other Application..."
 msgstr "使用其它程序打開..."
 
@@ -384,7 +385,7 @@ msgstr "離線下載"
 msgid "Copy Link"
 msgstr "複製鏈接地址"
 
-#: ../bcloud/IconWindow.py:346
+#: ../bcloud/IconWindow.py:346 ../bcloud/SharePage.py:58
 msgid "Share"
 msgstr "分享"
 
@@ -412,9 +413,9 @@ msgstr "複製鏈接失敗"
 msgid "Failed to share selected files"
 msgstr "無法分享選中的文件"
 
-#: ../bcloud/IconWindow.py:683
+#: ../bcloud/IconWindow.py:683 ../bcloud/SharePage.py:179
 msgid "Modified"
-msgstr "修改時間:"
+msgstr "修改時間"
 
 #: ../bcloud/NewFolderDialog.py:88
 msgid "Filepath shall start with /"
@@ -576,6 +577,53 @@ msgstr "文件名爲空"
 #: ../bcloud/RenameDialog.py:91
 msgid "Filename should not contain /"
 msgstr "文件名裏不可以包含/"
+
+#: ../bcloud/SharePage.py:36
+msgid "Password:"
+msgstr "密碼:"
+
+#: ../bcloud/SharePage.py:46
+msgid "Password ..."
+msgstr "密碼 ..."
+
+#: ../bcloud/SharePage.py:60
+msgid "Shared files"
+msgstr "共享文件"
+
+#: ../bcloud/SharePage.py:84 ../bcloud/SharePage.py:109
+msgid "Copy selected files to my account"
+msgstr "將選中的文件保存到自己的網盤"
+
+#: ../bcloud/SharePage.py:92 ../bcloud/SharePage.py:117
+msgid "URL of shared files..."
+msgstr "共享文件的URL..."
+
+#: ../bcloud/SharePage.py:203
+msgid "Error: password error, please try again"
+msgstr "密碼錯誤, 請重試"
+
+#: ../bcloud/SharePage.py:213 ../bcloud/SharePage.py:314
+#, python-brace-format
+msgid "Invalid link: {0}!"
+msgstr "無效鏈接: {0}!"
+
+#: ../bcloud/SharePage.py:255
+msgid "Failed to get files, please reload this page"
+msgstr "獲取文件失敗, 請重試"
+
+#: ../bcloud/SharePage.py:327
+msgid "Failed to copy selected files!"
+msgstr "複製文件失敗!"
+
+#: ../bcloud/SharePage.py:331
+#, python-brace-format
+msgid "Failed to copy selected files! {0}"
+msgstr "無法複製選中的文件: {0}"
+
+#: ../bcloud/SharePage.py:395
+#, python-brace-format
+msgid "Go to parent directory: {0}"
+msgstr "返回上級目錄: {0}"
 
 #: ../bcloud/SigninDialog.py:26 ../bcloud/VCodeDialog.py:20
 msgid "Verification.."
