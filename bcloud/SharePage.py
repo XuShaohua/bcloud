@@ -211,6 +211,8 @@ class SharePage(Gtk.Box):
             if error or not info or not info[1]:
                 logger.error('SharePage.reload: %s, %s' % (error, info))
                 self.app.toast(_('Invalid link: {0}!'.format(self.curr_url)))
+                self.has_next = False
+                self.url_entry.props.secondary_icon_name = REFRESH_ICON
                 return
             else:
                 need_pwd, self.uk, self.shareid = info
