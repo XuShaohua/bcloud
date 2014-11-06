@@ -230,6 +230,7 @@ class SharePage(Gtk.Box):
                     self.load_url()
 
         self.liststore.clear()
+        self.url_entry.props.secondary_icon_name = ABORT_ICON
         self.page = 0
         self.has_next = True
         self.curr_url = self.url_entry.get_text()
