@@ -387,12 +387,19 @@ class SharePage(Gtk.Box):
         box = Gtk.Box(spacing=5, orientation=Gtk.Orientation.VERTICAL)
         image = Gtk.Image.new_from_pixbuf(
                 self.liststore[tree_path][LARGE_ICON_COL])
+        image.props.xalign = 0
+        image.props.halign = Gtk.Align.START
         box.pack_start(image, True, True, 0)
         if self.liststore[tree_path][NAME_COL] == '..':
             label = Gtk.Label(_('Go to parent directory: {0}').format(
                               self.liststore[tree_path][PATH_COL]))
         else:
             label = Gtk.Label(self.liststore[tree_path][PATH_COL])
+        label.props.max_width_chars = 40
+        label.props.xalign = 0
+        label.props.halign = Gtk.Align.START
+        label.props.wrap_mode = Pango.WrapMode.CHAR
+        label.props.wrap = True
         box.pack_start(label, False, False, 0)
         tooltip.set_custom(box)
         box.show_all()
