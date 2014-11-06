@@ -81,7 +81,7 @@ class SharePage(Gtk.Box):
 
             cloud_button = Gtk.Button()
             cloud_button.props.tooltip_text = \
-                    _('Transfer selected files to my account')
+                    _('Copy selected files to my account')
             cloud_image = Gtk.Image.new_from_icon_name('cloud-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             cloud_button.set_image(cloud_image)
@@ -104,15 +104,23 @@ class SharePage(Gtk.Box):
             control_box = Gtk.Box()
             self.pack_start(control_box, False, False, 0)
 
-            reload_button = Gtk.Button.new_with_label(_('Reload'))
-            reload_button.props.margin_left = 40
-            #reload_button.connect('clicked', self.on_reload_button_clicked)
-            control_box.pack_start(reload_button, False, False, 0)
+            cloud_button = Gtk.Button()
+            cloud_button.props.tooltip_text = \
+                    _('Copy selected files to my account')
+            cloud_image = Gtk.Image.new_from_icon_name('cloud-symbolic',
+                    Gtk.IconSize.SMALL_TOOLBAR)
+            cloud_button.set_image(cloud_image)
+            cloud_button.connect('clicked', self.on_cloud_button_clicked)
+            control_box.pack_start(cloud_button, False, False, 5)
 
-            # show loading process
-            self.loading_spin = Gtk.Spinner()
-            self.loading_spin.props.margin_right = 5
-            control_box.pack_end(self.loading_spin, False, False, 0)
+            self.url_entry = Gtk.Entry()
+            self.url_entry.set_placeholder_text(_('URL of shared files...'))
+            self.url_entry.props.width_chars = 80
+            self.url_entry.props.secondary_icon_name = GO_ICON
+            self.url_entry.connect('activate', self.on_url_entry_activated)
+            self.url_entry.connect('changed', self.on_url_entry_changed)
+            self.url_entry.connect('icon-press', self.on_url_entry_icon_pressed)
+            control_box.pack_start(self.url_entry, True, True, 0)
 
         scrolled_win = Gtk.ScrolledWindow()
         self.pack_start(scrolled_win, True, True, 0)
@@ -287,7 +295,7 @@ class SharePage(Gtk.Box):
                     large_pixbuf,
                     file_['server_filename'],
                     file_['path'],
-                    file_['isdir'],
+                    bool(file_['isdir']),
                     size,
                     human_size,
                     mtime,
