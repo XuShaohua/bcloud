@@ -147,6 +147,62 @@ def update_liststore_image(liststore, tree_iters, col, pcs_files, dir_name,
             if status:
                 GLib.idle_add(update_image, filepath, tree_iter)
 
+def update_share_image(liststore, tree_iters, col, large_col, pcs_files,
+                       dir_name, icon_size, large_icon_size):
+    '''下载文件缩略图, 并将它显示到liststore里.
+
+    需要同时更新两列里的图片, 用不同的缩放尺寸.
+    pcs_files - 里面包含了几个必要的字段.
+    dir_name  - 缓存目录, 下载到的图片会保存这个目录里.
+    '''
+    def update_image(filepath, tree_iter):
+        try:
+            tree_path = liststore.get_path(tree_iter)
+            if tree_path is None:
+                return
+            pix = GdkPixbuf.Pixbuf.new_from_file(filepath)
+            width = pix.get_width()
+            height = pix.get_height()
+            small_pix = pix.scale_simple(icon_size,
+                                         height * icon_size // width,
+                                         GdkPixbuf.InterpType.NEAREST)
+            liststore[tree_path][col] = small_pix
+            liststore[tree_path][large_col] = pix 
+        except GLib.GError:
+            logger.error(traceback.format_exc())
+
+    def dump_image(url, filepath):
+        req = net.urlopen(url)
+        if not req or not req.data:
+            logger.warn('update_share_image:, failed to request %s' % url)
+            return False
+        with open(filepath, 'wb') as fh:
+            fh.write(req.data)
+        return True
+
+    for tree_iter, pcs_file in zip(tree_iters, pcs_files):
+        if 'thumbs' not in pcs_file:
+            continue
+        elif 'url2' in pcs_file['thumbs']:
+            key = 'url2'
+        elif 'url3' in pcs_file['thumbs']:
+            key = 'url3'
+        elif 'url1' in pcs_file['thumbs']:
+            key = 'url1'
+        else:
+            continue
+        fs_id = pcs_file['fs_id']
+        url = pcs_file['thumbs'][key]
+        filepath = os.path.join(dir_name, 'share-{0}.jpg'.format(fs_id))
+        if os.path.exists(filepath) and os.path.getsize(filepath):
+            GLib.idle_add(update_image, filepath, tree_iter)
+        elif not url or len(url) < 10:
+            logger.warn('update_share_image: failed to get url %s' % url)
+        else:
+            status = dump_image(url, filepath)
+            if status:
+                GLib.idle_add(update_image, filepath, tree_iter)
+
 def update_avatar(cookie, dir_name):
     '''获取用户头像信息'''
     filepath = os.path.join(dir_name, 'avatar.jpg')

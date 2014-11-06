@@ -84,21 +84,25 @@ def list_share(cookie, tokens, uk, page=1):
     else:
         return None
 
-def list_share_path(cookie, tokens, uk, path, share_id, page):
+def list_share_files(cookie, tokens, uk, shareid, dirname, page=1):
     '''列举出用户共享的某一个目录中的文件信息
 
+    这个对所有用户都有效
     uk       - user key
-    path     - 共享目录
-    share_id - 共享文件的ID值
+    shareid - 共享文件的ID值
+    dirname  - 共享目录, 如果dirname为None, 说明这有可能是一个单独共享的文件,
+               这里, 需要调用list_share_single_file()
     '''
+    if not dirname:
+        return list_share_single_file(cookie, tokens, uk, shareid)
     url = ''.join([
         const.PAN_URL,
-        'share/list?channel=chunlei&clienttype=0&web=1&num=100',
+        'share/list?channel=chunlei&clienttype=0&web=1&num=50',
         '&t=', util.timestamp(),
         '&page=', str(page),
-        '&dir=', encoder.encode_uri_component(path),
+        '&dir=', encoder.encode_uri_component(dirname),
         '&t=', util.latency(),
-        '&shareid=', share_id,
+        '&shareid=', shareid,
         '&order=time&desc=1',
         '&uk=', uk,
         '&_=', util.timestamp(),
@@ -110,38 +114,60 @@ def list_share_path(cookie, tokens, uk, path, share_id, page):
     })
     if req:
         content = req.data
-        return json.loads(content.decode())
+        info = json.loads(content.decode())
+        if info['errno'] == 0:
+            return info['list']
+    return list_share_single_file(cookie, tokens, uk, shareid)
+
+def list_share_single_file(cookie, tokens, uk, shareid):
+    '''获取单独共享出来的文件.
+
+    目前支持的链接格式有:
+      * http://pan.baidu.com/wap/link?uk=202032639&shareid=420754&third=0
+      * http://pan.baidu.com/share/link?uk=202032639&shareid=420754
+    '''
+    def parse_share_page(content):
+        tree = html.fromstring(content)
+        script_sel = CSS('script')
+        scripts = script_sel(tree)
+        for script in scripts:
+            if (script.text and (script.text.find('viewsingle_param') > -1 or
+                script.text.find('mpan.viewlist_param') > -1)):
+                break
+        else:
+            logger.warn('pcs.parse_share_page: failed to get filelist, %s', url)
+            return None
+        start = script.text.find('viewsingle_param.list=JSON.parse(')
+        end = script.text.find(');mpan.viewsingle_param.username')
+        if start == -1 or end == -1:
+            start = script.text.find('listArr:JSON.parse(')
+            end = script.text.find('),rootPath:')
+            if start == -1 or end == -1:
+                return None
+            else:
+                json_str = script.text[start+19:end]
+        else:
+            json_str = script.text[start+33:end]
+        try:
+            return json.loads(json.loads(json_str))
+        except ValueError:
+            logger.warn(traceback.format_exc())
+            return None
+
+    url = ''.join([
+        const.PAN_URL, 'wap/link',
+        '?shareid=', shareid,
+        '&uk=', uk,
+        '&third=0',
+    ])
+    req = net.urlopen(url, headers={
+        'Cookie': cookie.header_output(),
+        'Referer': const.SHARE_REFERER,
+    })
+    if req:
+        return parse_share_page(req.data)
     else:
         return None
-
-#def get_share_page(url):
-#    '''获取共享页面的文件信息'''
-#    req = net.urlopen(url)
-#    if req:
-#        content = req.data.decode()
-#        match = re.findall('applicationConfig,(.+)\]\);', content)
-#        share_files = {}
-#        if not match:
-#            match = re.findall('viewShareData=(.+");FileUtils.spublic', content)
-#            if not match:
-#                logger.error('get_share_page(): %s, %s' % (url, match))
-#                return None
-#            list_ = json.loads(json.loads(match[0]))
-#        else:
-#            list_ = json.loads(json.loads(match[0]))
-#        if isinstance(list_, dict):
-#            share_files['list'] = [list_, ]
-#        else:
-#            share_files['list'] = list_
-#        id_match = re.findall('FileUtils\.share_id="(\d+)"', content)
-#        uk_match = re.findall('/share/home\?uk=(\d+)" target=', content)
-#        sign_match = re.findall('FileUtils\.share_sign="([^"]+)"', content)
-#        if id_match and uk_match and sign_match:
-#            share_files['share_id'] = id_match[0]
-#            share_files['uk'] = uk_match[0]
-#            share_files['sign'] = sign_match[0]
-#            return share_files
-#    return None
 
 def enable_share(cookie, tokens, fid_list):
     '''建立新的分享.
@@ -190,62 +216,110 @@ def disable_share(cookie, tokens, shareid_list):
     else:
         return None
 
-def get_others_share_page(url, cookie):
-    '''列举其他用户共享了的文件的信息.
+def verify_share_password(uk, shareid, pwd, vcode=''):
+    '''验证共享文件的密码.
 
-    如果成功, 返回(uk, shareid, filelist)
+    如果密码正确, 会在返回的请求头里加入一个cookie: BDCLND
+    
+    pwd - 四位的明文密码
+    vcode - 验证码; 目前还不支持
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'share/verify?&clienttype=0&web=1&channel=chunlei',
+        '&shareid=', shareid,
+        '&uk=', uk,
+    ])
+    data = 'pwd={0}&vcode={1}'.format(pwd, vcode)
+
+    req = net.urlopen(url, data=data.encode())
+    if req:
+        content = req.data.decode()
+        info = json.loads(content)
+        errno = info.get('errno', 1)
+        if errno == 0:
+            return req.headers.get_all('Set-Cookie')
+        elif errno in (-19, -62, -63):
+            pass  # TODO: need verify code
+    return None
+
+def get_share_uk_and_shareid(cookie, url):
+    '''从共享链接中提示uk和shareid.
+
+    如果共享文件需要输入密码, 就会将need_pwd设为True
+    如果成功, 返回(need_pwd, uk, shareid)
     如果失败, 就返回None
 
     目前支持的链接格式有:
       * http://pan.baidu.com/wap/link?uk=202032639&shareid=420754&third=0
       * http://pan.baidu.com/share/link?uk=202032639&shareid=420754
+      * http://pan.baidu.com/s/1i3iQY48
     '''
-    def parse_share(content):
-        tree = html.fromstring(content)
-        script_sel = CSS('script')
-        scripts = script_sel(tree)
-        for script in scripts:
-            if (script.text and (script.text.find('viewsingle_param') > -1 or
-                script.text.find('mpan.viewlist_param') > -1)):
-                break
+    def parse_share_uk(content):
+        '''代码片段如下:
+
+        yunData.SHARE_ID = "677200861";
+        yunData.SHARE_UK = "1295729848";
+        '''
+        uk_reg = re.compile('yunData.SHARE_UK\s*=\s*"(\d+)"')
+        shareid_reg = re.compile('yunData.SHARE_ID\s*=\s*"(\d+)"')
+        uk_match = uk_reg.search(content)
+        shareid_match = shareid_reg.search(content)
+        if uk_match and shareid_match:
+            return False, uk_match.group(1), shareid_match.group(1)
         else:
-            logger.warn('pcs.list_other_share: failed to get filelist, %s', url)
-            return None
-        start = script.text.find('viewsingle_param.list=JSON.parse(')
-        end = script.text.find(');mpan.viewsingle_param.username')
-        if start == -1 or end == -1:
-            start = script.text.find('listArr:JSON.parse(')
-            end = script.text.find('),rootPath:')
-            if start == -1 or end == -1:
-                return None
-            else:
-                json_str = script.text[start+19:end]
-        else:
-            json_str = script.text[start+33:end]
-        try:
-            return json.loads(json.loads(json_str))
-        except ValueError:
             return None
 
-    url = url.replace('com/share/', 'com/wap/')
-    url = re.sub('num=\d+', 'num=1000', url)
-    uk_reg = re.compile('uk=(\d+)')
-    uk_match = uk_reg.search(url)
-    shareid_reg = re.compile('shareid=(\d+)')
-    shareid_match = shareid_reg.search(url)
-    if not uk_match or not shareid_match:
-        return None
-    uk = uk_match.group(1)
-    shareid = shareid_match.group(1)
-    req = net.urlopen(url, headers={
+    def parse_uk_from_url(url):
+        uk_reg = re.compile('uk=(\d+)')
+        uk_match = uk_reg.search(url)
+        shareid_reg = re.compile('shareid=(\d+)')
+        shareid_match = shareid_reg.search(url)
+        if not uk_match or not shareid_match:
+            return '', ''
+        uk = uk_match.group(1)
+        shareid = shareid_match.group(1)
+        return uk, shareid
+
+    # 识别加密链接
+    req = net.urlopen_without_redirect(url, headers={
         'Cookie': cookie.header_output(),
-        'Referer': const.SHARE_REFERER,
     })
-    if req:
-        filelist = parse_share(req.data)
-        if filelist:
-            return (uk, shareid, filelist)
-    return None
+    if req and req.headers.get('Location'):
+        init_url = req.headers.get('Location')
+        if init_url.find('share/init') > -1:
+            uk, shareid = parse_uk_from_url(init_url)
+            return True, uk, shareid
+
+    # 处理短链接
+    if url.startswith('http://pan.baidu.com/s/'):
+        req = net.urlopen(url, headers={
+            'Cookie': cookie.header_output(),
+        })
+        if req:
+            return parse_share_uk(req.data.decode())
+    # 处理正常链接
+    uk, shareid = parse_uk_from_url(url)
+    return False, uk, shareid
+
+def get_share_dirname(url):
+    '''从url中提取出当前的目录'''
+    dirname_match = re.search('(dir|path)=([^&]+)',
+                              encoder.decode_uri_component(url))
+    if dirname_match:
+        return dirname_match.group(2)
+    else:
+        return None
+
+def get_share_url_with_dirname(uk, shareid, dirname):
+    '''得到共享目录的链接'''
+    return ''.join([
+           const.PAN_URL, 'wap/link',
+           '?shareid=', shareid,
+           '&uk=', uk,
+           '&dir=', encoder.encode_uri_component(dirname),
+           '&third=0',
+        ])
 
 def share_transfer(cookie, tokens, shareid, uk, filelist, dest, upload_mode):
     '''
@@ -255,19 +329,18 @@ def share_transfer(cookie, tokens, shareid, uk, filelist, dest, upload_mode):
     filelist - 要转移文件的列表, 是绝对路径
     '''
     ondup = const.UPLOAD_ONDUP[upload_mode]
-    if not ondup:
-        ondup = 'newcopy',
     url = ''.join([
         const.PAN_URL,
         'share/transfer?app_id=250528&channel=chunlei&clienttype=0&web=1',
         '&bdstoken=', tokens['bdstoken'],
-        '&from=', shareid,
+        '&from=', uk,
+        '&shareid=', shareid,
         '&ondup=', ondup,
         '&async=1',
     ])
     data = ''.join([
-        'filelist=', encoder.encode_uri_component(filelist),
-        '&path=', encoder.encode_uri_component(dest),
+        'path=', encoder.encode_uri_component(dest),
+        '&filelist=', encoder.encode_uri_component(json.dumps(filelist))
     ])
 
     req = net.urlopen(url, headers={
@@ -669,8 +742,6 @@ def upload(cookie, source_path, path, upload_mode):
       * newcopy, 保留原先的文件, 并在新上传的文件名尾部加上当前时间戳.
     '''
     ondup = const.UPLOAD_ONDUP[upload_mode]
-    if not ondup:
-        ondup = 'newcopy'
     dir_name, file_name = os.path.split(path)
     url = ''.join([
         const.PCS_URL_C,
@@ -694,8 +765,6 @@ def upload(cookie, source_path, path, upload_mode):
 def rapid_upload(cookie, tokens, source_path, path, upload_mode):
     '''快速上传'''
     ondup = const.UPLOAD_ONDUP[upload_mode]
-    if not ondup:
-        ondup = 'newcopy'
     content_length = os.path.getsize(source_path)
     assert content_length > RAPIDUPLOAD_THRESHOLD, 'file size is not satisfied!'
     dir_name, file_name = os.path.split(path)
@@ -1074,25 +1143,4 @@ def get_avatar(cookie):
         return parse_avatar(req.data.decode())
     else:
         return None
-
-
-def verify_share_password(share_id, share_uk, pwd, vcode=''):
-    """
-    :return: None for failed, otherwise will return cookie
-    """
-    url = (const.PAN_URL + 'share/verify?shareid=%s&uk=%s'
-           '&channel=chunlei&clienttype=0&web=1')
-    url %= share_id, share_uk
-
-    req = net.urlopen(url, data={'pwd': pwd, 'vcode': vcode})
-
-    if req:
-        content = req.data.decode()
-        result = json.loads(content)
-        if result.errno == 0:
-            return req.headers.get_all('Set-Cookie')
-        if result.errno in (-19, -62, -63):
-            pass  # TODO: need verify code
-
-    return None
 

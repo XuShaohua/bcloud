@@ -105,12 +105,11 @@ class IconWindow(Gtk.ScrolledWindow):
         这一操作主要是为了便于接下来的查找工作.
         文件的path都被提取出来, 然后放到了一个list中.
         '''
-        cache_path = Config.get_cache_path(self.app.profile['username'])
         tree_iters = []
         for pcs_file in pcs_files:
             path = pcs_file['path']
-            pixbuf, type_ = self.app.mime.get(
-                    path, pcs_file['isdir'], icon_size=self.ICON_SIZE)
+            pixbuf, type_ = self.app.mime.get(path, pcs_file['isdir'],
+                                              icon_size=self.ICON_SIZE)
             name = os.path.split(path)[NAME_COL]
             tooltip = gutil.escape(name)
             size = pcs_file.get('size', 0)
@@ -123,6 +122,7 @@ class IconWindow(Gtk.ScrolledWindow):
                 json.dumps(pcs_file)
             ])
             tree_iters.append(tree_iter)
+        cache_path = Config.get_cache_path(self.app.profile['username'])
         gutil.async_call(gutil.update_liststore_image, self.liststore,
                          tree_iters, PIXBUF_COL, pcs_files, cache_path,
                          self.ICON_SIZE)
