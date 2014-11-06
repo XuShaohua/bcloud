@@ -185,10 +185,10 @@ def update_share_image(liststore, tree_iters, col, large_col, pcs_files,
             continue
         elif 'url2' in pcs_file['thumbs']:
             key = 'url2'
-        elif 'url3' in pcs_file['thumbs']:
-            key = 'url3'
         elif 'url1' in pcs_file['thumbs']:
             key = 'url1'
+        elif 'url3' in pcs_file['thumbs']:
+            key = 'url3'
         else:
             continue
         fs_id = pcs_file['fs_id']
