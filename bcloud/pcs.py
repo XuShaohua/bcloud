@@ -165,7 +165,7 @@ def list_share_single_file(cookie, tokens, uk, shareid):
         'Referer': const.SHARE_REFERER,
     })
     if req:
-        return parse_share_page(req.data)
+        return parse_share_page(req.data.decode())
     else:
         return None
 
