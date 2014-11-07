@@ -203,23 +203,28 @@ def update_share_image(liststore, tree_iters, col, large_col, pcs_files,
             if status:
                 GLib.idle_add(update_image, filepath, tree_iter)
 
-def update_avatar(cookie, dir_name):
+def update_avatar(cookie, tokens, dir_name):
     '''获取用户头像信息'''
-    filepath = os.path.join(dir_name, 'avatar.jpg')
-    if (os.path.exists(filepath) and
-            time.time() - os.stat(filepath).st_mtime <= AVATAR_UPDATE_INTERVAL):
-        return filepath
-    img_url = pcs.get_avatar(cookie)
+    uk = pcs.get_user_uk(cookie, tokens)
+    if not uk:
+        return None
+    user_info = pcs.get_user_info(tokens, uk)
+    if not user_info:
+        return None
+    img_path = os.path.join(dir_name, 'avatar.jpg')
+    if (os.path.exists(img_path) and
+            time.time() - os.stat(img_path).st_mtime <= AVATAR_UPDATE_INTERVAL):
+        return (uk, user_info['uname'], img_path)
+    img_url = user_info['avatar_url']
     if not img_url:
         return None
-    else:
-        req = net.urlopen(img_url)
-        if not req or not req.data:
-            logger.warn('gutil.update_avatar(), failed to request %s' % url)
-            return None
-        with open(filepath, 'wb') as fh:
-            fh.write(req.data)
-        return filepath
+    req = net.urlopen(img_url)
+    if not req or not req.data:
+        logger.warn('gutil.update_avatar(), failed to request %s' % url)
+        return None
+    with open(img_path, 'wb') as fh:
+        fh.write(req.data)
+    return (uk, user_info['uname'], img_path)
 
 def ellipse_text(text, length=10):
     if len(text) < length:

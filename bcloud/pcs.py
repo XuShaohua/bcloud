@@ -40,7 +40,6 @@ def get_quota(cookie, tokens):
     else:
         return None
 
-
 def get_user_uk(cookie, tokens):
     '''获取用户的uk'''
     url = 'http://yun.baidu.com'
@@ -52,6 +51,26 @@ def get_user_uk(cookie, tokens):
             return match[0]
         else:
             logger.warn('pcs.get_user_uk(), failed to parse uk, %s' % url)
+    return None
+
+def get_user_info(tokens, uk):
+    '''获取用户的部分信息.
+
+    比如头像, 用户名, 自我介绍, 粉丝数等.
+    这个接口可用于查询任何用户的信息, 只要知道他/她的uk.
+    '''
+    url = ''.join([
+        const.PAN_URL,
+        'pcloud/user/getinfo?channel=chunlei&clienttype=0&web=1',
+        '&bdstoken=', tokens['bdstoken'],
+        '&query_uk=', uk,
+        '&t=', util.timestamp(),
+    ])
+    req = net.urlopen(url)
+    if req:
+        info = json.loads(req.data.decode())
+        if info and info['errno'] == 0:
+            return info['user_info']
     return None
 
 def list_share(cookie, tokens, uk, page=1):
@@ -1123,24 +1142,6 @@ def cloud_clear_task(cookie, tokens):
     if req:
         content = req.data
         return json.loads(content.decode())
-    else:
-        return None
-
-def get_avatar(cookie):
-    '''获取当前用户的头像'''
-    def parse_avatar(content):
-        img_sel = CSS('img.account-avatar-show')
-        tree = html.fromstring(content)
-        img_elems = img_sel(tree)
-        if len(img_elems) == 1:
-            return img_elems[0].attrib.get('src', None)
-        else:
-            return None
-
-    url = 'http://passport.baidu.com/center?_t=' + util.timestamp()
-    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
-    if req:
-        return parse_avatar(req.data.decode())
     else:
         return None
 

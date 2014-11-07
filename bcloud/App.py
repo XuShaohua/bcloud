@@ -290,16 +290,21 @@ class App:
 
     def update_avatar(self):
         '''更新用户头像'''
-        def do_update_avatar(img_path, error=None):
-            if error or not img_path:
+        def do_update_avatar(info, error=None):
+            if error or not info:
                 logger.error('Failed to get user avatar: %s, %s' %
-                             (img_path, error))
+                             (info, error))
             else:
+                uk, uname, img_path = info
                 self.img_avatar.set_from_file(img_path)
+                self.img_avatar.props.tooltip_text = '\n'.join([
+                    self.profile['username'],
+                    uname,
+                ])
+        self.img_avatar.props.tooltip_text = ''
         cache_path = Config.get_cache_path(self.profile['username'])
-        self.img_avatar.props.tooltip_text = self.profile['username']
-        gutil.async_call(gutil.update_avatar, self.cookie, cache_path,
-                         callback=do_update_avatar)
+        gutil.async_call(gutil.update_avatar, self.cookie, self.tokens,
+                         cache_path, callback=do_update_avatar)
 
     def init_notebook(self):
         def append_page(page):
