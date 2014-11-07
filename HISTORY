@@ -1,3 +1,9 @@
+v3.5.8 - 2014.11.7
+* Feature: add share-page
+* Feature: support appindicator in Ubuntu Unity desktop
+* Commit database in background
+* i18n updated
+
 v3.5.7 - 2014.10.31
 * Feature: validate filepath
 * Feature: add popup menu in DownloadPage

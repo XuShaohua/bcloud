@@ -8,6 +8,7 @@ bcloud/CloudPage.py
 bcloud/Config.py
 bcloud/DownloadPage.py
 bcloud/Downloader.py
+bcloud/ErrorMsg.py
 bcloud/FolderBrowserDialog.py
 bcloud/HomePage.py
 bcloud/IconWindow.py
@@ -17,6 +18,7 @@ bcloud/PreferencesDialog.py
 bcloud/PropertiesDialog.py
 bcloud/RenameDialog.py
 bcloud/RequestCookie.py
+bcloud/SharePage.py
 bcloud/SigninDialog.py
 bcloud/TrashPage.py
 bcloud/UploadPage.py
