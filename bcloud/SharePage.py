@@ -283,11 +283,11 @@ class SharePage(Gtk.Box):
                 ])
 
             for file_ in filelist:
-                pixbuf, type_ = self.app.mime.get(file_['path'],
-                                                  file_['isdir'],
+                isdir = file_['isdir'] == '1'
+                pixbuf, type_ = self.app.mime.get(file_['path'], isdir,
                                                   icon_size=ICON_SIZE)
-                large_pixbuf, type_ = self.app.mime.get(file_['path'],
-                        file_['isdir'], icon_size=LARGE_ICON_SIZE)
+                large_pixbuf, type_ = self.app.mime.get(file_['path'], isdir,
+                        icon_size=LARGE_ICON_SIZE)
                 size = int(file_.get('size', 0))
                 human_size = util.get_human_size(size)[0]
                 mtime = int(file_.get('server_mtime', 0))
@@ -298,7 +298,7 @@ class SharePage(Gtk.Box):
                     large_pixbuf,
                     file_['server_filename'],
                     file_['path'],
-                    bool(file_['isdir']),
+                    isdir,
                     size,
                     human_size,
                     mtime,
