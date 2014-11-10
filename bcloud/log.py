@@ -9,7 +9,7 @@ import sys
 
 def _init_logger(log_level, maxBytes=5*1024*1024, backupCount=5):
     log_file = os.path.expanduser('~/.config/bcloud/bcloud.log')
-    dir_name = os.path.split(log_file)[0]
+    dir_name = os.path.dirname(log_file)
     if not os.path.exists(dir_name):
         try:
             os.makedirs(dir_name)
