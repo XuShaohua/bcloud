@@ -23,6 +23,12 @@ from bcloud import util
 try:
     import keyring
     keyring_available = True
+    try:
+        keyring.set_password("test", "utest", "ptest");
+        keyring.get_password("test", "utest");
+        keyring.delete_password("test", "utest");
+    except:
+        keyring_available = False
 except (ImportError, ValueError):
     logger.warn(traceback.format_exc())
     keyring_available = False
