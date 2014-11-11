@@ -180,7 +180,7 @@ class SigninDialog(Gtk.Dialog):
         box.show_all()
         self.infobar.hide()
 
-        if not hasattr(gutil, 'keyring'):
+        if not gutil.keyring_available:
             self.signin_check.set_active(False)
             self.signin_check.set_sensitive(False)
             self.remember_check.set_active(False)
