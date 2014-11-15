@@ -24,14 +24,20 @@ from bcloud import util
 
 def get_ppui_logintime():
     '''ppui_ligintime 这个字段, 是一个随机数.'''
-    return str(random.randint(25000, 28535))
+    return str(random.randint(52000, 58535))
 
 def get_BAIDUID():
     '''获取一个cookie - BAIDUID.
 
     这里, 我们访问百度首页, 返回的response header里面有我们需要的cookie
     '''
-    req = net.urlopen(const.REFERER)
+    url = ''.join([
+        const.PASSPORT_URL,
+        '?getapi&tpl=mn&apiver=v3',
+        '&tt=', util.timestamp(),
+        '&class=login&logintype=basicLogin',
+    ])
+    req = net.urlopen(url, headers={'Referer': ''})
     if req:
         return req.headers.get_all('Set-Cookie')
     else:
@@ -56,13 +62,14 @@ def get_token(cookie):
     '''
     url = ''.join([
         const.PASSPORT_URL,
-        '?getapi&tpl=mn&apiver=v3',
+        '?getapi&tpl=pp&apiver=v3',
         '&tt=', util.timestamp(),
-        '&class=login&logintype=dialogLogin',
+        '&class=login&logintype=basicLogin',
     ])
     headers={
         'Cookie': cookie.header_output(),
-        'Referer': const.REFERER,
+        'Accept': const.ACCEPT_HTML,
+        'Cache-control': 'max-age=0',
     }
     req = net.urlopen(url, headers=headers)
     if req:
@@ -192,7 +199,7 @@ def get_public_key(cookie, token):
         return util.json_loads_single(req.data.decode())
     return None
 
-def post_login(cookie, token, username, password, rsakey, verifycode='',
+def post_login(cookie, tokens, username, password, rsakey, verifycode='',
                codestring=''):
     '''登录验证.
     password   - 使用RSA加密后的base64字符串
@@ -207,12 +214,14 @@ def post_login(cookie, token, username, password, rsakey, verifycode='',
     '''
     url = const.PASSPORT_LOGIN
     data = ''.join([
-        'staticpage=https%3A%2F%2Fpassport.baidu.com%2Fstatic%2Fpasspc-account%2Fhtml%2Fv3Jump.html&charset=UTF-8',
-        '&token=', token,
+        'staticpage=https%3A%2F%2Fpassport.baidu.com%2Fstatic%2Fpasspc-account%2Fhtml%2Fv3Jump.html',
+        '&charset=UTF-8',
+        '&token=', tokens['token'],
         '&tpl=pp&subpro=&apiver=v3',
         '&tt=', util.timestamp(),
         '&codestring=', codestring,
-        '&safeflg=0&u=https%3A%2F%2Fpassport.baidu.com%2F&isPhone=',
+        '&safeflg=0&u=http%3A%2F%2Fpassport.baidu.com%2F',
+        '&isPhone=',
         '&quick_user=0&logintype=basicLogin&logLoginType=pc_loginBasic&idc=',
         '&loginmerge=true',
         '&username=', encoder.encode_uri_component(username),
@@ -220,13 +229,15 @@ def post_login(cookie, token, username, password, rsakey, verifycode='',
         '&verifycode=', verifycode,
         '&mem_pass=on',
         '&rsakey=', rsakey,
-        '&crypttype=12&ppui_logintime=',get_ppui_logintime(),
-        '&callback=parent.bd__pcbs__m8g1kg',
+        '&crypttype=12',
+        '&ppui_logintime=',get_ppui_logintime(),
+        '&callback=parent.bd__pcbs__28g1kg',
     ])
     logger.debug('auth.post_login: %s' % data)
+    logger.debug('cookie: %s' % cookie.header_output())
     headers={
-        'Cookie': cookie.header_output(),
-        'Content-Type': const.CONTENT_FORM,
+        'Accept': const.ACCEPT_HTML,
+        'Cookie': cookie.sub_output('BAIDUID','HOSUPPORT', 'UBI'),
         'Referer': const.REFERER,
         'Connection': 'Keep-Alive',
     }
@@ -234,6 +245,11 @@ def post_login(cookie, token, username, password, rsakey, verifycode='',
     if req:
         auth_cookie = req.headers.get_all('Set-Cookie')
         resp_content= req.data.decode()
+        logger.debug('tokens: %s' % tokens)
+        logger.debug('post login content: %s' % resp_content)
+        logger.debug('post login cookie: %s' %
+                     req.headers.get_all('Set-Cookie'))
+        logger.debug('post login header: %s' % req.headers.items())
         match = re.findall('"(err_no[^"]+)"', resp_content)
         if len(match) != 1:
             return (-1, None)
@@ -307,7 +323,7 @@ def authorize_sms_vcode(cookie, tokens, vcode):
         '&type=mobile&jsonp=1&apiver=v3&verifychannel=&action=check',
         '&vcode=', vcode,
         '&needsid=&rsakey=&subpro=',
-    ]
+    ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     if req:
         return req.headers.get_all('Set-Cookie')
