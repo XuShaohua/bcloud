@@ -129,6 +129,7 @@ class App:
         # icon_name, disname, tooltip, color
         self.nav_liststore = Gtk.ListStore(str, str, str, Gdk.RGBA)
         nav_treeview = Gtk.TreeView(model=self.nav_liststore)
+        nav_treeview.get_style_context().add_class(Gtk.STYLE_CLASS_SIDEBAR)
         self.nav_selection = nav_treeview.get_selection()
         nav_treeview.props.headers_visible = False
         nav_treeview.set_tooltip_column(TOOLTIP_COL)
