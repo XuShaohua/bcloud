@@ -278,3 +278,38 @@ def get_bdstoken(cookie):
         return parse_bdstoken(req.data.decode())
     else:
         return None
+
+def send_sms(cookie, tokens):
+    '''要求百度向绑定的手机号上发一条包含验证码的短信'''
+    url = ''.join([
+        const.PASSPORT_BASE,
+        'v2/sapi/authwidgetverify',
+        '?authtoken=', tokens['authtoken'],
+        '&type=mobile&jsonp=1&apiver=v3&verifychannel=&action=send',
+        '&vcode=&needsid=&rsakey=&subpro=',
+    ])
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        return json.loads(req.data.decode())
+    else:
+        return None
+
+def authorize_sms_vcode(cookie, tokens, vcode):
+    '''发送手机验证码到服务器.
+
+    tokens 里面包含了authtoken.
+    vcode 是一个6位数字, 是百度发送的短信验证码
+    '''
+    url = ''.join([
+        const.PASSPORT_BASE,
+        'v2/sapi/authwidgetverify',
+        '?authtoken=', tokens['authtoken'],
+        '&type=mobile&jsonp=1&apiver=v3&verifychannel=&action=check',
+        '&vcode=', vcode,
+        '&needsid=&rsakey=&subpro=',
+    ]
+    req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
+    if req:
+        return req.headers.get_all('Set-Cookie')
+    else:
+        return None

@@ -154,7 +154,6 @@ class App:
         self.img_avatar.props.halign = Gtk.Align.CENTER
         left_box.pack_end(self.img_avatar, False, False, 5)
 
-
         self.notebook = Gtk.Notebook()
         self.notebook.props.show_tabs = False
         paned.add2(self.notebook)
