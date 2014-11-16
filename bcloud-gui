@@ -24,7 +24,7 @@ def main():
     if (os.path.exists(logfile) and
             time.time() - os.stat(logfile).st_ctime > LOG_INTERVAL):
         os.remove(logfile)
-    #sys.stderr = open(logfile, 'a')
+    sys.stderr = open(logfile, 'a')
     app = App()
     app.run(sys.argv)
 
