@@ -22,9 +22,9 @@ TIMEOUT = 50
 default_headers = {
     'User-agent': const.USER_AGENT,
     'Referer': const.PAN_REFERER,
-    'x-requested-with': 'XMLHttpRequest',
+    #'x-requested-with': 'XMLHttpRequest',
     'Accept': const.ACCEPT_JSON,
-    'Accept-language': 'zh-cn, zh',
+    'Accept-language': 'zh-cn, zh;q=0.5',
     'Accept-encoding': 'gzip, deflate',
     'Pragma': 'no-cache',
     'Cache-control': 'no-cache',

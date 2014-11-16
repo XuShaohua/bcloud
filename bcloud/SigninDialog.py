@@ -21,15 +21,106 @@ from bcloud import Widgets
 
 DELTA = 1 * 24 * 60 * 60   # 1 days
 
+
+class SMSVcodeDialog(Gtk.Dialog):
+    '''登陆时的手机验证码对话框'''
+
+    def __init__(self, parent, username, password, cookie, tokens):
+        super().__init__(_('SMS Authorization..'), parent,
+                         Gtk.DialogFlags.MODAL)
+        self.set_default_size(280, 130)
+        self.set_border_width(10)
+        self.parent = parent
+        self.username = username
+        self.password = password
+        self.cookie = cookie
+        self.tokens = tokens
+
+        box = self.get_content_area()
+        box.set_spacing(5)
+
+        sms_button = Gtk.Button(_('Send SMS'))
+        sms_button.connect('clicked', self.on_sms_button_clicked)
+        box.pack_start(sms_button, False, False, 0)
+
+        self.entry = Gtk.Entry()
+        self.entry.connect('activate', self.check_vcode)
+        box.pack_start(self.entry, False, False, 0)
+
+        ok_button = Gtk.Button.new_from_stock(Gtk.STOCK_OK)
+        ok_button.connect('clicked', self.check_vcode)
+        ok_button.props.valign = Gtk.Align.END
+        box.pack_start(ok_button, False, False, 10)
+
+        box.show_all()
+
+    def on_sms_button_clicked(self, button):
+        gutil.async_call(auth.send_sms, self.cookie, self.tokens)
+        button.set_sensitive(False)
+        GLib.timeout_add(60000, lambda: button.set_sensitive(True))
+
+    def get_sms_vcode(self):
+        return self.entry.get_text()
+
+    def on_get_bdstoken(self, bdstoken, error=None):
+        if error or not bdstoken:
+            logger.error('SigninDialog.on_get_bdstoken: %s, %s' %
+                         (bdstoken, error))
+            self.parent.signin_failed(_('Failed to get bdstoken!'))
+        else:
+            self.tokens['bdstoken'] = bdstoken
+            self.parent.update_profile(self.username, self.password,
+                                       self.cookie, self.tokens, dump=True)
+            self.response(Gtk.ResponseType.OK)
+
+    def on_login_proxy(self, auth_cookie, error=None):
+        print('on login proxy:', auth_cookie, error)
+        if error or not auth_cookie:
+            print('error')
+        else:
+            self.cookie.load_list(auth_cookie)
+            print('self.cookie:', self.cookie)
+            self.parent.signin_button.set_label(_('Get bdstoken...'))
+            gutil.async_call(auth.get_bdstoken, self.cookie,
+                             callback=self.on_get_bdstoken)
+
+    def on_authorize_sms_vcode(self, info, error=None):
+        print('on authorize sms vcode:', info, error)
+        if error or not info:
+            logger.error('SigninDialog.authrize_sms_vcode: %s, %s' %
+                         (info, error))
+            print('fucking error:')
+            #return
+        resp, auth_cookie = info
+        print('resp:', resp)
+        print('auth cookie:', auth_cookie)
+        if int(resp['errno']) != 110000:
+            print('fucking error is not  1100000')
+            logger.error('SigninDialog.authrize_sms_vcode: %s, %s' %
+                         (info, error))
+        else:
+            self.cookie.load_list(auth_cookie)
+            print('fuck cookie:', self.cookie)
+            gutil.async_call(auth.login_proxy, self.cookie, self.tokens,
+                             callback=self.on_login_proxy)
+
+    def check_vcode(self, *args):
+        gutil.async_call(auth.authorize_sms_vcode, self.cookie, self.tokens,
+                         self.entry.get_text(),
+                         callback=self.on_authorize_sms_vcode)
+
+
 class SigninVcodeDialog(Gtk.Dialog):
-    def __init__(self, parent, username, cookie, token, codeString, vcodetype):
+    '''登陆时的验证码对话框'''
+
+    def __init__(self, parent, username, cookie, tokens, codeString, vcodetype):
         super().__init__(_('Verification..'), parent, Gtk.DialogFlags.MODAL)
 
         self.set_default_size(280, 130)
         self.set_border_width(10)
         self.username = username
         self.cookie = cookie
-        self.token = token
+        self.tokens = tokens
         self.codeString = codeString
         self.vcodetype = vcodetype
 
@@ -101,7 +192,7 @@ class SigninVcodeDialog(Gtk.Dialog):
         self.loading_spin.start()
         self.loading_spin.show_all()
         self.vcode_entry.set_sensitive(False)
-        gutil.async_call(auth.refresh_signin_vcode, self.cookie, self.token,
+        gutil.async_call(auth.refresh_signin_vcode, self.cookie, self.tokens,
                          self.vcodetype, callback=_refresh_vcode)
 
     def check_entry(self, *args):
@@ -275,18 +366,25 @@ class SigninDialog(Gtk.Dialog):
                                     dump=True)
 
         def on_post_login(info, error=None):
+            print('on post login:', info, error)
             if error or not info:
                 logger.error('SigninDialog.on_post_login: %s, %s' %
                              (info, error))
                 self.signin_failed(
                         _('Login failed, please try again'))
             else:
-                errno, bduss = info
+                errno, query = info
+                if errno == 0:
+                    cookie.load_list(query)
+                    self.signin_button.set_label(_('Get bdstoken...'))
+                    gutil.async_call(auth.get_bdstoken, cookie,
+                                     callback=on_get_bdstoken)
                 # 257: 需要输入验证码
-                if errno == 257:
+                elif errno == 257:
                     nonlocal verifycode
                     nonlocal codeString
-                    vcodetype, codeString = bduss
+                    vcodetype = query['vcodetype']
+                    codeString = query['codestring']
                     dialog = SigninVcodeDialog(self, username, cookie,
                                                tokens['token'], codeString,
                                                vcodetype)
@@ -312,11 +410,14 @@ class SigninDialog(Gtk.Dialog):
                 elif errno == 6:
                     self.signin_failed(
                             _('Verfication code error, please try again'))
-                elif errno == 0:
-                    cookie.load_list(bduss)
-                    self.signin_button.set_label(_('Get bdstoken...'))
-                    gutil.async_call(auth.get_bdstoken, cookie,
-                                     callback=on_get_bdstoken)
+                # 需要短信验证
+                elif errno == 400031:
+                    tokens['authtoken'] = query['authtoken']
+                    tokens['lstr'] = query['lstr']
+                    tokens['ltoken'] = query['ltoken']
+                    dialog = SMSVcodeDialog(self, username, password, cookie,
+                                            tokens)
+                    dialog.run()
                 else:
                     logger.error('SigninDialog.on_post_login: %s, %s' %
                                  (info, error))
@@ -334,7 +435,7 @@ class SigninDialog(Gtk.Dialog):
                 rsakey = info['key']
                 nonlocal password_enc
                 password_enc = util.RSA_encrypt(pubkey, password)
-                gutil.async_call(auth.post_login, cookie, tokens['token'],
+                gutil.async_call(auth.post_login, cookie, tokens,
                                  username, password_enc, rsakey, verifycode,
                                  codeString, callback=on_post_login)
 
@@ -352,8 +453,7 @@ class SigninDialog(Gtk.Dialog):
                 vcodetype = status['data']['vcodetype']
                 if codeString:
                     dialog = SigninVcodeDialog(self, username, cookie,
-                                               tokens['token'], codeString,
-                                               vcodetype)
+                                               tokens, codeString, vcodetype)
                     response = dialog.run()
                     verifycode = dialog.get_vcode()
                     codeString = dialog.codeString
@@ -363,12 +463,10 @@ class SigninDialog(Gtk.Dialog):
                         return
                     else:
                         gutil.async_call(auth.get_public_key, cookie,
-                                         tokens['token'],
-                                         callback=on_get_public_key)
+                                         tokens, callback=on_get_public_key)
                 else:
                     gutil.async_call(auth.get_public_key, cookie,
-                                     tokens['token'],
-                                     callback=on_get_public_key)
+                                     tokens, callback=on_get_public_key)
 
         def on_get_UBI(ubi_cookie, error=None):
             if error or not ubi_cookie:
@@ -378,7 +476,7 @@ class SigninDialog(Gtk.Dialog):
             else:
                 cookie.load_list(ubi_cookie)
                 self.signin_button.set_label(_('Check login'))
-                gutil.async_call(auth.check_login, cookie, tokens['token'],
+                gutil.async_call(auth.check_login, cookie, tokens,
                                  username, callback=on_check_login)
 
         def on_get_token(info, error=None):
@@ -390,9 +488,10 @@ class SigninDialog(Gtk.Dialog):
                 nonlocal tokens
                 hosupport, token = info
                 cookie.load_list(hosupport)
+                cookie.load('cflag=65535%3A1; PANWEB=1;')
                 tokens['token'] = token
                 self.signin_button.set_label(_('Get UBI...'))
-                gutil.async_call(auth.get_UBI, cookie, token,
+                gutil.async_call(auth.get_UBI, cookie, tokens,
                                  callback=on_get_UBI)
 
         def on_get_BAIDUID(uid_cookie, error=None):
@@ -416,7 +515,6 @@ class SigninDialog(Gtk.Dialog):
                 self.update_profile(username, password, cookie, tokens)
                 return
         cookie = RequestCookie()
-        cookie.load('cflag=65535%3A1; PANWEB=1;')
         tokens = {}
         verifycode = ''
         codeString = ''

@@ -79,7 +79,7 @@ def get_token(cookie):
             return cookie, content_obj['data']['token']
     return None
 
-def get_UBI(cookie, token):
+def get_UBI(cookie, tokens):
     '''检查登录历史, 可以获得一个Cookie - UBI.
     返回的信息类似于: 
     {"errInfo":{ "no": "0" }, "data": {'displayname':['xxx@163.com']}}
@@ -87,7 +87,7 @@ def get_UBI(cookie, token):
     url = ''.join([
         const.PASSPORT_URL,
         '?loginhistory',
-        '&token=', token,
+        '&token=', tokens['token'],
         '&tpl=pp&apiver=v3',
         '&tt=', util.timestamp(),
     ])
@@ -101,7 +101,7 @@ def get_UBI(cookie, token):
     else:
         return None
 
-def check_login(cookie, token, username):
+def check_login(cookie, tokens, username):
     '''进行登录验证, 主要是在服务器上验证这个帐户的状态.
 
     如果帐户不存在, 或者帐户异常, 就不需要再进行最后一步的登录操作了.
@@ -112,7 +112,7 @@ def check_login(cookie, token, username):
     url = ''.join([
         const.PASSPORT_URL,
         '?logincheck',
-        '&token=', token,
+        '&token=', tokens['token'],
         '&tpl=mm&apiver=v3',
         '&tt=', util.timestamp(),
         '&username=', encoder.encode_uri_component(username),
@@ -149,7 +149,7 @@ def get_signin_vcode(cookie, codeString):
     else:
         return None
 
-def refresh_signin_vcode(cookie, token, vcodetype):
+def refresh_signin_vcode(cookie, tokens, vcodetype):
     '''刷新验证码.
 
     vcodetype - 在调用check_login()时返回的vcodetype.
@@ -157,7 +157,7 @@ def refresh_signin_vcode(cookie, token, vcodetype):
     url = ''.join([
         const.PASSPORT_BASE,
         'v2/?reggetcodestr',
-        '&token=', token,
+        '&token=', tokens['token'],
         '&tpl=pp&apiver=v3',
         '&tt=', util.timestamp(),
         '&fr=ligin',
@@ -178,7 +178,7 @@ def refresh_signin_vcode(cookie, token, vcodetype):
             logger.error(traceback.format_exc())
     return None
 
-def get_public_key(cookie, token):
+def get_public_key(cookie, tokens):
     '''获取RSA公钥, 这个用于加密用户的密码
     
     返回的数据如下:
@@ -186,7 +186,7 @@ def get_public_key(cookie, token):
     '''
     url = ''.join([
         const.PASSPORT_BASE, 'v2/getpublickey',
-        '?token=', token,
+        '?token=', tokens['token'],
         '&tpl=pp&apiver=v3&tt=', util.timestamp(),
     ])
     headers={
@@ -233,8 +233,6 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
         '&ppui_logintime=',get_ppui_logintime(),
         '&callback=parent.bd__pcbs__28g1kg',
     ])
-    logger.debug('auth.post_login: %s' % data)
-    logger.debug('cookie: %s' % cookie.header_output())
     headers={
         'Accept': const.ACCEPT_HTML,
         'Cookie': cookie.sub_output('BAIDUID','HOSUPPORT', 'UBI'),
@@ -243,27 +241,25 @@ def post_login(cookie, tokens, username, password, rsakey, verifycode='',
     }
     req = net.urlopen(url, headers=headers, data=data.encode())
     if req:
-        auth_cookie = req.headers.get_all('Set-Cookie')
-        resp_content= req.data.decode()
-        logger.debug('tokens: %s' % tokens)
-        logger.debug('post login content: %s' % resp_content)
-        logger.debug('post login cookie: %s' %
-                     req.headers.get_all('Set-Cookie'))
-        logger.debug('post login header: %s' % req.headers.items())
-        match = re.findall('"(err_no[^"]+)"', resp_content)
-        if len(match) != 1:
+        content= req.data.decode()
+        match = re.search('"(err_no[^"]+)"', content)
+        if not match:
             return (-1, None)
-        query = dict(urllib.parse.parse_qsl(match[0]))
-        err_no = int(query.get('err_no', '-1'))
+        query = dict(urllib.parse.parse_qsl(match.group(1)))
+        query['err_no'] = int(query['err_no'])
+        err_no = query['err_no']
+        auth_cookie = req.headers.get_all('Set-Cookie')
+
         if err_no == 0:
             return (0, auth_cookie)
-        if err_no != 257:
+        # 要输入验证码
+        elif err_no == 257:
+            return (err_no, query)
+        # 需要短信验证
+        elif err_no == 400031:
+            return (err_no, query)
+        else:
             return (err_no, None)
-        vcodetype = query.get('vcodetype', '')
-        codeString = query.get('codeString', '')
-        if vcodetype and codeString:
-            return (257, (vcodetype, codeString))
-        return (-1, None)
     else:
         return (-1, None)
     return (-1, None)
@@ -295,22 +291,27 @@ def get_bdstoken(cookie):
     else:
         return None
 
-def send_sms(cookie, tokens):
-    '''要求百度向绑定的手机号上发一条包含验证码的短信'''
+def send_sms(cookie, tokens, vtype='email'):
+    '''要求百度向绑定的手机号上发一条包含验证码的短信
+    
+    vtype - 验证方式, email, 邮件验证; mobile, 短信验证
+    '''
     url = ''.join([
         const.PASSPORT_BASE,
         'v2/sapi/authwidgetverify',
-        '?authtoken=', tokens['authtoken'],
-        '&type=mobile&jsonp=1&apiver=v3&verifychannel=&action=send',
+        '?authtoken=', encoder.encode_uri_component(tokens['authtoken']),
+        '&type=', vtype,
+        '&jsonp=1&apiver=v3&verifychannel=&action=send',
         '&vcode=&needsid=&rsakey=&subpro=',
     ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     if req:
-        return json.loads(req.data.decode())
+        logger.debug(req.data.decode())
+        return util.json_loads_single(req.data.decode())
     else:
         return None
 
-def authorize_sms_vcode(cookie, tokens, vcode):
+def authorize_sms_vcode(cookie, tokens, vcode, vtype='email'):
     '''发送手机验证码到服务器.
 
     tokens 里面包含了authtoken.
@@ -319,13 +320,41 @@ def authorize_sms_vcode(cookie, tokens, vcode):
     url = ''.join([
         const.PASSPORT_BASE,
         'v2/sapi/authwidgetverify',
-        '?authtoken=', tokens['authtoken'],
-        '&type=mobile&jsonp=1&apiver=v3&verifychannel=&action=check',
+        '?authtoken=', encoder.encode_uri_component(tokens['authtoken']),
+        '&type=', vtype,
+        '&jsonp=1&apiver=v3&verifychannel=&action=check',
         '&vcode=', vcode,
         '&needsid=&rsakey=&subpro=',
     ])
     req = net.urlopen(url, headers={'Cookie': cookie.header_output()})
     if req:
+        info = util.json_loads_single(req.data.decode())
+        auth_cookie = req.headers.get_all('Set-Cookie')
+        return info, auth_cookie
+    else:
+        return None
+
+def login_proxy(cookie, tokens):
+    '''短信验证之后, 要通过这个proxy来请求服务器端的认证cookie.'''
+    logger.debug('login_proxy: %s, %s' % (cookie, tokens))
+    url = ''.join([
+        const.PASSPORT_BASE,
+        'v2/?loginproxy&u=https%3A%2F%2Fpassport.baidu.com%2F&tpl=pp',
+        '&ltoken=', tokens['ltoken'],
+        '&lstr=', encoder.encode_uri_component(tokens['lstr']),
+        '&apiver=v3&',
+        'tt=',util.timestamp(),
+        '&callback=bd__cbs__bh6flx',
+    ])
+    req = net.urlopen(url, headers={
+        'Accept': '*/*',
+        'Cookie': cookie.sub_output('BAIDUID', 'UBI', 'HOSUPPORT'),
+        'Referer': const.REFERER,
+    })
+    if req:
+        logger.debug('login_proxy header: %s' % req.headers.items())
+        logger.debug('login proxy cookies: %s' %
+                     req.headers.get_all('Set-Cookie'))
         return req.headers.get_all('Set-Cookie')
     else:
         return None
