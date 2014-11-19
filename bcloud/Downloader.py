@@ -187,7 +187,11 @@ class Downloader(threading.Thread, GObject.GObject):
                     return
                 content_length = match.group(1)
             size = int(content_length)
-            if size <= SMALL_FILE_SIZE:
+            if size == 0:
+                open(filepath, 'a').close()
+                self.emit('downloaded', row[FSID_COL])
+                return
+            elif size <= SMALL_FILE_SIZE:
                 threads = 1
             else:
                 threads = self.default_threads
