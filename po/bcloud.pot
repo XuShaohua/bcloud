@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-06 19:03+0800\n"
+"POT-Creation-Date: 2014-11-26 22:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,27 +29,27 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: ../bcloud/App.py:99 ../bcloud/App.py:411
+#: ../bcloud/App.py:99 ../bcloud/App.py:416
 msgid "Quit"
 msgstr ""
 
-#: ../bcloud/App.py:150
+#: ../bcloud/App.py:151
 msgid "Unknown"
 msgstr ""
 
-#: ../bcloud/App.py:389
+#: ../bcloud/App.py:394
 msgid "Show App"
 msgstr ""
 
-#: ../bcloud/App.py:397
+#: ../bcloud/App.py:402
 msgid "Pause Upload Tasks"
 msgstr ""
 
-#: ../bcloud/App.py:403
+#: ../bcloud/App.py:408
 msgid "Pause Download Tasks"
 msgstr ""
 
-#: ../bcloud/App.py:457
+#: ../bcloud/App.py:462
 #, python-brace-format
 msgid "{0} copied to clipboard"
 msgstr ""
@@ -189,7 +189,7 @@ msgid "Error: {0}"
 msgstr ""
 
 #: ../bcloud/CloudPage.py:292 ../bcloud/CloudPage.py:392
-#: ../bcloud/FolderBrowserDialog.py:22 ../bcloud/SharePage.py:342
+#: ../bcloud/FolderBrowserDialog.py:22 ../bcloud/SharePage.py:344
 msgid "Save to.."
 msgstr ""
 
@@ -598,126 +598,130 @@ msgstr ""
 msgid "Error: password error, please try again"
 msgstr ""
 
-#: ../bcloud/SharePage.py:213 ../bcloud/SharePage.py:314
+#: ../bcloud/SharePage.py:213 ../bcloud/SharePage.py:316
 #, python-brace-format
 msgid "Invalid link: {0}!"
 msgstr ""
 
-#: ../bcloud/SharePage.py:255
+#: ../bcloud/SharePage.py:257
 msgid "Failed to get files, please reload this page"
 msgstr ""
 
-#: ../bcloud/SharePage.py:327
+#: ../bcloud/SharePage.py:329
 msgid "Failed to copy selected files!"
 msgstr ""
 
-#: ../bcloud/SharePage.py:331
+#: ../bcloud/SharePage.py:333
 #, python-brace-format
 msgid "Failed to copy selected files! {0}"
 msgstr ""
 
-#: ../bcloud/SharePage.py:395
+#: ../bcloud/SharePage.py:397
 #, python-brace-format
 msgid "Go to parent directory: {0}"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:26 ../bcloud/VCodeDialog.py:20
+#: ../bcloud/SigninDialog.py:29 ../bcloud/VCodeDialog.py:20
 msgid "Verification.."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:124
+#: ../bcloud/SigninDialog.py:127
 msgid "Sign in now"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:143
+#: ../bcloud/SigninDialog.py:146
 msgid "Username/Email/Phone..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:148
+#: ../bcloud/SigninDialog.py:151
 msgid "Password .."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:154
+#: ../bcloud/SigninDialog.py:157
 msgid "Remember Password"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:161
+#: ../bcloud/SigninDialog.py:164
 msgid "Signin Automatically"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:167 ../bcloud/SigninDialog.py:236
+#: ../bcloud/SigninDialog.py:170 ../bcloud/SigninDialog.py:239
 msgid "Sign in"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:177
+#: ../bcloud/SigninDialog.py:180
 msgid "Failed to sign in, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:261
+#: ../bcloud/SigninDialog.py:264
 msgid "In process..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:270
+#: ../bcloud/SigninDialog.py:273
 msgid "Failed to get bdstoken!"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:282
+#: ../bcloud/SigninDialog.py:285
 msgid "Login failed, please try again"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:298 ../bcloud/SigninDialog.py:362
-msgid "Please input verification code!"
-msgstr ""
-
-#: ../bcloud/SigninDialog.py:301 ../bcloud/SigninDialog.py:317
+#: ../bcloud/SigninDialog.py:290 ../bcloud/SigninDialog.py:310
 msgid "Get bdstoken..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:310
+#: ../bcloud/SigninDialog.py:307 ../bcloud/SigninDialog.py:371
+msgid "Please input verification code!"
+msgstr ""
+
+#: ../bcloud/SigninDialog.py:319
 msgid "Password error, please try again"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:314
+#: ../bcloud/SigninDialog.py:323
 msgid "Verfication code error, please try again"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:323
+#: ../bcloud/SigninDialog.py:329
+msgid "Does not support SMS/Email verification!"
+msgstr ""
+
+#: ../bcloud/SigninDialog.py:333
 msgid "Unknown error, please try again"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:330
+#: ../bcloud/SigninDialog.py:340
 msgid "Failed to request public key, please try again"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:345
+#: ../bcloud/SigninDialog.py:355
 msgid "Failed to check login, please try again"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:377
+#: ../bcloud/SigninDialog.py:384
 msgid "Failed to get UBI, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:380
+#: ../bcloud/SigninDialog.py:387
 msgid "Check login"
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:388
+#: ../bcloud/SigninDialog.py:395
 msgid "Failed to get token, please try again."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:394
+#: ../bcloud/SigninDialog.py:402
 msgid "Get UBI..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:403
+#: ../bcloud/SigninDialog.py:411
 msgid "Failed to get BAIDUID cookie, please try agin."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:406
+#: ../bcloud/SigninDialog.py:414
 msgid "Get TOKEN..."
 msgstr ""
 
-#: ../bcloud/SigninDialog.py:425
+#: ../bcloud/SigninDialog.py:432
 msgid "Get BAIDUID..."
 msgstr ""
 

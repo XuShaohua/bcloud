@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-06 19:03+0800\n"
+"POT-Creation-Date: 2014-11-26 22:11+0800\n"
 "PO-Revision-Date: 2014-10-21 17:15+0800\n"
 "Last-Translator: CzBiX <gliuwr@gmail.com>\n"
 "Language-Team: Chinese (traditional)\n"
@@ -29,27 +29,27 @@ msgstr "註銷"
 msgid "About"
 msgstr "關於"
 
-#: ../bcloud/App.py:99 ../bcloud/App.py:411
+#: ../bcloud/App.py:99 ../bcloud/App.py:416
 msgid "Quit"
 msgstr "退出"
 
-#: ../bcloud/App.py:150
+#: ../bcloud/App.py:151
 msgid "Unknown"
 msgstr "未知"
 
-#: ../bcloud/App.py:389
+#: ../bcloud/App.py:394
 msgid "Show App"
 msgstr "顯示程序"
 
-#: ../bcloud/App.py:397
+#: ../bcloud/App.py:402
 msgid "Pause Upload Tasks"
 msgstr "暫停所有上傳任務"
 
-#: ../bcloud/App.py:403
+#: ../bcloud/App.py:408
 msgid "Pause Download Tasks"
 msgstr "暫停所有下載任務"
 
-#: ../bcloud/App.py:457
+#: ../bcloud/App.py:462
 #, python-brace-format
 msgid "{0} copied to clipboard"
 msgstr "{0} 已被複製到剪貼板"
@@ -189,7 +189,7 @@ msgid "Error: {0}"
 msgstr "錯誤: {0}"
 
 #: ../bcloud/CloudPage.py:292 ../bcloud/CloudPage.py:392
-#: ../bcloud/FolderBrowserDialog.py:22 ../bcloud/SharePage.py:342
+#: ../bcloud/FolderBrowserDialog.py:22 ../bcloud/SharePage.py:344
 msgid "Save to.."
 msgstr "保存到.."
 
@@ -602,126 +602,130 @@ msgstr "共享文件的URL..."
 msgid "Error: password error, please try again"
 msgstr "密碼錯誤, 請重試"
 
-#: ../bcloud/SharePage.py:213 ../bcloud/SharePage.py:314
+#: ../bcloud/SharePage.py:213 ../bcloud/SharePage.py:316
 #, python-brace-format
 msgid "Invalid link: {0}!"
 msgstr "無效鏈接: {0}!"
 
-#: ../bcloud/SharePage.py:255
+#: ../bcloud/SharePage.py:257
 msgid "Failed to get files, please reload this page"
 msgstr "獲取文件失敗, 請重試"
 
-#: ../bcloud/SharePage.py:327
+#: ../bcloud/SharePage.py:329
 msgid "Failed to copy selected files!"
 msgstr "複製文件失敗!"
 
-#: ../bcloud/SharePage.py:331
+#: ../bcloud/SharePage.py:333
 #, python-brace-format
 msgid "Failed to copy selected files! {0}"
 msgstr "無法複製選中的文件: {0}"
 
-#: ../bcloud/SharePage.py:395
+#: ../bcloud/SharePage.py:397
 #, python-brace-format
 msgid "Go to parent directory: {0}"
 msgstr "返回上級目錄: {0}"
 
-#: ../bcloud/SigninDialog.py:26 ../bcloud/VCodeDialog.py:20
+#: ../bcloud/SigninDialog.py:29 ../bcloud/VCodeDialog.py:20
 msgid "Verification.."
 msgstr "請驗證.."
 
-#: ../bcloud/SigninDialog.py:124
+#: ../bcloud/SigninDialog.py:127
 msgid "Sign in now"
 msgstr "現在登錄"
 
-#: ../bcloud/SigninDialog.py:143
+#: ../bcloud/SigninDialog.py:146
 msgid "Username/Email/Phone..."
 msgstr "用戶名/Email/手機號..."
 
-#: ../bcloud/SigninDialog.py:148
+#: ../bcloud/SigninDialog.py:151
 msgid "Password .."
 msgstr "密碼 .."
 
-#: ../bcloud/SigninDialog.py:154
+#: ../bcloud/SigninDialog.py:157
 msgid "Remember Password"
 msgstr "記住密碼"
 
-#: ../bcloud/SigninDialog.py:161
+#: ../bcloud/SigninDialog.py:164
 msgid "Signin Automatically"
 msgstr "自動登錄"
 
-#: ../bcloud/SigninDialog.py:167 ../bcloud/SigninDialog.py:236
+#: ../bcloud/SigninDialog.py:170 ../bcloud/SigninDialog.py:239
 msgid "Sign in"
 msgstr "登錄"
 
-#: ../bcloud/SigninDialog.py:177
+#: ../bcloud/SigninDialog.py:180
 msgid "Failed to sign in, please try again."
 msgstr "登錄失敗, 請重試"
 
-#: ../bcloud/SigninDialog.py:261
+#: ../bcloud/SigninDialog.py:264
 msgid "In process..."
 msgstr "正在處理..."
 
-#: ../bcloud/SigninDialog.py:270
+#: ../bcloud/SigninDialog.py:273
 msgid "Failed to get bdstoken!"
 msgstr "獲取bdstoken 失敗!"
 
-#: ../bcloud/SigninDialog.py:282
+#: ../bcloud/SigninDialog.py:285
 msgid "Login failed, please try again"
 msgstr "登錄失敗, 請重試"
 
-#: ../bcloud/SigninDialog.py:298 ../bcloud/SigninDialog.py:362
-msgid "Please input verification code!"
-msgstr "請輸入驗證碼!"
-
-#: ../bcloud/SigninDialog.py:301 ../bcloud/SigninDialog.py:317
+#: ../bcloud/SigninDialog.py:290 ../bcloud/SigninDialog.py:310
 msgid "Get bdstoken..."
 msgstr "獲取bdstoken..."
 
-#: ../bcloud/SigninDialog.py:310
+#: ../bcloud/SigninDialog.py:307 ../bcloud/SigninDialog.py:371
+msgid "Please input verification code!"
+msgstr "請輸入驗證碼!"
+
+#: ../bcloud/SigninDialog.py:319
 msgid "Password error, please try again"
 msgstr "密碼錯誤, 請重試"
 
-#: ../bcloud/SigninDialog.py:314
+#: ../bcloud/SigninDialog.py:323
 msgid "Verfication code error, please try again"
 msgstr "驗證碼錯誤, 請重試"
 
-#: ../bcloud/SigninDialog.py:323
+#: ../bcloud/SigninDialog.py:329
+msgid "Does not support SMS/Email verification!"
+msgstr "不支持手機短信/郵件驗證!"
+
+#: ../bcloud/SigninDialog.py:333
 msgid "Unknown error, please try again"
 msgstr "未知錯誤, 請重試"
 
-#: ../bcloud/SigninDialog.py:330
+#: ../bcloud/SigninDialog.py:340
 msgid "Failed to request public key, please try again"
 msgstr "獲取公鑰失敗, 請重試"
 
-#: ../bcloud/SigninDialog.py:345
+#: ../bcloud/SigninDialog.py:355
 msgid "Failed to check login, please try again"
 msgstr "檢測登錄歷史失敗, 請重試"
 
-#: ../bcloud/SigninDialog.py:377
+#: ../bcloud/SigninDialog.py:384
 msgid "Failed to get UBI, please try again."
 msgstr "獲取UBI失敗, 請重試"
 
-#: ../bcloud/SigninDialog.py:380
+#: ../bcloud/SigninDialog.py:387
 msgid "Check login"
 msgstr "檢測登錄歷史"
 
-#: ../bcloud/SigninDialog.py:388
+#: ../bcloud/SigninDialog.py:395
 msgid "Failed to get token, please try again."
 msgstr "獲取token失敗, 請重試"
 
-#: ../bcloud/SigninDialog.py:394
+#: ../bcloud/SigninDialog.py:402
 msgid "Get UBI..."
 msgstr "獲取UBI..."
 
-#: ../bcloud/SigninDialog.py:403
+#: ../bcloud/SigninDialog.py:411
 msgid "Failed to get BAIDUID cookie, please try agin."
 msgstr "獲取BAIDUID cookie失敗, 請重試"
 
-#: ../bcloud/SigninDialog.py:406
+#: ../bcloud/SigninDialog.py:414
 msgid "Get TOKEN..."
 msgstr "獲取 TOKEN..."
 
-#: ../bcloud/SigninDialog.py:425
+#: ../bcloud/SigninDialog.py:432
 msgid "Get BAIDUID..."
 msgstr "獲取BAIDUID..."
 
