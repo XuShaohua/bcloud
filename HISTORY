@@ -1,3 +1,11 @@
+v3.5.9 - 2014.11.26
+* Fixed: check file is empty or not before downloading it
+* Add SIDEBAR class to treeview
+* Fixed: wrong parameter in get_token()
+* Fixed: failed to check isdir option in SharePage
+* remove Gio package
+* i18n updated
+
 v3.5.8 - 2014.11.7
 * Feature: add share-page
 * Feature: support appindicator in Ubuntu Unity desktop

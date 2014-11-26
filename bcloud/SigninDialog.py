@@ -278,7 +278,6 @@ class SigninDialog(Gtk.Dialog):
                                     dump=True)
 
         def on_post_login(info, error=None):
-            print('on post login:', info, error)
             if error or not info:
                 logger.error('SigninDialog.on_post_login: %s, %s' %
                              (info, error))
