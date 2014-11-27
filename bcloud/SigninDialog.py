@@ -295,7 +295,7 @@ class SigninDialog(Gtk.Dialog):
                     nonlocal verifycode
                     nonlocal codeString
                     vcodetype = query['vcodetype']
-                    codeString = query['codestring']
+                    codeString = query['codeString']
                     dialog = SigninVcodeDialog(self, username, cookie,
                                                tokens['token'], codeString,
                                                vcodetype)
