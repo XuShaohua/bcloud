@@ -309,7 +309,7 @@ class SigninDialog(Gtk.Dialog):
                     else:
                         self.signin_button.set_label(_('Get bdstoken...'))
                         gutil.async_call(auth.post_login, cookie,
-                                         tokens['token'], username,
+                                         tokens, username,
                                          password_enc, rsakey, verifycode,
                                          codeString, callback=on_post_login)
                 # 密码错误
