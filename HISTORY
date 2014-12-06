@@ -1,3 +1,7 @@
+v3.5.10 - 2014.12.6
+* Fixed: KeyError in SigninDialog
+* Fixed: TypeError, string indices must be integers in SigninDialog
+
 v3.5.9 - 2014.11.26
 * Fixed: check file is empty or not before downloading it
 * Add SIDEBAR class to treeview
