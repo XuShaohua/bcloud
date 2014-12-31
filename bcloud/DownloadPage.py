@@ -90,7 +90,8 @@ class DownloadPage(Gtk.Box):
             control_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
             self.headerbar.pack_start(control_box)
 
-            start_button = Gtk.Button()
+            start_button = Gtk.Button.new_from_icon_name(
+                    'document-open-symbolic')
             start_img = Gtk.Image.new_from_icon_name(
                     'media-playback-start-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
@@ -609,14 +610,14 @@ class DownloadPage(Gtk.Box):
             # update speed label at each 5s
             self.download_speed_sid = GLib.timeout_add(
                     self.DOWNLOAD_SPEED_INTERVAL, self.download_speed_interval)
-        self.speed_label.set_text('0 kb/s')
+        self.speed_label.set_text('0 kB/s')
 
     def download_speed_add(self, size):
         self.download_speed_received += size
 
     def download_speed_interval(self):
         speed = self.download_speed_received // self.DOWNLOAD_SPEED_INTERVAL
-        self.speed_label.set_text('%s kb/s' % speed)
+        self.speed_label.set_text('%s kB/s' % speed)
         # reset received data size
         self.download_speed_received = 0
         return True
