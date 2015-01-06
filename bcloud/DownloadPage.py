@@ -90,8 +90,7 @@ class DownloadPage(Gtk.Box):
             control_box_context.add_class(Gtk.STYLE_CLASS_LINKED)
             self.headerbar.pack_start(control_box)
 
-            start_button = Gtk.Button.new_from_icon_name(
-                    'document-open-symbolic')
+            start_button = Gtk.Button()
             start_img = Gtk.Image.new_from_icon_name(
                     'media-playback-start-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
