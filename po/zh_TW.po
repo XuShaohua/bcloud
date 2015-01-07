@@ -254,7 +254,7 @@ msgstr "暫停"
 #: ../bcloud/DownloadPage.py:138 ../bcloud/DownloadPage.py:164
 #: ../bcloud/UploadPage.py:139 ../bcloud/UploadPage.py:175
 msgid "Remove completed tasks"
-msgstr "刪除所有任務"
+msgstr "刪除所有已完成的任務"
 
 #: ../bcloud/DownloadPage.py:220 ../bcloud/UploadPage.py:225
 msgid "State"
