@@ -37,6 +37,7 @@ DEFAULT_PROFILE = {
     'window-size': (960, 680),
     'use-status-icon': True,
     'use-dark-theme': False, # 默认禁用深色主题
+    'display-avatar': True,  # 是否显示用户头像
     'use-notify': True,
     'first-run': True,
     'save-dir': Config.HOME_DIR,

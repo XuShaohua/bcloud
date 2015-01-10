@@ -301,6 +301,8 @@ class App:
                     self.profile['username'],
                     uname,
                 ])
+        if not self.profile['display-avatar']:
+            return
         self.img_avatar.props.tooltip_text = ''
         cache_path = Config.get_cache_path(self.profile['username'])
         gutil.async_call(gutil.update_avatar, self.cookie, self.tokens,

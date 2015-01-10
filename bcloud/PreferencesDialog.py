@@ -83,6 +83,15 @@ class PreferencesDialog(Gtk.Dialog):
         status_switch.props.halign = Gtk.Align.START
         general_grid.attach(status_switch, 1, 4, 1, 1)
 
+        avatar_label = Gtk.Label.new(_('Display Avatar:'))
+        avatar_label.props.xalign = 1
+        general_grid.attach(avatar_label, 0, 5, 1, 1)
+        avatar_switch = Gtk.Switch()
+        avatar_switch.set_active(self.app.profile['display-avatar'])
+        avatar_switch.connect('notify::active', self.on_avatar_switch_activate)
+        avatar_switch.props.halign = Gtk.Align.START
+        general_grid.attach(avatar_switch, 1, 5, 1, 1)
+
         # network tab
         network_grid = Gtk.Grid()
         network_grid.props.halign = Gtk.Align.CENTER
@@ -193,6 +202,9 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_status_switch_activate(self, switch, event):
         self.app.profile['use-status-icon'] = switch.get_active()
+
+    def on_avatar_switch_activate(self, switch, event):
+        self.app.profile['display-avatar'] = switch.get_active()
 
     def on_stream_switch_activate(self, switch, event):
         self.app.profile['use-streaming'] = switch.get_active()
