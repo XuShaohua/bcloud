@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 22:11+0800\n"
+"POT-Creation-Date: 2015-01-10 10:41+0800\n"
 "PO-Revision-Date: 2014-10-21 17:15+0800\n"
 "Last-Translator: CzBiX <gliuwr@gmail.com>\n"
 "Language-Team: Chinese (traditional)\n"
@@ -29,7 +29,7 @@ msgstr "註銷"
 msgid "About"
 msgstr "關於"
 
-#: ../bcloud/App.py:99 ../bcloud/App.py:416
+#: ../bcloud/App.py:99 ../bcloud/App.py:418
 msgid "Quit"
 msgstr "退出"
 
@@ -37,19 +37,19 @@ msgstr "退出"
 msgid "Unknown"
 msgstr "未知"
 
-#: ../bcloud/App.py:394
+#: ../bcloud/App.py:396
 msgid "Show App"
 msgstr "顯示程序"
 
-#: ../bcloud/App.py:402
+#: ../bcloud/App.py:404
 msgid "Pause Upload Tasks"
 msgstr "暫停所有上傳任務"
 
-#: ../bcloud/App.py:408
+#: ../bcloud/App.py:410
 msgid "Pause Download Tasks"
 msgstr "暫停所有下載任務"
 
-#: ../bcloud/App.py:462
+#: ../bcloud/App.py:464
 #, python-brace-format
 msgid "{0} copied to clipboard"
 msgstr "{0} 已被複製到剪貼板"
@@ -449,15 +449,19 @@ msgstr "使用暗色主題:"
 msgid "Use Status Icon:"
 msgstr "使用狀態圖標:"
 
-#: ../bcloud/PreferencesDialog.py:92
+#: ../bcloud/PreferencesDialog.py:86
+msgid "Display Avatar:"
+msgstr "顯示用戶頭像:"
+
+#: ../bcloud/PreferencesDialog.py:101
 msgid "Network"
 msgstr "網絡"
 
-#: ../bcloud/PreferencesDialog.py:94
+#: ../bcloud/PreferencesDialog.py:103
 msgid "Use streaming mode:"
 msgstr "流媒體模式:"
 
-#: ../bcloud/PreferencesDialog.py:102
+#: ../bcloud/PreferencesDialog.py:111
 msgid ""
 "Open the compressed version of videos, useful for those whose network "
 "connection is slow."
@@ -465,63 +469,63 @@ msgstr ""
 "播放壓縮後視頻(大概會壓到480P, 畫質可能會有損失).如果你的網速不理想, 這會很有"
 "用"
 
-#: ../bcloud/PreferencesDialog.py:105
+#: ../bcloud/PreferencesDialog.py:114
 msgid "Concurrent downloads:"
 msgstr "同時下載:"
 
-#: ../bcloud/PreferencesDialog.py:114
+#: ../bcloud/PreferencesDialog.py:123
 msgid "Per task:"
 msgstr "每個下載任務:"
 
-#: ../bcloud/PreferencesDialog.py:122
+#: ../bcloud/PreferencesDialog.py:131
 msgid "connections"
 msgstr "個連接"
 
-#: ../bcloud/PreferencesDialog.py:126
+#: ../bcloud/PreferencesDialog.py:135
 msgid "Retries each:"
 msgstr "重連間隔:"
 
-#: ../bcloud/PreferencesDialog.py:133
+#: ../bcloud/PreferencesDialog.py:142
 msgid "0: disable retries"
 msgstr "0: 禁止重新連接"
 
-#: ../bcloud/PreferencesDialog.py:135
+#: ../bcloud/PreferencesDialog.py:144
 msgid "minutes"
 msgstr "分鐘"
 
-#: ../bcloud/PreferencesDialog.py:139
+#: ../bcloud/PreferencesDialog.py:148
 msgid "Download timeout:"
 msgstr "下載超時:"
 
-#: ../bcloud/PreferencesDialog.py:148
+#: ../bcloud/PreferencesDialog.py:157
 msgid "seconds"
 msgstr "秒"
 
-#: ../bcloud/PreferencesDialog.py:152
+#: ../bcloud/PreferencesDialog.py:161
 msgid "File exists while downloading:"
 msgstr "下載時如果文件已存在:"
 
-#: ../bcloud/PreferencesDialog.py:156 ../bcloud/PreferencesDialog.py:169
+#: ../bcloud/PreferencesDialog.py:165 ../bcloud/PreferencesDialog.py:178
 msgid "Do Nothing"
 msgstr "什麼都不做"
 
-#: ../bcloud/PreferencesDialog.py:157 ../bcloud/PreferencesDialog.py:170
+#: ../bcloud/PreferencesDialog.py:166 ../bcloud/PreferencesDialog.py:179
 msgid "Overwrite"
 msgstr "覆蓋"
 
-#: ../bcloud/PreferencesDialog.py:158 ../bcloud/PreferencesDialog.py:171
+#: ../bcloud/PreferencesDialog.py:167 ../bcloud/PreferencesDialog.py:180
 msgid "Rename Automatically"
 msgstr "自動重命名"
 
-#: ../bcloud/PreferencesDialog.py:162
+#: ../bcloud/PreferencesDialog.py:171
 msgid "What to do when downloading a file which already exists on local disk"
 msgstr "當下載一個文件時, 本地有相同名稱的文件存在"
 
-#: ../bcloud/PreferencesDialog.py:165
+#: ../bcloud/PreferencesDialog.py:174
 msgid "File exists while uploading:"
 msgstr "上傳時如果文件已存在:"
 
-#: ../bcloud/PreferencesDialog.py:174
+#: ../bcloud/PreferencesDialog.py:183
 msgid "What to do when uploading a file which already exists on server"
 msgstr "當上傳一個文件到服務器時, 服務器上已經有同名文件存在"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-26 22:11+0800\n"
+"POT-Creation-Date: 2015-01-10 10:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: ../bcloud/App.py:99 ../bcloud/App.py:416
+#: ../bcloud/App.py:99 ../bcloud/App.py:418
 msgid "Quit"
 msgstr ""
 
@@ -37,19 +37,19 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: ../bcloud/App.py:394
+#: ../bcloud/App.py:396
 msgid "Show App"
 msgstr ""
 
-#: ../bcloud/App.py:402
+#: ../bcloud/App.py:404
 msgid "Pause Upload Tasks"
 msgstr ""
 
-#: ../bcloud/App.py:408
+#: ../bcloud/App.py:410
 msgid "Pause Download Tasks"
 msgstr ""
 
-#: ../bcloud/App.py:462
+#: ../bcloud/App.py:464
 #, python-brace-format
 msgid "{0} copied to clipboard"
 msgstr ""
@@ -447,77 +447,81 @@ msgstr ""
 msgid "Use Status Icon:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:92
+#: ../bcloud/PreferencesDialog.py:86
+msgid "Display Avatar:"
+msgstr ""
+
+#: ../bcloud/PreferencesDialog.py:101
 msgid "Network"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:94
+#: ../bcloud/PreferencesDialog.py:103
 msgid "Use streaming mode:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:102
+#: ../bcloud/PreferencesDialog.py:111
 msgid ""
 "Open the compressed version of videos, useful for those whose network "
 "connection is slow."
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:105
+#: ../bcloud/PreferencesDialog.py:114
 msgid "Concurrent downloads:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:114
+#: ../bcloud/PreferencesDialog.py:123
 msgid "Per task:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:122
+#: ../bcloud/PreferencesDialog.py:131
 msgid "connections"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:126
+#: ../bcloud/PreferencesDialog.py:135
 msgid "Retries each:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:133
+#: ../bcloud/PreferencesDialog.py:142
 msgid "0: disable retries"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:135
+#: ../bcloud/PreferencesDialog.py:144
 msgid "minutes"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:139
+#: ../bcloud/PreferencesDialog.py:148
 msgid "Download timeout:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:148
+#: ../bcloud/PreferencesDialog.py:157
 msgid "seconds"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:152
+#: ../bcloud/PreferencesDialog.py:161
 msgid "File exists while downloading:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:156 ../bcloud/PreferencesDialog.py:169
+#: ../bcloud/PreferencesDialog.py:165 ../bcloud/PreferencesDialog.py:178
 msgid "Do Nothing"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:157 ../bcloud/PreferencesDialog.py:170
+#: ../bcloud/PreferencesDialog.py:166 ../bcloud/PreferencesDialog.py:179
 msgid "Overwrite"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:158 ../bcloud/PreferencesDialog.py:171
+#: ../bcloud/PreferencesDialog.py:167 ../bcloud/PreferencesDialog.py:180
 msgid "Rename Automatically"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:162
+#: ../bcloud/PreferencesDialog.py:171
 msgid "What to do when downloading a file which already exists on local disk"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:165
+#: ../bcloud/PreferencesDialog.py:174
 msgid "File exists while uploading:"
 msgstr ""
 
-#: ../bcloud/PreferencesDialog.py:174
+#: ../bcloud/PreferencesDialog.py:183
 msgid "What to do when uploading a file which already exists on server"
 msgstr ""
 
