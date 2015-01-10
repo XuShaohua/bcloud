@@ -1,3 +1,10 @@
+v3.6.1 - 2014.1.10
+* Add `display-avatar` option
+* App logo updated
+* i18n updated
+* Fixed: Gtk.Button.new_from_icon_name() requires two parameters;
+* Fixed: kb -> kB
+
 v3.5.10 - 2014.12.6
 * Fixed: KeyError in SigninDialog
 * Fixed: TypeError, string indices must be integers in SigninDialog

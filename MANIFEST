@@ -48,7 +48,11 @@ share/bcloud/icons/hicolor/scalable/actions/mail-send-receive-symbolic.svg
 share/bcloud/icons/hicolor/scalable/actions/others-symbolic.svg
 share/bcloud/icons/hicolor/scalable/apps/bcloud.svg
 share/icons/hicolor/128x128/apps/bcloud.png
+share/icons/hicolor/16x16/apps/bcloud.png
+share/icons/hicolor/22x22/apps/bcloud.png
+share/icons/hicolor/24x24/apps/bcloud.png
 share/icons/hicolor/256x256/apps/bcloud.png
+share/icons/hicolor/32x32/apps/bcloud.png
 share/icons/hicolor/48x48/apps/bcloud.png
 share/icons/hicolor/512x512/apps/bcloud.png
 share/icons/hicolor/64x64/apps/bcloud.png
