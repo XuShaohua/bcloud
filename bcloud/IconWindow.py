@@ -113,7 +113,10 @@ class IconWindow(Gtk.ScrolledWindow):
             name = os.path.split(path)[NAME_COL]
             tooltip = gutil.escape(name)
             size = pcs_file.get('size', 0)
-            human_size = util.get_human_size(pcs_file['size'])[0]
+            if pcs_file['isdir']:
+                human_size = '--'
+            else:
+                human_size = util.get_human_size(pcs_file['size'])[0]
             mtime = pcs_file.get('server_mtime', 0)
             human_mtime = time.ctime(mtime)
             tree_iter = self.liststore.append([
