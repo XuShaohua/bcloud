@@ -447,7 +447,7 @@ msgstr "使用暗色主題:"
 
 #: ../bcloud/PreferencesDialog.py:77
 msgid "Use Status Icon:"
-msgstr "使用狀態圖標:"
+msgstr "最小化到系統托盤:"
 
 #: ../bcloud/PreferencesDialog.py:86
 msgid "Display Avatar:"
