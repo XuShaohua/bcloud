@@ -408,7 +408,7 @@ class SigninDialog(Gtk.Dialog):
                 logger.error('SigninDialog.on_get_BAIDUID: %s, %s' %
                              (uid_cookie, error))
                 self.signin_failed(
-                        _('Failed to get BAIDUID cookie, please try agin.'))
+                        _('Failed to get BAIDUID cookie, please try again.'))
             else:
                 cookie.load_list(uid_cookie)
                 self.signin_button.set_label(_('Get TOKEN...'))
