@@ -276,7 +276,8 @@ class Downloader(threading.Thread, GObject.GObject):
             json.dump(status, fh)
 
         if row[STATE_COL] == State.CANCELED:
-            os.remove(tmp_filepath)
+            if os.path.exists(tmp_filepath):
+                os.remove(tmp_filepath)
             if os.path.exists(conf_filepath):
                 os.remove(conf_filepath)
         elif row[STATE_COL] == State.ERROR:
