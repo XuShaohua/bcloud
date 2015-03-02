@@ -698,52 +698,52 @@ class DownloadPage(Gtk.Box):
             return False
         selected_path = selection[1][0]
         row = self.liststore[int(str(selected_path))]
-        if row[STATE_COL] != State.FINISHED:
-            return
         fs_id = row[FSID_COL]
         file_type = self.app.mime.get(row[PATH_COL], False, icon_size=64)[1]
 
         menu = Gtk.Menu()
         self.menu = menu
 
-        default_app_info = Gio.AppInfo.get_default_for_type(file_type, False)
-        app_infos = Gio.AppInfo.get_recommended_for_type(file_type)
-        if app_infos:
-            app_infos = [info for info in app_infos if \
-                    info.get_name() != default_app_info.get_name()]
-        if len(app_infos) > 1:
-            launch_item = Gtk.ImageMenuItem.new_with_label(
-                _('Open With {0}').format(default_app_info.get_display_name()))
-            build_app_menu(menu, launch_item, default_app_info)
-
-            more_app_item = Gtk.MenuItem.new_with_label(_('Open With'))
-            menu.append(more_app_item)
-            sub_menu = Gtk.Menu()
-            more_app_item.set_submenu(sub_menu)
-
-            for app_info in app_infos:
-                launch_item = Gtk.ImageMenuItem.new_with_label(
-                        app_info.get_display_name())
-                build_app_menu(sub_menu, launch_item, app_info)
-            sep_item = Gtk.SeparatorMenuItem()
-            sub_menu.append(sep_item)
-            choose_app_item = Gtk.MenuItem.new_with_label(
-                    _('Other Application...'))
-            choose_app_item.connect('activate', on_choose_app_activated)
-            sub_menu.append(choose_app_item)
-        else:
+        # 已下载完成的任务
+        if row[STATE_COL] == State.FINISHED:
+            default_app_info = Gio.AppInfo.get_default_for_type(file_type, False)
+            app_infos = Gio.AppInfo.get_recommended_for_type(file_type)
             if app_infos:
-                app_infos = (default_app_info, app_infos[0])
-            elif default_app_info:
-                app_infos = (default_app_info, )
-            for app_info in app_infos:
+                app_infos = [info for info in app_infos if \
+                        info.get_name() != default_app_info.get_name()]
+            if len(app_infos) > 1:
                 launch_item = Gtk.ImageMenuItem.new_with_label(
-                    _('Open With {0}').format(app_info.get_display_name()))
-                build_app_menu(menu, launch_item, app_info)
-            choose_app_item = Gtk.MenuItem.new_with_label(
-                    _('Open With Other Application...'))
-            choose_app_item.connect('activate', on_choose_app_activated)
-            menu.append(choose_app_item)
+                    _('Open With {0}').format(default_app_info.get_display_name()))
+                build_app_menu(menu, launch_item, default_app_info)
+
+                more_app_item = Gtk.MenuItem.new_with_label(_('Open With'))
+                menu.append(more_app_item)
+                sub_menu = Gtk.Menu()
+                more_app_item.set_submenu(sub_menu)
+
+                for app_info in app_infos:
+                    launch_item = Gtk.ImageMenuItem.new_with_label(
+                            app_info.get_display_name())
+                    build_app_menu(sub_menu, launch_item, app_info)
+                sep_item = Gtk.SeparatorMenuItem()
+                sub_menu.append(sep_item)
+                choose_app_item = Gtk.MenuItem.new_with_label(
+                        _('Other Application...'))
+                choose_app_item.connect('activate', on_choose_app_activated)
+                sub_menu.append(choose_app_item)
+            else:
+                if app_infos:
+                    app_infos = (default_app_info, app_infos[0])
+                elif default_app_info:
+                    app_infos = (default_app_info, )
+                for app_info in app_infos:
+                    launch_item = Gtk.ImageMenuItem.new_with_label(
+                        _('Open With {0}').format(app_info.get_display_name()))
+                    build_app_menu(menu, launch_item, app_info)
+                choose_app_item = Gtk.MenuItem.new_with_label(
+                        _('Open With Other Application...'))
+                choose_app_item.connect('activate', on_choose_app_activated)
+                menu.append(choose_app_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
