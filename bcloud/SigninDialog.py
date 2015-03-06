@@ -151,6 +151,7 @@ class SigninDialog(Gtk.Dialog):
         self.password_entry.set_placeholder_text(_('Password ..'))
         self.password_entry.props.visibility = False
         self.password_entry.connect('changed', self.on_password_entry_changed)
+        self.password_entry.connect('activate', self.on_password_entry_activate)
         box.pack_start(self.password_entry, False, False, 0)
 
         self.remember_check = Gtk.CheckButton.new_with_label(
@@ -263,6 +264,15 @@ class SigninDialog(Gtk.Dialog):
         self.infobar.hide()
         button.set_label(_('In process...'))
         button.set_sensitive(False)
+        self.signin()
+
+    def on_password_entry_activate(self, entry):
+        if (len(self.password_entry.get_text()) <= 1 or
+                not self.username_combo.get_child().get_text()):
+            return
+        self.infobar.hide()
+        self.signin_button.set_label(_('In process...'))
+        self.signin_button.set_sensitive(False)
         self.signin()
 
     def signin(self):
