@@ -63,7 +63,7 @@ msgstr "全選"
 #: ../bcloud/SharePage.py:161 ../bcloud/TrashPage.py:141
 #: ../bcloud/UploadPage.py:205
 msgid "Name"
-msgstr "檔案名"
+msgstr "檔案名稱"
 
 #: ../bcloud/BTBrowserDialog.py:68 ../bcloud/CloudPage.py:157
 #: ../bcloud/DownloadPage.py:214 ../bcloud/IconWindow.py:676
@@ -310,7 +310,7 @@ msgstr "打開方式"
 
 #: ../bcloud/DownloadPage.py:731 ../bcloud/IconWindow.py:314
 msgid "Other Application..."
-msgstr "其它程序..."
+msgstr "其它程式..."
 
 #: ../bcloud/DownloadPage.py:744 ../bcloud/IconWindow.py:329
 msgid "Open With Other Application..."
@@ -318,7 +318,7 @@ msgstr "使用其他程式打開..."
 
 #: ../bcloud/FolderBrowserDialog.py:37
 msgid "Create Folder"
-msgstr "新建目錄"
+msgstr "新增目錄"
 
 #: ../bcloud/FolderBrowserDialog.py:55
 msgid "Folder"
@@ -342,7 +342,7 @@ msgstr "顯示網盤中的所有檔案"
 
 #: ../bcloud/HomePage.py:243 ../bcloud/HomePage.py:284
 msgid "Search documents and folders by name"
-msgstr "搜索檔案名"
+msgstr "搜尋檔案名稱"
 
 #: ../bcloud/IconWindow.py:173 ../bcloud/IconWindow.py:725
 msgid "Error: Move folder to itself!"
@@ -351,7 +351,7 @@ msgstr "錯誤: 無法將目錄移動到自身"
 #: ../bcloud/IconWindow.py:213 ../bcloud/NewFolderDialog.py:23
 #: ../bcloud/NewFolderDialog.py:36
 msgid "New Folder"
-msgstr "新建目錄"
+msgstr "新增目錄"
 
 #: ../bcloud/IconWindow.py:219
 msgid "Upload Files..."
@@ -403,7 +403,7 @@ msgstr "重命名..."
 
 #: ../bcloud/IconWindow.py:364
 msgid "Move to Trash"
-msgstr "丟棄到回收站"
+msgstr "丟進回收桶"
 
 #: ../bcloud/IconWindow.py:501
 msgid "Failed to copy link"
@@ -466,7 +466,7 @@ msgid ""
 "Open the compressed version of videos, useful for those whose network "
 "connection is slow."
 msgstr ""
-"播放壓縮後視頻(大概會壓到480P, 畫質可能會有損失).如果你的網速不理想, 這會很有"
+"播放壓縮後的影片(大概會壓到480P, 畫質可能會有損失).如果你的網速不理想, 這會很有"
 "用"
 
 #: ../bcloud/PreferencesDialog.py:114
@@ -515,11 +515,11 @@ msgstr "覆蓋"
 
 #: ../bcloud/PreferencesDialog.py:167 ../bcloud/PreferencesDialog.py:180
 msgid "Rename Automatically"
-msgstr "自動重命名"
+msgstr "自動重新命名"
 
 #: ../bcloud/PreferencesDialog.py:171
 msgid "What to do when downloading a file which already exists on local disk"
-msgstr "當下載一個檔案時, 本地有相同名稱的檔案存在"
+msgstr "當下載一個檔案時, 下載資料夾已有相同名稱的檔案存在"
 
 #: ../bcloud/PreferencesDialog.py:174
 msgid "File exists while uploading:"
@@ -527,7 +527,7 @@ msgstr "上傳時如果檔案已存在:"
 
 #: ../bcloud/PreferencesDialog.py:183
 msgid "What to do when uploading a file which already exists on server"
-msgstr "當上傳一個檔案到服務器時, 服務器上已經有同名檔案存在"
+msgstr "當上傳一個檔案到雲端時, 已經有同名檔案存在"
 
 #: ../bcloud/PropertiesDialog.py:26 ../bcloud/PropertiesDialog.py:95
 msgid " Properties"
@@ -535,7 +535,7 @@ msgstr " 的屬性"
 
 #: ../bcloud/PropertiesDialog.py:42 ../bcloud/PropertiesDialog.py:108
 msgid "Name:"
-msgstr "檔案名:"
+msgstr "檔案名稱:"
 
 #: ../bcloud/PropertiesDialog.py:47 ../bcloud/PropertiesDialog.py:113
 msgid "Location:"
@@ -547,7 +547,7 @@ msgstr " 字節"
 
 #: ../bcloud/PropertiesDialog.py:75
 msgid "Created:"
-msgstr "創建:"
+msgstr "新建:"
 
 #: ../bcloud/PropertiesDialog.py:80
 msgid "Modified:"
@@ -564,7 +564,7 @@ msgstr "內容:"
 
 #: ../bcloud/RenameDialog.py:24
 msgid "Rename files"
-msgstr "重命名檔案"
+msgstr "重新命名檔案"
 
 #: ../bcloud/RenameDialog.py:44
 msgid "Old Name:"
@@ -576,11 +576,11 @@ msgstr "新名稱"
 
 #: ../bcloud/RenameDialog.py:88
 msgid "Filename is empty"
-msgstr "檔案名爲空"
+msgstr "檔案名稱爲空"
 
 #: ../bcloud/RenameDialog.py:91
 msgid "Filename should not contain /"
-msgstr "檔案名裏不可以包含/"
+msgstr "檔案名稱裡不可以包含/"
 
 #: ../bcloud/SharePage.py:36
 msgid "Password:"
@@ -592,7 +592,7 @@ msgstr "密碼 ..."
 
 #: ../bcloud/SharePage.py:60
 msgid "Shared files"
-msgstr "共享檔案"
+msgstr "分享檔案"
 
 #: ../bcloud/SharePage.py:84 ../bcloud/SharePage.py:109
 msgid "Copy selected files to my account"
@@ -600,7 +600,7 @@ msgstr "將選中的檔案保存到自己的網盤"
 
 #: ../bcloud/SharePage.py:92 ../bcloud/SharePage.py:117
 msgid "URL of shared files..."
-msgstr "共享檔案的 URL..."
+msgstr "分享檔案的 URL..."
 
 #: ../bcloud/SharePage.py:203
 msgid "Error: password error, please try again"
@@ -627,7 +627,7 @@ msgstr "無法複製選中的檔案: {0}"
 #: ../bcloud/SharePage.py:397
 #, python-brace-format
 msgid "Go to parent directory: {0}"
-msgstr "返回上級目錄: {0}"
+msgstr "返回上層目錄: {0}"
 
 #: ../bcloud/SigninDialog.py:29 ../bcloud/VCodeDialog.py:20
 msgid "Verification.."
@@ -639,7 +639,7 @@ msgstr "現在登錄"
 
 #: ../bcloud/SigninDialog.py:146
 msgid "Username/Email/Phone..."
-msgstr "用戶名/Email/手機號..."
+msgstr "用戶名/Email/電話號碼..."
 
 #: ../bcloud/SigninDialog.py:151
 msgid "Password .."
@@ -691,7 +691,7 @@ msgstr "驗證碼錯誤, 請重試"
 
 #: ../bcloud/SigninDialog.py:329
 msgid "Does not support SMS/Email verification!"
-msgstr "不支持手機短信/郵件驗證!"
+msgstr "不支持手機簡訊/郵件驗證!"
 
 #: ../bcloud/SigninDialog.py:333
 msgid "Unknown error, please try again"
@@ -735,7 +735,7 @@ msgstr "獲取BAIDUID..."
 
 #: ../bcloud/TrashPage.py:29
 msgid "Trash"
-msgstr "回收站"
+msgstr "回收桶"
 
 #: ../bcloud/TrashPage.py:31
 msgid "Files deleted"
@@ -751,11 +751,11 @@ msgstr "永久刪除選中的檔案"
 
 #: ../bcloud/TrashPage.py:76 ../bcloud/TrashPage.py:105
 msgid "Clear trash"
-msgstr "清空回收站"
+msgstr "清空回收桶"
 
 #: ../bcloud/TrashPage.py:104
 msgid "Clear Trash"
-msgstr "清空回收站"
+msgstr "清空回收桶"
 
 #: ../bcloud/TrashPage.py:109
 msgid "Delete"
@@ -816,7 +816,7 @@ msgstr "無效路徑"
 #: ../bcloud/UploadPage.py:494
 #, python-brace-format
 msgid "{0} is too large to upload (>10G)."
-msgstr "{0} 太大, 無法上傳(>10G)"
+msgstr "{0} 檔案太大, 無法上傳(>10G)"
 
 #: ../bcloud/UploadPage.py:592
 msgid "Failed to upload, please try again"
@@ -833,9 +833,9 @@ msgstr "檔案路徑不可以直過1000個字符"
 
 #: ../bcloud/const.py:92
 msgid "Filepath should not contain \\ ? | \" > < : *"
-msgstr "檔案名裏不可以包含 \\ ? | \" < > : *"
+msgstr "檔案名稱裡不可以包含 \\ ? | \" < > : *"
 
 #: ../bcloud/const.py:93
 msgid ""
 "\\r \\n \\t \\0 \\x0B or SPACE should not appear in start or end of filename"
-msgstr "檔案名不能以 \\r \\n \\t \\0 \\x0B 或空格開頭或結束"
+msgstr "檔案名稱不能以 \\r \\n \\t \\0 \\x0B 或空格開頭或結束"
