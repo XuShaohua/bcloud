@@ -19,11 +19,11 @@ msgstr ""
 
 #: ../bcloud/App.py:96 ../bcloud/PreferencesDialog.py:17
 msgid "Preferences"
-msgstr "首選項"
+msgstr "偏好設定"
 
 #: ../bcloud/App.py:97
 msgid "Sign out"
-msgstr "註銷"
+msgstr "登出"
 
 #: ../bcloud/App.py:98
 msgid "About"
@@ -94,7 +94,7 @@ msgstr "網路錯誤"
 
 #: ../bcloud/CategoryPage.py:207 ../bcloud/CategoryPage.py:209
 msgid "Videos"
-msgstr "視頻"
+msgstr "影片"
 
 #: ../bcloud/CategoryPage.py:216 ../bcloud/CategoryPage.py:218
 msgid "Music"
@@ -106,7 +106,7 @@ msgstr "圖片"
 
 #: ../bcloud/CategoryPage.py:234 ../bcloud/CategoryPage.py:236
 msgid "Documents"
-msgstr "文檔"
+msgstr "文件"
 
 #: ../bcloud/CategoryPage.py:243 ../bcloud/CategoryPage.py:245
 msgid "Others"
@@ -139,7 +139,7 @@ msgstr "離線下載"
 
 #: ../bcloud/CloudPage.py:54
 msgid "Create new cloud task"
-msgstr "新建離線下載"
+msgstr "新增離線下載"
 
 #: ../bcloud/CloudPage.py:63 ../bcloud/DownloadPage.py:115
 #: ../bcloud/UploadPage.py:92
@@ -207,11 +207,11 @@ msgstr "新建鏈接任務"
 
 #: ../bcloud/CloudPage.py:360
 msgid "Paste links here, line by line"
-msgstr "將下載鏈接貼到這裏, 每行一個"
+msgstr "將下載鏈接貼到這裡, 每行一個"
 
 #: ../bcloud/CloudPage.py:368
 msgid "Support http/https/ftp/thunder/qqdl/flashget/eMule/Magnet format"
-msgstr "支持 HTTP/HTTPS/FTP/迅雷/旋風/快車/電驢/磁鏈 等格式"
+msgstr "支援 HTTP/HTTPS/FTP/迅雷/旋風/快車/電驢/磁鏈 等格式"
 
 #: ../bcloud/Config.py:46
 msgid "Baidu Pan client for GNU/Linux desktop users."
@@ -296,7 +296,7 @@ msgstr "在下載 {0} 時出錯"
 #: ../bcloud/DownloadPage.py:506
 #, python-brace-format
 msgid "Disk Error: failed to read/write {0}"
-msgstr "磁盤錯誤: 無法讀取/寫入 {0}"
+msgstr "硬碟錯誤: 無法讀取/寫入 {0}"
 
 #: ../bcloud/DownloadPage.py:716 ../bcloud/DownloadPage.py:741
 #: ../bcloud/IconWindow.py:298 ../bcloud/IconWindow.py:325
