@@ -230,7 +230,7 @@ class HomePage(Gtk.Box):
             reload_img = Gtk.Image.new_from_icon_name('view-refresh-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             reload_button.set_image(reload_img)
-            reload_button.set_tooltip_text(_('Reload'))
+            reload_button.set_tooltip_text(_('Reload (F5)'))
             reload_button.connect('clicked', self.reload)
             self.headerbar.pack_end(reload_button)
 

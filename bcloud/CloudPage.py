@@ -91,7 +91,7 @@ class CloudPage(Gtk.Box):
             reload_img = Gtk.Image.new_from_icon_name('view-refresh-symbolic',
                     Gtk.IconSize.SMALL_TOOLBAR)
             reload_button.set_image(reload_img)
-            reload_button.set_tooltip_text(_('Reload'))
+            reload_button.set_tooltip_text(_('Reload (F5)'))
             reload_button.connect('clicked', self.on_reload_button_clicked)
             self.headerbar.pack_end(reload_button)
 
@@ -106,7 +106,7 @@ class CloudPage(Gtk.Box):
             link_button.connect('clicked', self.on_link_button_clicked)
             control_box.pack_start(link_button, False, False, 0)
 
-            reload_button = Gtk.Button.new_with_label(_('Reload'))
+            reload_button = Gtk.Button.new_with_label(_('Reload (F5)'))
             reload_button.props.margin_left = 40
             reload_button.connect('clicked', self.on_reload_button_clicked)
             control_box.pack_start(reload_button, False, False, 0)

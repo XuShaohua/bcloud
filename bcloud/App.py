@@ -159,6 +159,14 @@ class App:
         self.notebook.props.show_tabs = False
         paned.add2(self.notebook)
 
+        # Add accelerator
+        self.accel_group = Gtk.AccelGroup()
+        self.window.add_accel_group(self.accel_group)
+        key, mod = Gtk.accelerator_parse('F5')
+        self.window.connect('activate-default', self.reload_current_page)
+        self.window.add_accelerator('activate-default',
+                self.accel_group, key, mod, Gtk.AccelFlags.VISIBLE)
+
     def on_app_activate(self, app):
         if not self.profile:
             self.show_signin_dialog()
