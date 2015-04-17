@@ -92,6 +92,26 @@ class PreferencesDialog(Gtk.Dialog):
         avatar_switch.props.halign = Gtk.Align.START
         general_grid.attach(avatar_switch, 1, 5, 1, 1)
 
+        enable_sync_label = Gtk.Label.new(_('Enable Sync:'))
+        enable_sync_label.props.xalign = 1
+        general_grid.attach(enable_sync_label, 0, 6, 1, 1)
+        sync_switch = Gtk.Switch()
+        sync_switch.set_active(self.app.profile['enable-sync'])
+        sync_switch.connect('notify::active', self.on_sync_switch_activate)
+        sync_switch.props.halign = Gtk.Align.START
+        general_grid.attach(sync_switch, 1, 6, 1, 1)
+
+
+        sync_dir_label = Gtk.Label.new(_('Sync Dir:'))
+        sync_dir_label.props.xalign = 1
+        general_grid.attach(sync_dir_label, 0, 7, 1, 1)
+        sync_dir_button = Gtk.FileChooserButton()
+        sync_dir_button.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
+        sync_dir_button.set_current_folder(app.profile['sync-dir'])
+        sync_dir_button.connect('file-set', self.on_sync_dir_update)
+        general_grid.attach(sync_dir_button, 1, 7, 1, 1)
+
+
         # network tab
         network_grid = Gtk.Grid()
         network_grid.props.halign = Gtk.Align.CENTER
@@ -191,6 +211,11 @@ class PreferencesDialog(Gtk.Dialog):
         if dir_name:
             self.app.profile['save-dir'] = dir_name
 
+    def on_sync_dir_update(self, file_button):
+        dir_name = file_button.get_filename()
+        if dir_name:
+            self.app.profile['sync-dir'] = dir_name
+
     def on_upload_hidden_switch_activate(self, switch, event):
         self.app.profile['upload-hidden-files'] = switch.get_active()
 
@@ -205,6 +230,9 @@ class PreferencesDialog(Gtk.Dialog):
 
     def on_avatar_switch_activate(self, switch, event):
         self.app.profile['display-avatar'] = switch.get_active()
+
+    def on_sync_switch_activate(self, switch, event):
+        self.app.profile['enable-sync'] = switch.get_active()
 
     def on_stream_switch_activate(self, switch, event):
         self.app.profile['use-streaming'] = switch.get_active()
