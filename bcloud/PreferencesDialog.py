@@ -114,7 +114,7 @@ class PreferencesDialog(Gtk.Dialog):
 
         sync_dest_dir_label = Gtk.Label.new(_('Dest Sync Dir:'))
         sync_dest_dir_label.props.xalign = 1
-        general_grid.attach(sync_dir_label, 0, 8, 1, 1)
+        general_grid.attach(sync_dest_dir_label, 0, 8, 1, 1)
         dest_dir_button = Gtk.Button.new_with_label(app.profile['dest-sync-dir'])
         dest_dir_button.connect('clicked', self.on_destdir_clicked)
         general_grid.attach(dest_dir_button, 1, 8, 1, 1)
