@@ -847,3 +847,7 @@ msgstr "開啓同步:"
 #: ../bcloud/PreferencesDialog.py:105
 msgid "Sync Dir:"
 msgstr "同步資料夾:"
+
+#: ../bcloud/PreferencesDialog.py:115
+msgid "Dest Sync Dir:"
+msgstr "遠端資料夾:"

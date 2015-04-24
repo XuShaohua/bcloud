@@ -359,7 +359,8 @@ class App:
         enable_sync = self.profile['enable-sync']
         if enable_sync:
             sync_dir = self.profile['sync-dir']
-            self.filewatcher = WatchFileChange(sync_dir, self.upload_page.add_bg_task)
+            #self.filewatcher = WatchFileChange(sync_dir, self.upload_page.add_bg_task)
+            self.filewatcher = WatchFileChange(sync_dir, self)
             self.filewatcher.start()
 
     def reload_current_page(self, *args, **kwds):

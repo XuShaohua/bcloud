@@ -42,6 +42,7 @@ DEFAULT_PROFILE = {
     'first-run': True,
     'save-dir': Config.HOME_DIR,
     'sync-dir': Config.HOME_DIR,
+    'dest-sync-dir': '/',
     'enable-sync': False,
     'use-streaming': True,  # 使用流媒体方式播放视频
     'username': '',

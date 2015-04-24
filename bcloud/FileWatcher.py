@@ -1,111 +1,93 @@
 import os
-import time
 import pyinotify
-from queue import Queue, Empty, Full
+from bcloud import pcs
+from bcloud import gutil
 from threading import Thread
-from pyinotify import IN_CREATE, IN_DELETE, IN_ACCESS, IN_CLOSE_NOWRITE, IN_CLOSE_WRITE, IN_MODIFY, IN_MOVED_FROM, IN_MOVED_TO, IN_OPEN 
+from pyinotify import ALL_EVENTS
 
-
-# MASK = IN_CREATE|IN_DELETE|IN_ACCESS|IN_CLOSE_NOWRITE|IN_CLOSE_WRITE|IN_MODIFY|IN_MOVED_FROM|IN_MOVED_TO|IN_OPEN 
-MASK = IN_CREATE
+MASK = ALL_EVENTS
 
 class EventHandler(pyinotify.ProcessEvent):
 
-    def __init__(self, source, upload_func, limiter):
+    def __init__(self, source, bcloud_app):
         super(EventHandler, self).__init__()
         self.source = source
-        self.upload_func = upload_func
-        self.limiter = limiter
+        self.bcloud_app = bcloud_app
+        self.cloud_root = bcloud_app.profile['dest-sync-dir']
 
     def process_IN_CREATE(self, event):
-        if os.path.isfile(event.pathname):
-            remotepath = self.process_Remote_Path(event.pathname)
-            # self.limiter.put_task((event.pathname, remotepath))
-            self.upload_func(event.pathname, remotepath)
+        if not event.dir:
+            self.process_IN_CLOSE_WRITE(event)
 
-    def process_Remote_Path(self, pathname):
-        return os.path.dirname(pathname[len(self.source):])
+    def process_Remote_Path(self, pathname, dir=False):
+        if dir:
+            return os.path.join(self.cloud_root, pathname[len(self.source)+1:])
+        else:
+            return os.path.join(self.cloud_root, os.path.dirname(pathname[len(self.source)+1:]))
 
+
+    def is_valid_filename(self, filename):
+        invalid_prefixs = (".", "~")
+        invalid_suffixs = (".swp", "crdownload")
+        not_startwith = lambda prefix: not filename.startswith(prefix)
+        not_endwith = lambda suffix: not filename.endswith(suffix)
+        
+        return all(map(not_startwith, invalid_prefixs)) and all(map(not_endwith, invalid_suffixs))
 
     def process_IN_DELETE(self, event):
-        print("Deleteing", event.pathname)
+        if event.dir:
+            remotepath = self.process_Remote_Path(event.pathname, True)
+        else:
+            remotepath = os.path.join(self.process_Remote_Path(event.pathname), event.name)
 
-
-    def process_IN_CLOSE_NOWRITE(self, event):
-        print("closenowrite", event.pathname)
+        gutil.async_call(pcs.delete_files, self.bcloud_app.cookie, \
+                self.bcloud_app.tokens, [remotepath], callback=lambda noop:noop)
 
     def process_IN_CLOSE_WRITE(self, event):
-        print("IN_CLOSE_WRITE", event.pathname)
+        if not event.dir and self.is_valid_filename(event.name):
+            remotepath = self.process_Remote_Path(event.pathname)
+            self.bcloud_app.upload_page.add_bg_task(event.pathname, remotepath)
 
-    def process_IN_MODIFY(self, event):
-        print("IN_MODIFY", event.pathname)
 
     def process_IN_MOVED_FROM(self, event):
-        print("move from", event.pathname)
+        self.process_IN_DELETE(event)
 
     def process_IN_MOVED_TO(self, event):
-        print("in_moved_to", event.pathname)
+        self.process_IN_CLOSE_WRITE(event)
 
-    def process_IN_OPEN(self, event):
-        print("OPEN FILE", event.pathname)
 
 class WatchFileChange(Thread):
 
 
-    def __init__(self, monitor_path, upload_func):
+    def __init__(self, monitor_path, bcloud_app):
 
         super(WatchFileChange, self).__init__()
-        self.setDaemon(True)
-        self.monitor_path = monitor_path
-        self.upload_func = upload_func
-        self.limiter = TaskLimiter(self.upload_func)
-        self.handler = EventHandler(self.monitor_path, self.upload_func, self.limiter)
+        self.setDaemon(True) 
+        self.monitor_path = monitor_path 
+        self.bcloud_app = bcloud_app
+        self.handler = EventHandler(self.monitor_path, self.bcloud_app)
         self.wm = pyinotify.WatchManager()
+        self.wdds = self.wm.add_watch(self.monitor_path, MASK, rec=True, auto_add=True)
         self.notifyer = pyinotify.Notifier(self.wm, self.handler)
    
     def stop(self):
+        self.wm.rm_watch(self.wdds)
         self.wm.close()
         self.notifyer.stop()
-        self.limiter.stop()
+
+    def chain_handler(self, event):
+        print(event)
 
     def run(self):
-        # self.limiter.start()
-        self.wm.add_watch(self.monitor_path, MASK, rec=True, auto_add=True)
         self.notifyer.loop()
 
-class TaskLimiter(Thread):
 
-    def __init__(self, upload_func):
-        super(TaskLimiter, self).__init__()
-        self.queue = Queue(10000)
-        self.setDaemon(True)
-        self.runflag = True
-        self.upload_func = upload_func
+if __name__ == '__main__':
 
-    def put_task(self, task):
-        for retry in range(3):
-            try:
-                self.queue.put_nowait(task)
-            except Full:
-                pass
+    def mock(source, dest):
+        print(source, dest)
 
-    def stop(self):
-        self.runflag = False
-    
-    def batch_get(self, num):
-        tasks = []
-        try:
-            for i in range(num):
-                task = self.queue.get_nowait()
-                tasks.append(task)
-        except Empty:
-            pass
-        return tasks
-
-    def run(self):
-        while self.runflag:
-            tasks = self.batch_get(50)
-            for task in tasks:
-                source, dest = task
-                self.upload_func(source, dest)
-            time.sleep(0.5)
+    source = "/home/alex/Documents"
+    watcher = WatchFileChange(source, mock)
+    watcher.start()
+    watcher.join()

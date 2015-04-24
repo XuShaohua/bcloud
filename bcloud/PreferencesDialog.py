@@ -9,6 +9,7 @@ from gi.repository import Gtk
 from bcloud import Config
 _ = Config._
 
+from bcloud.FolderBrowserDialog import FolderBrowserDialog
 
 class PreferencesDialog(Gtk.Dialog):
 
@@ -110,6 +111,13 @@ class PreferencesDialog(Gtk.Dialog):
         sync_dir_button.set_current_folder(app.profile['sync-dir'])
         sync_dir_button.connect('file-set', self.on_sync_dir_update)
         general_grid.attach(sync_dir_button, 1, 7, 1, 1)
+
+        sync_dest_dir_label = Gtk.Label.new(_('Dest Sync Dir:'))
+        sync_dest_dir_label.props.xalign = 1
+        general_grid.attach(sync_dir_label, 0, 8, 1, 1)
+        dest_dir_button = Gtk.Button.new_with_label(app.profile['dest-sync-dir'])
+        dest_dir_button.connect('clicked', self.on_destdir_clicked)
+        general_grid.attach(dest_dir_button, 1, 8, 1, 1)
 
 
         # network tab
@@ -215,6 +223,17 @@ class PreferencesDialog(Gtk.Dialog):
         dir_name = file_button.get_filename()
         if dir_name:
             self.app.profile['sync-dir'] = dir_name
+
+    def on_destdir_clicked(self, button):
+        folder_dialog = FolderBrowserDialog(self, self.app)
+        response = folder_dialog.run()
+        if response != Gtk.ResponseType.OK:
+            folder_dialog.destroy()
+            return
+        dir_name = folder_dialog.get_path()
+        folder_dialog.destroy()
+        button.set_label(dir_name)
+        self.app.profile['dest-sync-dir'] = dir_name
 
     def on_upload_hidden_switch_activate(self, switch, event):
         self.app.profile['upload-hidden-files'] = switch.get_active()
