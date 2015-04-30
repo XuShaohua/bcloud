@@ -1,18 +1,21 @@
+# -*- coding:utf-8 -*-
 import os
 import pyinotify
+from time import time, sleep
 from bcloud import pcs
 from bcloud import gutil
-from threading import Thread
+from threading import Thread, Lock
 from pyinotify import ALL_EVENTS
 
 MASK = ALL_EVENTS
 
 class EventHandler(pyinotify.ProcessEvent):
 
-    def __init__(self, source, bcloud_app):
+    def __init__(self, source, bcloud_app, task_queue):
         super(EventHandler, self).__init__()
         self.source = source
         self.bcloud_app = bcloud_app
+        self.task_queue = task_queue
         self.cloud_root = bcloud_app.profile['dest-sync-dir']
 
     def process_IN_CREATE(self, event):
@@ -27,8 +30,8 @@ class EventHandler(pyinotify.ProcessEvent):
 
 
     def is_valid_filename(self, filename):
-        invalid_prefixs = (".", "~")
-        invalid_suffixs = (".swp", "crdownload")
+        invalid_prefixs = (".", "~", "#")
+        invalid_suffixs = (".swp", ".crdownload")
         not_startwith = lambda prefix: not filename.startswith(prefix)
         not_endwith = lambda suffix: not filename.endswith(suffix)
         
@@ -46,7 +49,8 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_CLOSE_WRITE(self, event):
         if not event.dir and self.is_valid_filename(event.name):
             remotepath = self.process_Remote_Path(event.pathname)
-            self.bcloud_app.upload_page.add_bg_task(event.pathname, remotepath)
+            #self.bcloud_app.uploa_page.add_bg_task(event.pathname, remotepath)
+            self.task_queue.submit((event.pathname, remotepath))
 
 
     def process_IN_MOVED_FROM(self, event):
@@ -65,22 +69,67 @@ class WatchFileChange(Thread):
         self.setDaemon(True) 
         self.monitor_path = monitor_path 
         self.bcloud_app = bcloud_app
-        self.handler = EventHandler(self.monitor_path, self.bcloud_app)
+        self.submitter = TaskSubmitter(self.bcloud_app)
+        self.submitter.start()
+        self.handler = EventHandler(self.monitor_path, self.bcloud_app, self.submitter)
         self.wm = pyinotify.WatchManager()
         self.wdds = self.wm.add_watch(self.monitor_path, MASK, rec=True, auto_add=True)
         self.notifyer = pyinotify.Notifier(self.wm, self.handler)
    
     def stop(self):
-        self.wm.rm_watch(self.wdds)
         self.wm.close()
         self.notifyer.stop()
-
-    def chain_handler(self, event):
-        print(event)
+        self.submitter.stop()
 
     def run(self):
         self.notifyer.loop()
 
+class TaskSubmitter(Thread):
+
+    def __init__(self, bcloud_app):
+        super(TaskSubmitter, self).__init__()
+        self.setDaemon(True) 
+        self.runflag = 1
+        self.bcloud_app = bcloud_app
+        self.lock = Lock()
+        self.queue = set()
+        self.last = time()
+
+    def submit(self, task):
+        with self.lock:
+            self.queue.add(task)
+            self.last = time()
+
+    def qsize(self):
+        with self.lock:
+            return len(self.queue)
+
+    def stop(self):
+        self.runflag = 0
+
+    def run(self):
+        while self.runflag:
+            if time() - self.last > 5 and self.qsize() > 0:
+                with self.lock:
+                    tasks = list(self.queue)
+                    self.queue.clear()
+
+                while len(tasks) > 0:
+                    pathname, remotepath = tasks.pop(0)
+                    self.bcloud_app.upload_page.add_bg_task(pathname, remotepath)
+                self.last = time()    
+            else:
+                sleep(1)
+
+class Bcloud_Mock(object):
+
+    def __init__(self):
+        self.cookie = ""
+        self.tokens = ""
+        self.profile = {'dest-sync-dir':""}
+
+    def add_bg_task(self, pathname, remotepath):
+        print(pathname, remotepath)
 
 if __name__ == '__main__':
 
@@ -88,6 +137,6 @@ if __name__ == '__main__':
         print(source, dest)
 
     source = "/home/alex/Documents"
-    watcher = WatchFileChange(source, mock)
+    watcher = WatchFileChange(source, Bcloud_Mock())
     watcher.start()
     watcher.join()
