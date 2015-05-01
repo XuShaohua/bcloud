@@ -65,6 +65,10 @@ class Uploader(threading.Thread, GObject.GObject):
         if self.check_exists() and self.upload_mode == UploadMode.IGNORE:
             self.emit('uploaded', self.row[FID_COL])
             return
+
+        # 检查上传的目录是否存在, 不存在创建
+        self.mkdir(os.path.dirname(self.row[PATH_COL]))
+
         # 如果文件大小小于4M, 就直接上传, 不支持断点续传(没必要).
         # 否则先尝试快速上传模式, 如果没有中的话, 就再进行分片上传.
         # 分片上传, 是最费事的, 也最占带宽.
@@ -85,6 +89,14 @@ class Uploader(threading.Thread, GObject.GObject):
     def check_exists(self):
         meta = pcs.get_metas(self.cookie, self.tokens, self.row[PATH_COL])
         return meta and meta.get('errno', 12) == 0
+
+    def check_dir_exists(self, remotepath):
+        meta = pcs.get_metas(self.cookie, self.tokens, remotepath)
+        return meta.get('errno', 12) == 0
+
+    def mkdir(self, remotepath):
+        if not self.check_dir_exists(remotepath):
+            return pcs.mkdir(self.cookie, self.tokens, remotepath)
 
     def upload(self):
         '''一般上传模式.

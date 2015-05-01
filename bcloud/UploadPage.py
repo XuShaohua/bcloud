@@ -403,6 +403,15 @@ class UploadPage(Gtk.Box):
         if source_paths:
             self.upload_files(source_paths, dir_name)
 
+    def add_bg_task(self, source_path, dest_path):
+        GLib.idle_add(self.bg_upload_file,  source_path, dest_path)
+
+    def bg_upload_file(self, source_path, dest_path):
+
+        self.check_first()
+        self.upload_file(source_path, dest_path)
+        self.scan_tasks()
+
     # Open API
     def upload_files(self, source_paths, dir_name=None):
         '''批量创建上传任务, 会扫描子目录并依次上传.
