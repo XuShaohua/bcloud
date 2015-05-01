@@ -839,3 +839,15 @@ msgstr "檔案名稱裡不可以包含 \\ ? | \" < > : *"
 msgid ""
 "\\r \\n \\t \\0 \\x0B or SPACE should not appear in start or end of filename"
 msgstr "檔案名稱不能以 \\r \\n \\t \\0 \\x0B 或空格開頭或結束"
+
+#: ../bcloud/PreferencesDialog.py:95
+msgid "Enable Sync:"
+msgstr "開啓同步:"
+
+#: ../bcloud/PreferencesDialog.py:105
+msgid "Sync Dir:"
+msgstr "同步資料夾:"
+
+#: ../bcloud/PreferencesDialog.py:115
+msgid "Dest Sync Dir:"
+msgstr "遠端資料夾:"
