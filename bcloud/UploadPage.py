@@ -291,14 +291,14 @@ class UploadPage(Gtk.Box):
             self.commit_count = 0
             self.conn.commit()
 
-    def add_task_db(self, task):
+    def add_task_db(self, task, force=True):
         '''向数据库中写入一个新的任务记录, 并返回它的fid'''
         sql = '''INSERT INTO upload (
         name, source_path, path, size, curr_size, state, state_name,
         human_size, percent, tooltip, threshold)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
         req = self.cursor.execute(sql, task)
-        self.check_commit(force=True)
+        self.check_commit(force=force)
         return req.lastrowid
 
     def add_slice_db(self, fid, slice_end, md5):
@@ -344,12 +344,12 @@ class UploadPage(Gtk.Box):
         ])
         self.check_commit(force=force)
 
-    def remove_task_db(self, fid):
+    def remove_task_db(self, fid, force=False):
         '''将任务从数据库中删除'''
         self.remove_slice_db(fid)
         sql = 'DELETE FROM upload WHERE fid=?'
         self.cursor.execute(sql, [fid, ])
-        self.check_commit(force=True)
+        self.check_commit(force=force)
 
     def remove_slice_db(self, fid):
         '''将上传任务的分片从数据库中删除'''
@@ -506,7 +506,7 @@ class UploadPage(Gtk.Box):
             tooltip,
             threshold,
         ]
-        row_id = self.add_task_db(task)
+        row_id = self.add_task_db(task, force=False)
         task.insert(0, row_id)
         self.liststore.append(task)
 
@@ -717,8 +717,9 @@ class UploadPage(Gtk.Box):
                 tree_iters.append(self.liststore.get_iter(row.path))
         for tree_iter in tree_iters:
             if tree_iter:
-                self.remove_task_db(self.liststore[tree_iter][FID_COL])
+                self.remove_task_db(self.liststore[tree_iter][FID_COL], False)
                 self.liststore.remove(tree_iter)
+        self.check_commit()
 
     def on_open_folder_button_clicked(self, button):
         model, tree_paths = self.selection.get_selected_rows()

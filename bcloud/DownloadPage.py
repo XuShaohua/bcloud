@@ -586,6 +586,15 @@ class DownloadPage(Gtk.Box):
         # 文件片段
         if not row:
             return
+
+        # 如果任务尚未下载完, 弹出一个对话框, 让用户确认删除
+        if row[STATE_COL] != State.DOWNLOADED:
+            dialog = ConfirmDialog()
+            response = dialog.run()
+            dialog.destroy()
+            if response != Gtk.ResponseType.OK:
+                return
+
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)
         elif row[CURRSIZE_COL] < row[SIZE_COL]:

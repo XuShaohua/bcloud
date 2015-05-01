@@ -230,7 +230,7 @@ class IconWindow(Gtk.ScrolledWindow):
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
-        reload_item = Gtk.MenuItem.new_with_label(_('Reload'))
+        reload_item = Gtk.MenuItem.new_with_label(_('Reload (F5)'))
         reload_item.connect('activate', self.on_reload_activated)
         menu.append(reload_item)
 
@@ -349,6 +349,9 @@ class IconWindow(Gtk.ScrolledWindow):
         share_item = Gtk.MenuItem.new_with_label(_('Share'))
         share_item.connect('activate', self.on_share_activated)
         menu.append(share_item)
+        private_share_item = Gtk.MenuItem.new_with_label(_('Private Share'))
+        private_share_item.connect('activate', self.on_private_share_activated)
+        menu.append(private_share_item)
 
         sep_item = Gtk.SeparatorMenuItem()
         menu.append(sep_item)
@@ -540,6 +543,28 @@ class IconWindow(Gtk.ScrolledWindow):
             fid_list.append(pcs_file['fs_id'])
             gutil.async_call(pcs.enable_share, self.app.cookie, self.app.tokens,
                              fid_list, callback=on_share)
+
+    def on_private_share_activated(self, menu_item):
+        def on_share(info, error=None):
+            print('on share:', info, error)
+            if error or not info or info[0]['errno'] != 0:
+                logger.error('IconWindow.on_share_activated: %s, %s' %
+                             (info, error))
+                self.app.toast(_('Failed to share selected files'))
+                return
+            #self.app.update_clipboard(info['shorturl'])
+            file_info, passwd = info
+            print('info:', file_info, passwd)
+
+        tree_paths = self.iconview.get_selected_items()
+        if not tree_paths:
+            return
+        fid_list = []
+        for tree_path in tree_paths:
+            pcs_file = self.get_pcs_file(tree_path)
+            fid_list.append(pcs_file['fs_id'])
+            gutil.async_call(pcs.enable_private_share, self.app.cookie,
+                             self.app.tokens, fid_list, callback=on_share)
 
     def on_moveto_activated(self, menu_item):
         tree_paths = self.iconview.get_selected_items()
