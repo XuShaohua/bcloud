@@ -15,6 +15,7 @@ from urllib import request
 from gi.repository import GLib
 from gi.repository import GObject
 
+from bcloud import const
 from bcloud.const import State, DownloadMode
 from bcloud import net
 from bcloud import pcs
@@ -65,7 +66,11 @@ class DownloadBatch(threading.Thread):
         logger.debug('DownloadBatch.get_req: %s, %s' % (start_size, end_size))
         opener = request.build_opener()
         content_range = 'bytes={0}-{1}'.format(start_size, end_size)
-        opener.addheaders = [('Range', content_range)]
+        opener.addheaders = [
+            ('Range', content_range),
+            ('User-Agent', const.USER_AGENT),
+            ('Referer', const.PAN_REFERER),
+        ]
         for i in range(RETRIES):
             try:
                 return opener.open(self.url, timeout=self.timeout)

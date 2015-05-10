@@ -588,7 +588,7 @@ class DownloadPage(Gtk.Box):
             return
 
         # 如果任务尚未下载完, 弹出一个对话框, 让用户确认删除
-        if row[STATE_COL] != State.DOWNLOADED:
+        if row[STATE_COL] != State.FINISHED:
             dialog = ConfirmDialog()
             response = dialog.run()
             dialog.destroy()
