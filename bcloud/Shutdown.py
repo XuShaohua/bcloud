@@ -7,6 +7,7 @@ import dbus
 
 SESSION_BUS, SYSTEM_BUS = 0, 1
 
+
 class Shutdown(object):
     '''Shutdown the system after the current snapshot has finished.
 
@@ -115,10 +116,10 @@ class Shutdown(object):
     }
 
     def __init__(self):
-        self.proxy, self.args = self._prepair()
+        self._proxy, self._args = self._prepair()
 
         # Indicate if a valid dbus service is available to shutdown system.
-        self.can_shutdown = (self.proxy is not None)
+        self.can_shutdown = (self._proxy is not None)
 
     def _prepair(self):
         '''Try to connect to the given dbus services. If successful it will
@@ -128,7 +129,7 @@ class Shutdown(object):
             sessionbus = dbus.SessionBus()
             systembus  = dbus.SystemBus()
         except:
-            return( (None, None) )
+            return (None, None)
         for dbus_props in self.DBUS_SHUTDOWN.values():
             try:
                 if dbus_props['bus'] == SESSION_BUS:
@@ -146,8 +147,6 @@ class Shutdown(object):
 
     def shutdown(self):
         '''Call the dbus proxy to start the shutdown.'''
-        if self.proxy is None:
-            return False
-        else:
+        if self._proxy:
             os.sync()
-            return self.proxy(*self.args)
+            self._proxy(*self._args)
