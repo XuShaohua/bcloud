@@ -444,15 +444,15 @@ class DownloadPage(Gtk.Box):
         self.add_task_db(task)
         self.scan_tasks()
 
-    def scan_tasks(self):
-        '''扫描所有下载任务, 并在需要时启动新的下载'''
+    def scan_tasks(self, ignore_shutdown=False):
+        '''扫描所有下载任务, 并在需要时启动新的下载.'''
         for row in self.liststore:
             if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
                 break
             if row[STATE_COL] == State.WAITING:
                 self.start_worker(row)
 
-        if not self.shutdown_button.get_active():
+        if not self.shutdown_button.get_active() or ignore_shutdown:
             return
         # Shutdown system after all tasks have finished
         for row in self.liststore:
@@ -679,7 +679,7 @@ class DownloadPage(Gtk.Box):
                 return
             operator(row, scan=False)
         self.check_commit(force=True)
-        self.scan_tasks()
+        self.scan_tasks(ignore_shutdown=True)
 
     def on_start_button_clicked(self, button):
         self.operate_selected_rows(self.start_task)
