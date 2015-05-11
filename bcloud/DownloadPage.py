@@ -127,7 +127,7 @@ class DownloadPage(Gtk.Box):
             shutdown_button.set_tooltip_text(
                     _('Shutdown system after all tasks have finished'))
             shutdown_button.set_sensitive(self.shutdown.can_shutdown)
-            shutdown_button.props.margin_start = 5
+            shutdown_button.props.margin_left = 5
             self.shutdown_button = shutdown_button
             self.headerbar.pack_start(shutdown_button)
 
@@ -179,7 +179,7 @@ class DownloadPage(Gtk.Box):
             shutdown_button.set_tooltip_text(
                     _('Shutdown system after all tasks have finished'))
             shutdown_button.set_sensitive(self.shutdown.can_shutdown)
-            shutdown_button.props.margin_start = 5
+            shutdown_button.props.margin_left = 5
             self.shutdown_button = shutdown_button
             control_box.pack_start(shutdown_button, False, False, 0)
 
@@ -451,6 +451,15 @@ class DownloadPage(Gtk.Box):
                 break
             if row[STATE_COL] == State.WAITING:
                 self.start_worker(row)
+
+        if not self.shutdown_button.get_active():
+            return
+        # Shutdown system after all tasks have finished
+        for row in self.liststore:
+            if row[STATE_COL] not in
+                (State.PAUSED, State.FINISHED, State.CANCELED):
+            return
+        self.shutdown.shutdown()
 
     def start_worker(self, row):
         '''为task新建一个后台下载线程, 并开始下载.'''
