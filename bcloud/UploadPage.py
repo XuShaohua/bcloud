@@ -565,10 +565,10 @@ class UploadPage(Gtk.Box):
             self.scan_tasks()
 
     def scan_tasks(self):
-        if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
+        if len(self.workers.keys()) >= self.app.profile['concurr-upload']:
             return
         for row in self.liststore:
-            if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
+            if len(self.workers.keys()) >= self.app.profile['concurr-upload']:
                 break
             if row[STATE_COL] == State.WAITING:
                 self.start_worker(row)

@@ -447,7 +447,7 @@ class DownloadPage(Gtk.Box):
     def scan_tasks(self, ignore_shutdown=False):
         '''扫描所有下载任务, 并在需要时启动新的下载.'''
         for row in self.liststore:
-            if len(self.workers.keys()) >= self.app.profile['concurr-tasks']:
+            if len(self.workers.keys()) >= self.app.profile['concurr-download']:
                 break
             if row[STATE_COL] == State.WAITING:
                 self.start_worker(row)

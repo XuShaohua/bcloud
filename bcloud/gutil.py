@@ -35,28 +35,46 @@ except (ImportError, ValueError):
 
 DEFAULT_PROFILE = {
     'window-size': (960, 680),
-    'use-status-icon': True,
-    'use-dark-theme': False, # 默认禁用深色主题
-    'display-avatar': True,  # 是否显示用户头像
-    'use-notify': True,
     'first-run': True,
-    'save-dir': Config.HOME_DIR,
-    'sync-dir': Config.HOME_DIR,
-    'dest-sync-dir': '/',
-    'enable-sync': False,
-    'use-streaming': True,  # 使用流媒体方式播放视频
     'username': '',
     'password': '',
     'remember-password': False,
     'auto-signin': False,
-    'upload-hidden-files': True,  # 同时上传隐藏文件.
-    'concurr-tasks': 2,     # 下载/上传同时进行的任务数, 1~5
-    'download-segments': 3, # 下载单个任务的线程数 1~10
-    'retries-each': 5,      # 隔5分钟后尝试重新下载
-    'download-timeout': 60, # 60 秒后下载超时
-    'download-mode': 0,     # 下载时如果本地已存在同名文件时的操作方式
-    'upload-mode': 0,       # 上传时如果服务器端已存在同名文件时的操作方式
-    'view-mode': {          # 保存的视图模式
+
+    # 使用流媒体方式播放视频
+    'use-streaming': True,
+    'use-status-icon': True,
+    # 默认禁用深色主题
+    'use-dark-theme': False,
+    # 是否显示用户头像
+    'display-avatar': True,
+    'use-notify': True,
+
+    # 下载的文件保存到
+    'save-dir': Config.HOME_DIR,
+    # 同时进行的下载任务数, 1~5
+    'concurr-download': 2,
+    # 下载单个任务的线程数 1~10
+    'download-segments': 3,
+    # 隔5分钟后尝试重新下载
+    'retries-each': 5,
+    # 60 秒后下载超时
+    'download-timeout': 60,
+    # 下载时如果本地已存在同名文件时的操作方式
+    'download-mode': 0,
+
+    # 同时进行的上传任务数, 1~5
+    'concurr-upload': 2,
+    # 上传隐藏文件.
+    'upload-hidden-files': True,
+    # 上传时如果服务器端已存在同名文件时的操作方式
+    'upload-mode': 0,
+    'enable-sync': False,
+    'sync-dir': Config.HOME_DIR,
+    'dest-sync-dir': '/',
+
+    # 保存的视图模式
+    'view-mode': {
         'HomePage': 0,
         'CategoryPage': 0,
         'BTPage': 0,
