@@ -1,4 +1,6 @@
 
+# Copyright (C) 2015 Alexzhang <alex8224@gmail.com>
+
 import os
 from threading import Thread, Lock
 from time import time, sleep

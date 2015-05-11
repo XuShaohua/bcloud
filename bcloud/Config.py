@@ -1,5 +1,5 @@
 
-# Copyright (C) 2014 LiuLang <gsushzhsosgsu@gmail.com>
+# Copyright (C) 2014-2015 LiuLang <gsushzhsosgsu@gmail.com>
 # Use of this source code is governed by GPLv3 license that can be found
 # in http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -36,13 +36,22 @@ DBUS_APP_NAME = 'org.liulang.bcloud'
 APPNAME = 'BCloud'
 VERSION = bcloud.__version__
 HOMEPAGE = 'https://github.com/LiuLang/bcloud'
-# 这里只列出了提交代码在三次以上的开发者, 完整的开发者信息可以在
-# https://github.com/LiuLang/bcloud/pulls 查看
+# https://github.com/LiuLang/bcloud/pulls
 AUTHORS = [
-    'LiuLang <gsushzhsosgsu@gmail.com>',
+    'Alexzhang <alex8224@gmail.com>',
+    'Aetf <horizonvei@gmail.com>',
     'CzBiX <czbix@live.com>',
+    'HybridGlucose <a07051226@gmail.com>',
+    'Iridium Cao <iridiumcao@gmail.com>',
+    'Khalid Hsu <khalidhsu@gmail.com>',
+    'latyas <latyas@gmail.com>',
+    'Libertas <horizonvei@gmail.com>',
+    'LiuLang <gsushzhsosgsu@gmail.com>',
+    'Zhenbo Li <litimetal@gmail.com>',
+    'slawdan <schludern@gmail.com>',
+    'Zihao Wang <wzhdev@gmail.com>',
 ]
-COPYRIGHT = 'Copyright (c) 2014 LiuLang'
+COPYRIGHT = 'Copyright (c) 2014-2015 LiuLang'
 DESCRIPTION = _('Baidu Pan client for GNU/Linux desktop users.')
 
 CACHE_DIR = os.path.join(HOME_DIR, '.cache', NAME)
