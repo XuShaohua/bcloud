@@ -456,9 +456,9 @@ class DownloadPage(Gtk.Box):
             return
         # Shutdown system after all tasks have finished
         for row in self.liststore:
-            if row[STATE_COL] not in
-                (State.PAUSED, State.FINISHED, State.CANCELED):
-            return
+            if (row[STATE_COL] not in
+                    (State.PAUSED, State.FINISHED, State.CANCELED)):
+                return
         self.shutdown.shutdown()
 
     def start_worker(self, row):
