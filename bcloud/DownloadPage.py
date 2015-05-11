@@ -23,6 +23,7 @@ from bcloud import gutil
 from bcloud import pcs
 from bcloud import util
 from bcloud.const import State
+from bcloud.Shutdown import Shutdown
 
 
 TASK_FILE = 'tasks.sqlite'
@@ -78,6 +79,8 @@ class DownloadPage(Gtk.Box):
     def __init__(self, app):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.app = app
+        self.shutdown = Shutdown()
+
         if Config.GTK_GE_312:
             self.headerbar = Gtk.HeaderBar()
             self.headerbar.props.show_close_button = True
@@ -116,6 +119,17 @@ class DownloadPage(Gtk.Box):
             open_folder_button.connect('clicked',
                                        self.on_open_folder_button_clicked)
             self.headerbar.pack_start(open_folder_button)
+
+            shutdown_button = Gtk.ToggleButton()
+            shutdown_img = Gtk.Image.new_from_icon_name(
+                    'system-shutdown-symbolic', Gtk.IconSize.SMALL_TOOLBAR)
+            shutdown_button.set_image(shutdown_img)
+            shutdown_button.set_tooltip_text(
+                    _('Shutdown system after all tasks have finished'))
+            shutdown_button.set_sensitive(self.shutdown.can_shutdown)
+            shutdown_button.props.margin_start = 5
+            self.shutdown_button = shutdown_button
+            self.headerbar.pack_start(shutdown_button)
 
             right_box = Gtk.Box()
             right_box_context = right_box.get_style_context()
@@ -159,6 +173,15 @@ class DownloadPage(Gtk.Box):
                                        self.on_open_folder_button_clicked)
             open_folder_button.props.margin_left = 40
             control_box.pack_start(open_folder_button, False, False, 0)
+
+            shutdown_button = Gtk.ToggleButton()
+            shutdown_button.set_label(_('Shutdown'))
+            shutdown_button.set_tooltip_text(
+                    _('Shutdown system after all tasks have finished'))
+            shutdown_button.set_sensitive(self.shutdown.can_shutdown)
+            shutdown_button.props.margin_start = 5
+            self.shutdown_button = shutdown_button
+            control_box.pack_start(shutdown_button, False, False, 0)
 
             remove_finished_button = Gtk.Button.new_with_label(
                     _('Remove completed tasks'))
