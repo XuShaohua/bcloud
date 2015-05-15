@@ -39,10 +39,10 @@ class Shutdown(object):
             #           Logout
             'interface': 'org.gnome.SessionManager',
             'arguments': (),
-                #arg (only with Logout)
-                #           0 normal
-                #           1 no confirm
-                #           2 force
+            #arg (only with Logout)
+            #           0 normal
+            #           1 no confirm
+            #           2 force
         },
         'kde': {
             'bus': SESSION_BUS,
