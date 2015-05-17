@@ -162,6 +162,17 @@ class PreferencesDialog(Gtk.Dialog):
                 _('What to do when downloading a file which already exists on local disk'))
         download_grid.attach(download_mode_combo, 1, 5, 2, 1)
 
+        confirm_deletion_label = Gtk.Label(
+                _('Ask me when deleting unfinished tasks:'))
+        download_grid.attach(confirm_deletion_label, 0, 6, 1, 1)
+        confirm_deletion_switch = Gtk.Switch()
+        confirm_deletion_switch.set_active(
+                self.app.profile['confirm-download-deletion'])
+        confirm_deletion_switch.connect('notify::active',
+                self.on_confirm_deletioin_switch_activate)
+        confirm_deletion_switch.props.halign = Gtk.Align.START
+        download_grid.attach(confirm_deletion_switch, 1, 6, 1, 1)
+
 
         # upload tab
         upload_grid = Gtk.Grid()
@@ -270,10 +281,15 @@ class PreferencesDialog(Gtk.Dialog):
         self.app.profile['retries-each'] = retries_spin.get_value()
 
     def on_download_timeout_value_changed(self, download_timeout_spin):
-        self.app.profile['download-timeout'] = download_timeout_spin.get_value()
+        self.app.profile['download-timeout'] = \
+                download_timeout_spin.get_value()
 
     def on_download_mode_changed(self, combo):
         self.app.profile['download-mode'] = combo.get_active()
+
+    def on_confirm_deletioin_switch_activate(self, switch, event):
+        self.app.profile['confirm-download-deletion'] = switch.get_active()
+
 
     def on_concurr_upload_value_changed(self, concurr_spin):
         self.app.profile['concurr-upload'] = concurr_spin.get_value()

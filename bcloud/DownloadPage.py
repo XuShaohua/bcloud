@@ -42,6 +42,29 @@ StateNames = (
 )
 
 
+class ConfirmDialog(Gtk.MessageDialog):
+
+    def __init__(self, app, multiple_files):
+        if multiple_files:
+            text = _('Do you want to remove unfinished tasks?')
+        else:
+            text = _('Do you want to remove unfinished task?')
+        super().__init__(app.window, Gtk.DialogFlags.MODAL,
+                         Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
+                         text)
+        self.app = app
+        box = self.get_message_area()
+        remember_button = Gtk.CheckButton(_('Do not ask again'))
+        remember_button.set_active(
+                not self.app.profile['confirm-download-deletion'])
+        remember_button.connect('toggled', self.on_remember_button_toggled)
+        box.pack_start(remember_button, False, False, 0)
+        box.show_all()
+
+    def on_remember_button_toggled(self, button):
+        self.app.profile['confirm-download-deletion'] = not button.get_active()
+
+
 class DownloadPage(Gtk.Box):
     '''下载任务管理器, 处理下载任务的后台调度.
 
@@ -621,11 +644,12 @@ class DownloadPage(Gtk.Box):
 
         # 如果任务尚未下载完, 弹出一个对话框, 让用户确认删除
         if row[STATE_COL] != State.FINISHED:
-            dialog = ConfirmDialog()
-            response = dialog.run()
-            dialog.destroy()
-            if response != Gtk.ResponseType.OK:
-                return
+            if self.app.profile['confirm-download-deletion']:
+                dialog = ConfirmDialog(self.app, False)
+                response = dialog.run()
+                dialog.destroy()
+                if response != Gtk.ResponseType.YES:
+                    return
 
         if row[STATE_COL] == State.DOWNLOADING:
             self.stop_worker(row)

@@ -101,7 +101,8 @@ class DownloadBatch(threading.Thread):
                     req = None
             else:
                 logger.error('DownloadBatch, block is empty: %s, %s, %s, %s' %
-                             (offset, self.start_size, self.end_size, block))
+                             (offset, self.start_size, self.end_size,
+                              len(block)))
                 self.queue.put((self.id_, BATCH_ERROR), block=False)
                 return
 

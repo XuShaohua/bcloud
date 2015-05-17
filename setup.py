@@ -53,9 +53,6 @@ if __name__ == '__main__':
             'Natural Language :: English',
             'Operating System :: POSIX :: Linux',
             'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.2',
-            'Programming Language :: Python :: 3.3',
-            'Programming Language :: Python :: 3.4',
             'Topic :: Communications :: File Sharing',
             ],
         )

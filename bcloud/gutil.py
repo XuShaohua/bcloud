@@ -62,6 +62,8 @@ DEFAULT_PROFILE = {
     'download-timeout': 60,
     # 下载时如果本地已存在同名文件时的操作方式
     'download-mode': 0,
+    # 删除未完成任务时, 弹出警告窗口
+    'confirm-download-deletion': True,
 
     # 同时进行的上传任务数, 1~5
     'concurr-upload': 2,
