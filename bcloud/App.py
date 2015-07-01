@@ -151,9 +151,10 @@ class App:
         nav_window.add(nav_treeview)
 
         self.progressbar = Gtk.ProgressBar()
-        self.progressbar.set_show_text(True)
-        self.progressbar.set_text(_('Unknown'))
         left_box.pack_end(self.progressbar, False, False, 0)
+
+        self.capicity_label = Gtk.Label(_('Unknown'))
+        left_box.pack_end(self.capicity_label, False, False, 0)
 
         self.img_avatar = Gtk.Image()
         self.img_avatar.props.halign = Gtk.Align.CENTER
@@ -300,7 +301,7 @@ class App:
         total = quota_info['total']
         used_size = util.get_human_size(used)[0]
         total_size = util.get_human_size(total)[0]
-        self.progressbar.set_text(used_size + ' / ' + total_size)
+        self.capicity_label.set_text('{0} / {1}'.format(used_size, total_size))
         self.progressbar.set_fraction(used / total)
 
     def update_avatar(self):
