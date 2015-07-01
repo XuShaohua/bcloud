@@ -150,7 +150,7 @@ class DownloadPage(Gtk.Box):
             shutdown_button.set_tooltip_text(
                     _('Shutdown system after all tasks have finished'))
             shutdown_button.set_sensitive(self.shutdown.can_shutdown)
-            shutdown_button.props.margin_left = 5
+            shutdown_button.props.margin_start = 5
             self.shutdown_button = shutdown_button
             self.headerbar.pack_start(shutdown_button)
 

@@ -157,14 +157,20 @@ class SigninDialog(Gtk.Dialog):
         self.remember_check = Gtk.CheckButton.new_with_label(
                 _('Remember Password'))
         self.remember_check.props.margin_top = 20
-        self.remember_check.props.margin_left = 20
+        if Config.GTK_GE_312:
+            self.remember_check.props.margin_start = 20
+        else:
+            self.remember_check.props.margin_left = 20
         box.pack_start(self.remember_check, False, False, 0)
         self.remember_check.connect('toggled', self.on_remember_check_toggled)
 
         self.signin_check = Gtk.CheckButton.new_with_label(
                 _('Signin Automatically'))
         self.signin_check.set_sensitive(False)
-        self.signin_check.props.margin_left = 20
+        if Config.GTK_GE_312:
+            self.signin_check.props.margin_start = 20
+        else:
+            self.signin_check.props.margin_left = 20
         box.pack_start(self.signin_check, False, False, 0)
         self.signin_check.connect('toggled', self.on_signin_check_toggled)
 
