@@ -1,4 +1,18 @@
-v3.6.1 - 2014.1.10
+v3.7.2 - 2015.7.5
+* Fixed: margin_left is deprecated in gtk3.12
+* Fixed; shrink left side panel
+* Fixed: ConfirmDialog does not exists
+
+v3.7.1 - 2015.5.16
+* i18n updated
+* Redesign Preferences dialog
+* Update contributor list
+* Fixed: syntax error
+* Support shutdown system automatically
+* Fixed: State has no attribute `DOWNLOADED`
+* Support sync dir
+
+v3.6.1 - 2015.1.10
 * Add `display-avatar` option
 * App logo updated
 * i18n updated
