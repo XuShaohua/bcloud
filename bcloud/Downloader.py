@@ -77,6 +77,11 @@ class DownloadBatch(threading.Thread):
                 return opener.open(self.url, timeout=self.timeout)
             except OSError:
                 logger.error(traceback.format_exc())
+                self.queue.put((self.id_, BATCH_ERROR), block=False)
+                return None
+            except:
+                self.queue.put((self.id_, BATCH_ERROR), block=False)
+                return None
         else:
             return None
 
@@ -97,8 +102,16 @@ class DownloadBatch(threading.Thread):
                     if block:
                         break
                 except (OSError, AttributeError):
+                    #self.queue.put((self.id_, BATCH_ERROR), block=False)
                     logger.error(traceback.format_exc())
                     req = None
+                except  :
+                    req=None
+                    logger.error( 'Time out occured.')
+                    #self.queue.put((self.id_, BATCH_ERROR), block=False)
+                    #return
+
+                   
             else:
                 logger.error('DownloadBatch, block is empty: %s, %s, %s, %s' %
                              (offset, self.start_size, self.end_size,
