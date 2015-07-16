@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=bcloud
-Name[zh_CN]=bcloud
+Name=BCloud
+Name[zh_CN]=BCloud
 GenericName=Baidu Pan Client for Linux
 GenericName[zh_CN]=百度网盘客户端
 Exec=bcloud-gui
