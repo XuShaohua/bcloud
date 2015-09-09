@@ -1,3 +1,6 @@
+v3.8.1 - 2015.9.9
+* Fixed: failed to sign in (pull#177, by @mhohai).
+
 v3.7.2 - 2015.7.5
 * Fixed: margin_left is deprecated in gtk3.12
 * Fixed; shrink left side panel
