@@ -3,6 +3,7 @@ Name=BCloud
 Name[zh_CN]=BCloud
 GenericName=Baidu Pan Client for Linux
 GenericName[zh_CN]=百度网盘客户端
+GenericName[zh_TW]=百度網盤客戶端
 Exec=bcloud-gui
 Icon=bcloud
 Terminal=false
