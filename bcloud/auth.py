@@ -276,7 +276,7 @@ def parse_bdstoken(content):
     @return 返回bdstoken
     '''
     bdstoken = ''
-    bds_re = re.compile('BDSTOKEN\s*=\s*"([^"]+)"')
+    bds_re = re.compile('"bdstoken"\s*:\s*"([^"]+)"', re.IGNORECASE)
     bds_match = bds_re.search(content)
     if bds_match:
         bdstoken = bds_match.group(1)
