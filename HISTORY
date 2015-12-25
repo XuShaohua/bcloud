@@ -1,3 +1,6 @@
+v3.8.2 - 2015.12.25
+* Fixed: failed to get bdstoken (pull#214, by @zhaihj).
+
 v3.8.1 - 2015.9.9
 * Fixed: failed to sign in (pull#177, by @mhohai).
 
