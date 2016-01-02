@@ -74,14 +74,31 @@ class PreferencesDialog(Gtk.Dialog):
         status_switch.props.halign = Gtk.Align.START
         general_grid.attach(status_switch, 1, 3, 1, 1)
 
+        minimized_label = Gtk.Label.new(_('Startup minimized:'))
+        minimized_label.props.xalign = 1
+        general_grid.attach(minimized_label, 0, 4, 1, 1)
+        minimized_switch = Gtk.Switch()
+        minimized_switch.set_active(self.app.profile['startup-minimized'])
+        if self.app.profile['use-status-icon']:
+            minimized_switch.set_sensitive(True)
+        else:
+            minimized_switch.set_sensitive(False)
+            minimized_switch.set_active(False)
+            self.app.profile['startup-minimized'] = False
+        minimized_switch.connect('notify::active',
+                                 self.on_minimized_switch_activate)
+        minimized_switch.props.halign = Gtk.Align.START
+        general_grid.attach(minimized_switch, 1, 4, 1, 1)
+        self.minimized_switch = minimized_switch
+
         avatar_label = Gtk.Label.new(_('Display Avatar:'))
         avatar_label.props.xalign = 1
-        general_grid.attach(avatar_label, 0, 4, 1, 1)
+        general_grid.attach(avatar_label, 0, 5, 1, 1)
         avatar_switch = Gtk.Switch()
         avatar_switch.set_active(self.app.profile['display-avatar'])
         avatar_switch.connect('notify::active', self.on_avatar_switch_activate)
         avatar_switch.props.halign = Gtk.Align.START
-        general_grid.attach(avatar_switch, 1, 4, 1, 1)
+        general_grid.attach(avatar_switch, 1, 5, 1, 1)
 
 
         # download tab
@@ -261,7 +278,16 @@ class PreferencesDialog(Gtk.Dialog):
         self.app.profile['use-dark-theme'] = switch.get_active()
 
     def on_status_switch_activate(self, switch, event):
-        self.app.profile['use-status-icon'] = switch.get_active()
+        status = switch.get_active()
+        self.app.profile['use-status-icon'] = status
+        if status:
+            self.minimized_switch.set_sensitive(True)
+        else:
+            self.minimized_switch.set_sensitive(False)
+            self.minimized_switch.set_active(False)
+
+    def on_minimized_switch_activate(self, switch, event):
+        self.app.profile['startup-minimized'] = switch.get_active()
 
     def on_avatar_switch_activate(self, switch, event):
         self.app.profile['display-avatar'] = switch.get_active()
