@@ -81,7 +81,7 @@ class DownloadPage(Gtk.Box):
     path - 文件在服务器上的绝对路径
     name - 文件在服务器上的名称
     savePath - 保存到的绝对路径
-    saveName - 保存时的文件名
+    save_name - 保存时的文件名
     currRange - 当前下载的进度, 以字节为单位, 在HTTP Header中可用.
     state - 任务状态 
     link - 文件的下载最终URL, 有效期大约是8小时, 超时后要重新获取.
@@ -223,7 +223,7 @@ class DownloadPage(Gtk.Box):
         self.pack_start(scrolled_win, True, True, 0)
 
         # name, path, fs_id, size, currsize, link,
-        # isdir, saveDir, saveName, state, statename,
+        # isdir, save_dir, save_name, state, statename,
         # humansize, percent, tooltip
         self.liststore = Gtk.ListStore(str, str, str, GObject.TYPE_INT64,
                                        GObject.TYPE_INT64, str,
@@ -402,7 +402,7 @@ class DownloadPage(Gtk.Box):
             self.app_infos.pop(fs_id, None)
 
     # Open API
-    def add_tasks(self, pcs_files):
+    def add_tasks(self, pcs_files, dirname=''):
         '''建立批量下载任务, 包括目录'''
         def on_list_dir(info, error=None):
             path, pcs_files = info
@@ -416,7 +416,7 @@ class DownloadPage(Gtk.Box):
                 dialog.run()
                 dialog.destroy()
                 return
-            self.add_tasks(pcs_files)
+            self.add_tasks(pcs_files, dirname)
 
         self.check_first()
         for pcs_file in pcs_files:
@@ -425,10 +425,10 @@ class DownloadPage(Gtk.Box):
                                  self.app.tokens, pcs_file['path'],
                                  callback=on_list_dir)
             else:
-                self.add_task(pcs_file)
+                self.add_task(pcs_file, dirname)
         self.check_commit(force=True)
 
-    def add_task(self, pcs_file):
+    def add_task(self, pcs_file, dirname=''):
         '''加入新的下载任务'''
         if pcs_file['isdir']:
             return
@@ -441,12 +441,14 @@ class DownloadPage(Gtk.Box):
             if row[STATE_COL] == State.FINISHED:
                 self.launch_app(fs_id)
             return
-        saveDir = os.path.split(self.app.profile['save-dir'] + 
-                                pcs_file['path'])[0]
-        saveName = pcs_file['server_filename']
+        if not dirname:
+            dirname = self.app.profile['save-dir']
+        save_dir = os.path.dirname(
+                os.path.join(dirname, pcs_file['path'][1:]))
+        save_name = pcs_file['server_filename']
         human_size = util.get_human_size(pcs_file['size'])[0]
         tooltip = gutil.escape(_('From {0}\nTo {1}').format(pcs_file['path'],
-                                                            saveDir))
+                                                            save_dir))
         task = (
             pcs_file['server_filename'],
             pcs_file['path'],
@@ -455,8 +457,8 @@ class DownloadPage(Gtk.Box):
             0,
             '',  # pcs['dlink' removed in new version.
             pcs_file['isdir'],
-            saveName,
-            saveDir,
+            save_name,
+            save_dir,
             State.WAITING,
             StateNames[State.WAITING],
             human_size,

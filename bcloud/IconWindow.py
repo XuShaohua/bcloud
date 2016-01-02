@@ -346,6 +346,9 @@ class IconWindow(Gtk.ScrolledWindow):
         download_item = Gtk.MenuItem.new_with_label(_('Download'))
         download_item.connect('activate', self.on_download_activated)
         menu.append(download_item)
+        download_to_item = Gtk.MenuItem.new_with_label(_('Download to...'))
+        download_to_item.connect('activate', self.on_download_to_activated)
+        menu.append(download_to_item)
         share_item = Gtk.MenuItem.new_with_label(_('Share'))
         share_item.connect('activate', self.on_share_activated)
         menu.append(share_item)
@@ -524,6 +527,27 @@ class IconWindow(Gtk.ScrolledWindow):
         pcs_files = [self.get_pcs_file(p) for p in tree_paths]
         self.app.blink_page(self.app.download_page)
         self.app.download_page.add_tasks(pcs_files)
+
+    def on_download_to_activated(self, menu_item):
+        '''下载文件/目录到指定的文件夹里.'''
+        tree_paths = self.iconview.get_selected_items()
+        if not tree_paths:
+            return
+
+        dialog = Gtk.FileChooserDialog(_('Save to...'), self.app.window,
+                Gtk.FileChooserAction.SELECT_FOLDER,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        response = dialog.run()
+        if response != Gtk.ResponseType.OK:
+            dialog.destroy()
+            return
+        dirname = dialog.get_filename()
+        dialog.destroy()
+
+        pcs_files = [self.get_pcs_file(p) for p in tree_paths]
+        self.app.blink_page(self.app.download_page)
+        self.app.download_page.add_tasks(pcs_files, dirname)
 
     def on_share_activated(self, menu_item):
         def on_share(info, error=None):
