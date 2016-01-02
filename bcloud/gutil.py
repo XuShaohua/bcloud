@@ -35,6 +35,14 @@ except (ImportError, ValueError):
 
 DEFAULT_PROFILE = {
     'window-size': (960, 680),
+    'use-status-icon': True,
+    # 启动时自动最小化
+    'startup-minimized': False,
+    # 默认禁用深色主题
+    'use-dark-theme': False,
+    # 是否显示用户头像
+    'display-avatar': True,
+    'use-notify': True,
     'first-run': True,
     'username': '',
     'password': '',

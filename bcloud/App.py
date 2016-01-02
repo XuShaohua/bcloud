@@ -8,11 +8,15 @@ import random
 import time
 import traceback
 
+import gi
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 from gi.repository import Gio
 from gi.repository import GLib
 from gi.repository import GObject
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+gi.require_version('Notify', '0.7')
 from gi.repository import Notify
 
 from bcloud import Config
