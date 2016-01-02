@@ -441,7 +441,7 @@ class UploadPage(Gtk.Box):
                 invalid_paths.append(source_path)
                 continue
             if (os.path.split(source_path)[1].startswith('.') and
-                    not self.app.profile['uploading-hidden-files']):
+                    not self.app.profile['upload-hidden-files']):
                 continue
             if os.path.isfile(source_path):
                 self.upload_file(source_path, dir_name)
