@@ -4,8 +4,9 @@
 
 'use strict';
 
+import { forge } from 'node-forge';
 import * as fs from 'fs';
-import * as request from 'request';
+import { request } from 'request';
 
 const cookieJar = request.jar();
 let token = '';
@@ -13,6 +14,13 @@ let token = '';
 // Convert single quotes to double quotes.
 function purifySingleQuoteJSON(input: string): string {
   return input.replace(/'/g, '"');
+}
+
+function rsaEncrypt(msg: string, pubkey: string): string {
+  const key = forge.pki.publicKeyFromPem(pubkey);
+  const cipherBinary = key.encrypt(msg, 'RSAES-PKCS1-V1_5');
+  // Convert binary ciphertext to base64 encoded string.
+  return new Buffer(cipherBinary, 'binary').toString('base64');
 }
 
 function getBaiduId(): Promise<string> {
@@ -85,12 +93,59 @@ function getPublicKey(): Promise<string> {
         try {
           const msg = JSON.parse(purifySingleQuoteJSON(body));
           // Remove new-line chars.
-          msg.pubkey = msg.pubkey.replace(/\n/g, '');
+          // msg.pubkey = msg.pubkey.replace(/\n/g, '');
           console.log('msg:', msg);
-          resolve(msg);
+          if (msg.errno === '0') {
+            resolve(msg);
+          } else {
+            reject(msg);
+          }
         } catch (jsonErr) {
           reject(jsonErr);
         }
+      } else {
+        reject(err);
+      }
+    });
+  });
+}
+
+// TODO(LiuLang): Add codestring and verifycode parameters.
+function login(username: string, password: string, rsakey: Object): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const encryptedPassword = rsaEncrypt(password, rsakey['pubkey']);
+    const url = 'https://passport.baidu.com/v2/api/?login';
+    const headers = {
+      'Referer': 'https://passport.baidu.com/v2/api/?login',
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Firefox/31.0 Iceweasel/31.2.0'
+    };
+    const form = {
+      'staticpage': 'https%3A%2F%2Fpassport.baidu.com%2Fstatic%2Fpasspc-account%2Fhtml%2Fv3Jump.html',
+      'charset': 'UTF-8',
+      'token': token,
+      'tpl': 'pp',
+      'apiver': 'v3',
+      'tt': '0',
+      'codestring': '',
+      'verifycode': '',
+      'safeflg': '0',
+      'u': 'http%3A%2F%2Fpassport.baidu.com%2F',
+      'quick_user': '0',
+      'logintype': 'basicLogin',
+      'logLoginType': 'pc_loginBasic',
+      'loginmerge': 'true',
+      'username': encodeURIComponent(username),
+      'password': encryptedPassword,
+      'mem_pass': 'on',
+      'rsakey': rsakey['key'],
+      'crypttype': '12',
+      'ppui_logintime': '52000',
+      'callback': 'parent.bd__pcbs__28g1kg',
+    };
+    request.post({url: url, jar: cookieJar, headers: headers, form: form}, (err, response, body) => {
+      console.log('login():', err, '\nheaders:', response.headers, '\nbody:', body);
+      if (err == null) {
+        resolve();
       } else {
         reject(err);
       }
@@ -104,17 +159,19 @@ fs.readFile('/tmp/bcloud.conf', {encoding: 'UTF-8'}, (readErr, content) => {
     return;
   }
 
+  let conf;
   try {
-    const conf = JSON.parse(content);
+    conf = JSON.parse(content);
     console.log('conf:', conf);
-
-    getBaiduId()
-      .then(getToken)
-      .then(() => checkLoginState(conf.username)
-      .then(getPublicKey)
-      .catch(err => console.error(err));
-
   } catch (jsonErr) {
     console.error(jsonErr);
+    return;
   }
+
+  getBaiduId()
+    .then(getToken)
+    .then(() => checkLoginState(conf.username))
+    .then(getPublicKey)
+    .then((rsakey) => login(conf.username, conf.password, rsakey))
+    .catch(err => console.error(err));
 });
