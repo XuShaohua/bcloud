@@ -52,5 +52,11 @@
     "@types/node": "^6.0.46",
     "@types/jasmine": "2.5.36"
   },
-  "repository": "https://github.com/liulang/bcloud.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liulang/bcloud.git"
+  },
+  "bugs": {
+    "url": "https://github.com/liulang/bcloud/issues"
+  }
 }
