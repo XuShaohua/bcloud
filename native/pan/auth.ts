@@ -4,13 +4,7 @@
 
 'use strict';
 
-import * as http from 'http';
+// Implementation of baidu account login API.
+export class Auth {
 
-http.get({
-  hostname: 'www.debian.org',
-  port: 80,
-  path: '/',
-  agent: false,
-}, (res) => {
-  console.log("res:", res);
-})
+}
