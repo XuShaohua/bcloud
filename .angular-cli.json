@@ -39,6 +39,9 @@
       "project": "web/tsconfig.app.json"
     },
     {
+      "project": "web/tsconfig.spec.json"
+    },
+    {
       "project": "e2e/tsconfig.e2e.json"
     }
   ],

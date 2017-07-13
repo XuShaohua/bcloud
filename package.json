@@ -19,8 +19,8 @@
     "test-web": "ng test",
     "lint-web": "ng lint",
     "e2e-web": "ng e2e",
-    "build": "npm run build-native",
-    "start": "npm run start-native"
+    "build": "npm run build-web",
+    "start": "npm run start-web"
   },
   "dependencies": {
     "@angular/animations": "^4.0.0",
