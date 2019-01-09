@@ -1,6 +1,8 @@
 {
   "name": "bcloud-ui",
   "version": "0.1.0",
+  "author": "Xu Shaohua <xushaohua2016@outlook.com>",
+  "homepage": "https://github.com/XuShaohua/bcloud",
   "private": true,
   "dependencies": {
     "@types/jest": "23.3.12",
