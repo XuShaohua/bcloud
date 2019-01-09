@@ -1,0 +1,25 @@
+appId: com.github.xushaohua.bcloud
+artifcatName: "${prodcutName}-${version}.${ext}"
+productName: BCloud
+
+
+linux:
+  target:
+    - AppImage
+    - deb
+  icon: resources/linux/icon.svg
+  category: Internet
+  executableName: bcloud
+
+win:
+  icon: resources/win32/bcloud.ico
+nsis:
+  perMachine: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  runAfterFinish: true
+
+mac:
+  target:
+    - dmg
+  icon: resources/darwin/bcloud.icns
