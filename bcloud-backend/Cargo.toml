@@ -1,6 +1,0 @@
-[package]
-name = "bcloud-backend"
-version = "0.1.0"
-authors = ["Xu Shaohua <xushaohua2016@outlook.com>"]
-
-[dependencies]

@@ -1,0 +1,11 @@
+[package]
+name = "bcloud-backend"
+version = "0.1.0"
+authors = ["Xu Shaohua <xushaohua2016@outlook.com>"]
+
+[dependencies]
+chrono = "0.4"
+regex = "1"
+reqwest = { version = "0.9", features = ["trust-dns", "rustls-tls"] }
+serde = "1.0"
+serde_json = "1.0"
